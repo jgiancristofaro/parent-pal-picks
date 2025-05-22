@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Button } from "@/components/ui/button";
@@ -126,7 +125,7 @@ const SitterProfile = () => {
         <section className="mb-6">
           <h2 className="text-xl font-bold mb-2">Availability</h2>
           <div className="overflow-x-auto">
-            <div className="calendar-grid">
+            <div className="grid grid-cols-7 gap-2">
               <div className="text-center font-medium py-2">S</div>
               <div className="text-center font-medium py-2">M</div>
               <div className="text-center font-medium py-2">T</div>
@@ -213,14 +212,6 @@ const SitterProfile = () => {
       </div>
       
       <BottomNavigation />
-
-      <style jsx>{`
-        .calendar-grid {
-          display: grid;
-          grid-template-columns: repeat(7, minmax(40px, 1fr));
-          grid-gap: 8px;
-        }
-      `}</style>
     </div>
   );
 };
