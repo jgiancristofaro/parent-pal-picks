@@ -59,11 +59,6 @@ const Home = () => {
     type: "Babysitting",
     details: "Sitter: Jessica",
     date: "Tomorrow"
-  }, {
-    id: "event2",
-    type: "Baby Products",
-    details: "Order #12345",
-    date: "Arriving in 2 days"
   }];
   return <div className="min-h-screen pb-20 bg-gray-50">
       <Header showSettings={true} />
@@ -94,12 +89,6 @@ const Home = () => {
           </Button>
         </Link>
       </div>
-      
-      <Link to="/bookings" className="block px-4 mb-8">
-        <div className="py-4 px-6 bg-white rounded-lg shadow-sm text-center border border-gray-100">
-          My Bookings/Orders
-        </div>
-      </Link>
 
       {/* Friends' Activity - Horizontal Scroll */}
       <div className="mb-8">
