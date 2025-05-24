@@ -6,6 +6,7 @@ import { SitterCard } from "@/components/SitterCard";
 import { ActivityItem } from "@/components/ActivityItem";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 const Home = () => {
   // Mock data for demonstration
@@ -21,6 +22,18 @@ const Home = () => {
       name: "Essential Baby Carriers",
       image: "https://images.unsplash.com/photo-1622987564758-a5476cb9f6d7?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       category: "Carrying"
+    },
+    {
+      id: "3",
+      name: "Organic Baby Food",
+      image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=2420&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      category: "Nutrition"
+    },
+    {
+      id: "4",
+      name: "Soft Baby Blankets",
+      image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2535&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      category: "Comfort"
     },
   ];
 
@@ -38,6 +51,20 @@ const Home = () => {
       userImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       action: "Booked a sitter",
       timeAgo: "3d"
+    },
+    {
+      userId: "103",
+      userName: "Sarah Williams",
+      userImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      action: "Recommended baby bottles",
+      timeAgo: "4d"
+    },
+    {
+      userId: "104",
+      userName: "Mike Johnson",
+      userImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      action: "Left a review",
+      timeAgo: "5d"
     },
   ];
   
@@ -60,13 +87,15 @@ const Home = () => {
     <div className="min-h-screen pb-20 bg-gray-50">
       <Header showSettings={true} />
       
-      <div className="relative mb-8">
-        <div className="h-44 bg-gradient-to-b from-purple-100 to-purple-50 flex items-end">
-          <div className="absolute inset-0 bg-center bg-cover opacity-20" 
+      {/* Hero Section */}
+      <div className="px-4 mb-8">
+        <div className="relative h-44 bg-gradient-to-br from-purple-100 to-purple-50 rounded-2xl overflow-hidden">
+          <div className="absolute inset-0 bg-center bg-cover opacity-30" 
               style={{ backgroundImage: "url('https://images.unsplash.com/photo-1492725764893-90b379c2b6e7?q=80&w=2540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')" }}>
           </div>
-          <div className="relative w-full p-6">
-            <h1 className="text-3xl font-bold text-gray-800">Welcome back, Sarah!</h1>
+          <div className="relative h-full flex flex-col justify-center p-6">
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome back, Sarah!</h1>
+            <p className="text-gray-600">How can we help you today?</p>
           </div>
         </div>
       </div>
@@ -90,37 +119,76 @@ const Home = () => {
         </div>
       </Link>
 
-      <div className="px-4 mb-8">
-        <h2 className="text-2xl font-bold mb-4">Friends' Activity</h2>
-        <div className="bg-white rounded-lg shadow-sm p-4 divide-y divide-gray-100">
-          {friendActivity.map((item, index) => (
-            <ActivityItem
-              key={index}
-              userId={item.userId}
-              userName={item.userName}
-              userImage={item.userImage}
-              action={item.action}
-              timeAgo={item.timeAgo}
-            />
-          ))}
+      {/* Friends' Activity - Horizontal Scroll */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center px-4 mb-4">
+          <h2 className="text-2xl font-bold">Friends' Activity</h2>
+          <button className="text-purple-500 text-sm font-medium">View All</button>
         </div>
+        <ScrollArea className="w-full whitespace-nowrap">
+          <div className="flex w-max space-x-4 p-4">
+            {friendActivity.map((item, index) => (
+              <div key={index} className="flex-none w-64 bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+                <div className="flex items-start">
+                  <Link to={`/profile/${item.userId}`} className="flex-shrink-0">
+                    <div className="w-12 h-12 rounded-full overflow-hidden">
+                      <img 
+                        src={item.userImage} 
+                        alt={item.userName} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </Link>
+                  <div className="ml-3 flex-grow">
+                    <div className="flex justify-between items-start">
+                      <Link to={`/profile/${item.userId}`}>
+                        <p className="font-semibold text-gray-800 text-sm">{item.userName}</p>
+                      </Link>
+                      <p className="text-xs text-gray-500">{item.timeAgo}</p>
+                    </div>
+                    <p className="text-gray-600 text-sm mt-1">{item.action}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
       </div>
 
-      <div className="px-4 mb-8">
-        <h2 className="text-2xl font-bold mb-4">Featured Recommendations</h2>
-        <div className="grid grid-cols-2 gap-4">
-          {featuredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              id={product.id}
-              name={product.name}
-              image={product.image}
-              category={product.category}
-            />
-          ))}
+      {/* Featured Recommendations - Horizontal Scroll */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center px-4 mb-4">
+          <h2 className="text-2xl font-bold">Featured Recommendations</h2>
+          <button className="text-purple-500 text-sm font-medium">View All</button>
         </div>
+        <ScrollArea className="w-full whitespace-nowrap">
+          <div className="flex w-max space-x-4 p-4">
+            {featuredProducts.map((product) => (
+              <div key={product.id} className="flex-none w-48">
+                <Link to={`/product/${product.id}`}>
+                  <div className="rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-lg transition-shadow duration-200">
+                    <div className="aspect-square overflow-hidden">
+                      <img 
+                        src={product.image} 
+                        alt={product.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="p-3">
+                      <h3 className="font-semibold text-gray-800 text-sm line-clamp-2">{product.name}</h3>
+                      <p className="text-xs text-gray-500 mt-1">{product.category}</p>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
       </div>
 
+      {/* Upcoming Section */}
       <div className="px-4 mb-8">
         <h2 className="text-2xl font-bold mb-4">Upcoming</h2>
         <div className="bg-white rounded-lg shadow-sm divide-y divide-gray-100">
