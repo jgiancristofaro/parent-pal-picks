@@ -175,7 +175,7 @@ const Search = () => {
               Search Results ({searchResults.length} sitters found)
             </h2>
             {searchResults.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {searchResults.map((sitter) => (
                   <SitterCard
                     key={sitter.id}
