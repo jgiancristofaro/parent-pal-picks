@@ -12,6 +12,13 @@ import Profile from "./pages/Profile";
 import SitterProfile from "./pages/SitterProfile";
 import Essentials from "./pages/Essentials";
 import Settings from "./pages/Settings";
+import PaymentMethods from "./pages/PaymentMethods";
+import Notifications from "./pages/Notifications";
+import Language from "./pages/Language";
+import Privacy from "./pages/Privacy";
+import Security from "./pages/Security";
+import Help from "./pages/Help";
+import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +39,13 @@ const App = () => (
           <Route path="/sitter/:id" element={<SitterProfile />} />
           <Route path="/shop" element={<Essentials />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/payment-methods" element={<PaymentMethods />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/language" element={<Language />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/security" element={<Security />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/about" element={<About />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
