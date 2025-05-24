@@ -11,6 +11,7 @@ import Search from "./pages/Search";
 import Profile from "./pages/Profile";
 import SitterProfile from "./pages/SitterProfile";
 import Essentials from "./pages/Essentials";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/profile/:userId" element={<Profile />} />
           <Route path="/sitter/:id" element={<SitterProfile />} />
           <Route path="/shop" element={<Essentials />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
