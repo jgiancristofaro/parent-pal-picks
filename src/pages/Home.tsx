@@ -6,6 +6,7 @@ import { ActivityItem } from "@/components/ActivityItem";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+
 const Home = () => {
   // Mock data for demonstration
   const featuredProducts = [{
@@ -61,7 +62,7 @@ const Home = () => {
     date: "Tomorrow"
   }];
   return <div className="min-h-screen pb-20 bg-gray-50">
-      <Header showSettings={true} />
+      <Header />
       
       {/* Hero Section */}
       <div className="px-4 mb-8">
@@ -159,7 +160,7 @@ const Home = () => {
                     <line x1="8" y1="2" x2="8" y2="6"></line>
                     <line x1="3" y1="10" x2="21" y2="10"></line>
                   </svg> : <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16v-3"></path>
+                    <path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 1 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16v-3"></path>
                     <path d="M16.5 9.4 7.55 4.24"></path><path d="M3.29 7 12 12l8.71-5"></path><path d="M12 22V12"></path>
                   </svg>}
               </div>
@@ -190,4 +191,5 @@ const Home = () => {
       <BottomNavigation />
     </div>;
 };
+
 export default Home;

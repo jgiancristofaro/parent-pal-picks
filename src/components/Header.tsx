@@ -12,7 +12,7 @@ interface HeaderProps {
 export const Header = ({ 
   title = "ParentPal", 
   showBack = false, 
-  showSettings = false, 
+  showSettings = true, 
   backTo = "/" 
 }: HeaderProps) => {
   return (

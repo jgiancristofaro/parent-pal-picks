@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -88,7 +87,7 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
-      <Header title="Settings" showBack={true} />
+      <Header title="Settings" showBack={true} showSettings={false} />
       
       <div className="px-4 py-6">
         {settingsItems.map((section, sectionIndex) => (
