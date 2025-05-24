@@ -21,7 +21,7 @@ export const SitterCard = ({
 }: SitterCardProps) => {
   return (
     <Link to={`/sitter/${id}`}>
-      <div className="flex items-center p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+      <div className="flex items-center p-4 mb-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
         <div className="w-16 h-16 rounded-full overflow-hidden mr-4 flex-shrink-0">
           <img 
             src={image} 

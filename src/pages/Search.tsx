@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -175,7 +174,7 @@ const Search = () => {
               Search Results ({searchResults.length} sitters found)
             </h2>
             {searchResults.length > 0 ? (
-              <div className="space-y-6">
+              <div>
                 {searchResults.map((sitter) => (
                   <SitterCard
                     key={sitter.id}
