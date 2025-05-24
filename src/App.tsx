@@ -20,6 +20,7 @@ import Security from "./pages/Security";
 import Help from "./pages/Help";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
+import AddReview from "./pages/AddReview";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/profile/:userId" element={<Profile />} />
           <Route path="/sitter/:id" element={<SitterProfile />} />
           <Route path="/shop" element={<Essentials />} />
+          <Route path="/add-review" element={<AddReview />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/payment-methods" element={<PaymentMethods />} />
           <Route path="/notifications" element={<Notifications />} />
