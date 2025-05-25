@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ArrowRight, Bell, X } from "lucide-react";
+import { useActivityNotifications } from "@/hooks/useActivityNotifications";
 
 const Home = () => {
   // Mock current user data
@@ -16,8 +17,14 @@ const Home = () => {
     profileImageUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   };
   
-  // Notification banner state
-  const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
+  // Real notification system
+  const { 
+    notificationMessage, 
+    hasNewActivity, 
+    markActivityFeedAsViewed 
+  } = useActivityNotifications(mockCurrentUser.id);
+  
+  // Local state for notification banner visibility
   const [showNotification, setShowNotification] = useState(false);
   
   // Mock data for demonstration
@@ -64,22 +71,20 @@ const Home = () => {
     timeAgo: "4d"
   }];
 
-  // Mock notification logic - simulate friend activity after 3 seconds
+  // Show notification banner when there's new activity
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const mockNotifications = [
-        "You have 3 new recommendations from friends.",
-        "Olivia just reviewed a sitter you might like."
-      ];
-      const randomNotification = mockNotifications[Math.floor(Math.random() * mockNotifications.length)];
-      setNotificationMessage(randomNotification);
+    if (hasNewActivity && notificationMessage) {
       setShowNotification(true);
-    }, 3000); // Shows after 3 seconds for demo
-
-    return () => clearTimeout(timer);
-  }, []);
+    }
+  }, [hasNewActivity, notificationMessage]);
 
   const dismissNotification = () => {
+    setShowNotification(false);
+  };
+
+  const handleActivityFeedClick = async () => {
+    // Mark activity feed as viewed when user clicks the notification
+    await markActivityFeedAsViewed();
     setShowNotification(false);
   };
 
@@ -93,11 +98,15 @@ const Home = () => {
         showSettings={true}
       />
       
-      {/* Conditional Notification Banner */}
-      {notificationMessage && showNotification && (
+      {/* Conditional Notification Banner - Only shows when there's real new activity */}
+      {notificationMessage && showNotification && hasNewActivity && (
         <div className="mx-4 mt-4 mb-4 bg-blue-100 border border-blue-200 rounded-lg overflow-hidden hover:bg-blue-200 transition-colors">
           <div className="flex items-center justify-between">
-            <Link to="/activity-feed" className="flex items-center flex-1 p-4 cursor-pointer">
+            <Link 
+              to="/activity-feed" 
+              className="flex items-center flex-1 p-4 cursor-pointer"
+              onClick={handleActivityFeedClick}
+            >
               <Bell className="w-5 h-5 text-blue-700 mr-3" />
               <span className="text-blue-700 font-medium">{notificationMessage}</span>
             </Link>

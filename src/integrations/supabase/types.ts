@@ -100,6 +100,8 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          last_activity_feed_view_at: string | null
+          last_login_at: string | null
           updated_at: string
           username: string | null
         }
@@ -108,6 +110,8 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id: string
+          last_activity_feed_view_at?: string | null
+          last_login_at?: string | null
           updated_at?: string
           username?: string | null
         }
@@ -116,6 +120,8 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          last_activity_feed_view_at?: string | null
+          last_login_at?: string | null
           updated_at?: string
           username?: string | null
         }
@@ -240,7 +246,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_new_activity_count: {
+        Args: { user_id: string }
+        Returns: number
+      }
+      get_recent_activity_summary: {
+        Args: { user_id: string }
+        Returns: {
+          activity_count: number
+          most_recent_user_name: string
+          most_recent_activity: string
+        }[]
+      }
+      update_activity_feed_view: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
