@@ -4,7 +4,7 @@ import { BottomNavigation } from "@/components/BottomNavigation";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Bell, X } from "lucide-react";
 
 const Home = () => {
   // Mock current user data
@@ -15,8 +15,9 @@ const Home = () => {
     profileImageUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   };
   
-  // Dynamic hero message state
-  const [heroMessage, setHeroMessage] = useState(`Welcome back, ${mockCurrentUser.firstName}!`);
+  // Notification banner state
+  const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
+  const [showNotification, setShowNotification] = useState(false);
   
   // Mock data for demonstration
   const featuredProducts = [{
@@ -62,19 +63,24 @@ const Home = () => {
     timeAgo: "4d"
   }];
 
-  // Mock dynamic message logic
+  // Mock notification logic - simulate friend activity after 3 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
-      const dynamicMessages = [
+      const mockNotifications = [
         "You have 3 new recommendations from friends.",
         "Olivia just reviewed a sitter you might like."
       ];
-      const randomMessage = dynamicMessages[Math.floor(Math.random() * dynamicMessages.length)];
-      setHeroMessage(randomMessage);
-    }, 5000); // Changes after 5 seconds for demo
+      const randomNotification = mockNotifications[Math.floor(Math.random() * mockNotifications.length)];
+      setNotificationMessage(randomNotification);
+      setShowNotification(true);
+    }, 3000); // Shows after 3 seconds for demo
 
     return () => clearTimeout(timer);
   }, []);
+
+  const dismissNotification = () => {
+    setShowNotification(false);
+  };
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
@@ -86,7 +92,25 @@ const Home = () => {
         showSettings={true}
       />
       
-      {/* Dynamic Hero Section */}
+      {/* Conditional Notification Banner */}
+      {notificationMessage && showNotification && (
+        <div className="mx-4 mb-4 bg-blue-100 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Bell className="w-5 h-5 text-blue-700 mr-3" />
+              <span className="text-blue-700 font-medium">{notificationMessage}</span>
+            </div>
+            <button 
+              onClick={dismissNotification}
+              className="text-blue-700 hover:text-blue-900 ml-4"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Static Hero Section */}
       <div className="px-4 mb-8">
         <div className="relative h-44 bg-gradient-to-br from-purple-100 to-purple-50 rounded-2xl overflow-hidden">
           <div className="absolute inset-0 bg-center bg-cover opacity-30" style={{
@@ -94,7 +118,7 @@ const Home = () => {
           }}>
           </div>
           <div className="relative h-full flex flex-col justify-center p-6 bg-violet-200">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">{heroMessage}</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome back, {mockCurrentUser.firstName}!</h1>
             <p className="text-gray-600">How can we help you today?</p>
           </div>
         </div>
