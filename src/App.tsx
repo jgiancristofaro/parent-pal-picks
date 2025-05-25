@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "./pages/Login";
+import ExistingUserLoginPage from "./pages/ExistingUserLoginPage";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
 import Profile from "./pages/Profile";
@@ -32,6 +33,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/login-existing" element={<ExistingUserLoginPage />} />
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<Search />} />
           <Route path="/find-sitter" element={<Search />} />
