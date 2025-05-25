@@ -1,13 +1,20 @@
+
+import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
-import { ProductCard } from "@/components/ProductCard";
-import { SitterCard } from "@/components/SitterCard";
-import { ActivityItem } from "@/components/ActivityItem";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ArrowRight } from "lucide-react";
 
 const Home = () => {
+  // Mock user data
+  const mockUserName = "Sarah";
+  const mockUserProfileImage = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+  
+  // Dynamic hero message state
+  const [heroMessage, setHeroMessage] = useState(`Welcome back, ${mockUserName}!`);
+  
   // Mock data for demonstration
   const featuredProducts = [{
     id: "1",
@@ -30,6 +37,8 @@ const Home = () => {
     image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2535&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     category: "Comfort"
   }];
+  
+  // Mock friends activity - can be empty to test empty state
   const friendActivity = [{
     userId: "101",
     userName: "Olivia Bennett",
@@ -48,31 +57,41 @@ const Home = () => {
     userImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     action: "Recommended baby bottles",
     timeAgo: "4d"
-  }, {
-    userId: "104",
-    userName: "Mike Johnson",
-    userImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    action: "Left a review",
-    timeAgo: "5d"
   }];
-  const upcomingEvents = [{
-    id: "event1",
-    type: "Babysitting",
-    details: "Sitter: Jessica",
-    date: "Tomorrow"
-  }];
-  return <div className="min-h-screen pb-20 bg-gray-50">
-      <Header />
+
+  // Mock dynamic message logic
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const dynamicMessages = [
+        "You have 3 new recommendations from friends.",
+        "Olivia just reviewed a sitter you might like."
+      ];
+      const randomMessage = dynamicMessages[Math.floor(Math.random() * dynamicMessages.length)];
+      setHeroMessage(randomMessage);
+    }, 5000); // Changes after 5 seconds for demo
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div className="min-h-screen pb-20 bg-gray-50">
+      <Header 
+        showUserProfileImage={true}
+        userProfileImageUrl={mockUserProfileImage}
+        userFullName={mockUserName}
+        showBack={false}
+        showSettings={true}
+      />
       
-      {/* Hero Section */}
+      {/* Dynamic Hero Section */}
       <div className="px-4 mb-8">
         <div className="relative h-44 bg-gradient-to-br from-purple-100 to-purple-50 rounded-2xl overflow-hidden">
           <div className="absolute inset-0 bg-center bg-cover opacity-30" style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1492725764893-90b379c2b6e7?q=80&w=2540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"
-        }}>
+            backgroundImage: "url('https://images.unsplash.com/photo-1492725764893-90b379c2b6e7?q=80&w=2540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"
+          }}>
           </div>
           <div className="relative h-full flex flex-col justify-center p-6 bg-violet-200">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome back, Sarah!</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">{heroMessage}</h1>
             <p className="text-gray-600">How can we help you today?</p>
           </div>
         </div>
@@ -91,35 +110,54 @@ const Home = () => {
         </Link>
       </div>
 
-      {/* Friends' Activity - Horizontal Scroll */}
+      {/* Enhanced Friends' Activity Section */}
       <div className="mb-8">
         <div className="flex justify-between items-center px-4 mb-4">
           <h2 className="text-2xl font-bold">Friends' Activity</h2>
-          <button className="text-purple-500 text-sm font-medium">View All</button>
+          {friendActivity.length > 0 && (
+            <Link to="/activity-feed" className="flex items-center text-purple-500 text-sm font-medium hover:text-purple-600">
+              View All
+              <ArrowRight className="w-4 h-4 ml-1" />
+            </Link>
+          )}
         </div>
-        <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex w-max space-x-4 p-4">
-            {friendActivity.map((item, index) => <div key={index} className="flex-none w-64 bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-                <div className="flex items-start">
-                  <Link to={`/profile/${item.userId}`} className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full overflow-hidden">
-                      <img src={item.userImage} alt={item.userName} className="w-full h-full object-cover" />
+
+        {friendActivity.length === 0 ? (
+          <div className="mx-4 bg-white rounded-xl shadow-sm p-8 text-center border border-gray-100">
+            <p className="text-gray-600 mb-4">Find and follow friends to see their recommendations here!</p>
+            <Link to="/search">
+              <Button variant="link" className="text-purple-500 hover:text-purple-600">
+                Find Friends
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <ScrollArea className="w-full whitespace-nowrap">
+            <div className="flex w-max space-x-4 p-4">
+              {friendActivity.map((item, index) => (
+                <div key={index} className="flex-none w-64 bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+                  <div className="flex items-start">
+                    <Link to={`/profile/${item.userId}`} className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-full overflow-hidden">
+                        <img src={item.userImage} alt={item.userName} className="w-full h-full object-cover" />
+                      </div>
+                    </Link>
+                    <div className="ml-3 flex-grow">
+                      <div className="flex justify-between items-start">
+                        <Link to={`/profile/${item.userId}`}>
+                          <p className="font-semibold text-gray-800 text-sm">{item.userName}</p>
+                        </Link>
+                        <p className="text-xs text-gray-500">{item.timeAgo}</p>
+                      </div>
+                      <p className="text-gray-600 text-sm mt-1">{item.action}</p>
                     </div>
-                  </Link>
-                  <div className="ml-3 flex-grow">
-                    <div className="flex justify-between items-start">
-                      <Link to={`/profile/${item.userId}`}>
-                        <p className="font-semibold text-gray-800 text-sm">{item.userName}</p>
-                      </Link>
-                      <p className="text-xs text-gray-500">{item.timeAgo}</p>
-                    </div>
-                    <p className="text-gray-600 text-sm mt-1">{item.action}</p>
                   </div>
                 </div>
-              </div>)}
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+              ))}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        )}
       </div>
 
       {/* Featured Recommendations - Horizontal Scroll */}
@@ -130,7 +168,8 @@ const Home = () => {
         </div>
         <ScrollArea className="w-full whitespace-nowrap">
           <div className="flex w-max space-x-4 p-4">
-            {featuredProducts.map(product => <div key={product.id} className="flex-none w-48">
+            {featuredProducts.map(product => (
+              <div key={product.id} className="flex-none w-48">
                 <Link to={`/product/${product.id}`}>
                   <div className="rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-lg transition-shadow duration-200">
                     <div className="aspect-square overflow-hidden">
@@ -142,54 +181,16 @@ const Home = () => {
                     </div>
                   </div>
                 </Link>
-              </div>)}
+              </div>
+            ))}
           </div>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
       </div>
 
-      {/* Upcoming Section */}
-      <div className="px-4 mb-8">
-        <h2 className="text-2xl font-bold mb-4">Upcoming</h2>
-        <div className="bg-white rounded-lg shadow-sm divide-y divide-gray-100">
-          {upcomingEvents.map(event => <div key={event.id} className="py-4 px-4 flex items-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
-                {event.type === "Babysitting" ? <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg> : <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 1 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16v-3"></path>
-                    <path d="M16.5 9.4 7.55 4.24"></path><path d="M3.29 7 12 12l8.71-5"></path><path d="M12 22V12"></path>
-                  </svg>}
-              </div>
-              <div className="flex-grow">
-                <h3 className="font-semibold text-gray-800">{event.type}</h3>
-                <p className="text-sm text-gray-500">{event.details}</p>
-              </div>
-              <div className="text-right text-sm text-purple-500">{event.date}</div>
-            </div>)}
-        </div>
-      </div>
-
-      <div className="px-4 mb-8">
-        <h2 className="text-2xl font-bold mb-4">Tips & Resources</h2>
-        <Link to="/tips/sleep-training" className="flex items-center p-4 bg-white rounded-lg shadow-sm">
-          <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-            </svg>
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-800">Sleep Training Guide</h3>
-          </div>
-        </Link>
-      </div>
-
       <BottomNavigation />
-    </div>;
+    </div>
+  );
 };
 
 export default Home;

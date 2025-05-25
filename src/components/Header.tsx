@@ -1,19 +1,26 @@
 
 import { ChevronLeft, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 
 interface HeaderProps {
   title?: string;
   showBack?: boolean;
   showSettings?: boolean;
   backTo?: string;
+  showUserProfileImage?: boolean;
+  userProfileImageUrl?: string | null;
+  userFullName?: string | null;
 }
 
 export const Header = ({ 
   title = "ParentPal", 
   showBack = false, 
   showSettings = true, 
-  backTo = "/" 
+  backTo = "/",
+  showUserProfileImage = false,
+  userProfileImageUrl = null,
+  userFullName = null
 }: HeaderProps) => {
   return (
     <header className="flex items-center justify-between px-4 py-4 bg-white border-b border-gray-100">
@@ -23,7 +30,16 @@ export const Header = ({
             <ChevronLeft className="w-6 h-6 text-gray-700" />
           </Link>
         )}
-        <h1 className="text-xl font-bold">{title}</h1>
+        
+        {showUserProfileImage && userProfileImageUrl ? (
+          <Link to="/profile">
+            <Avatar className="w-10 h-10">
+              <AvatarImage src={userProfileImageUrl} alt={userFullName || "User"} />
+            </Avatar>
+          </Link>
+        ) : (
+          <h1 className="text-xl font-bold">{title}</h1>
+        )}
       </div>
       {showSettings && (
         <Link to="/settings">
