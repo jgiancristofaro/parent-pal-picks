@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -5,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search as SearchIcon } from "lucide-react";
 import { SitterCard } from "@/components/SitterCard";
+import { FriendRecommendedFilter } from "@/components/FriendRecommendedFilter";
+import { useFriendRecommendedSitters } from "@/hooks/useFriendRecommendedSitters";
 
 interface SearchFilters {
   location: string;
@@ -12,7 +15,7 @@ interface SearchFilters {
   time: string;
   availability: string;
   experience: string;
-  recommended: boolean;
+  friendRecommendedOnly: boolean;
 }
 
 const Search = () => {
@@ -22,11 +25,24 @@ const Search = () => {
     time: "",
     availability: "",
     experience: "",
-    recommended: false
+    friendRecommendedOnly: false
   });
   
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+
+  // Mock user ID - in a real app, this would come from authentication
+  const currentUserId = "mock-user-id";
+
+  // Fetch friend-recommended sitters
+  const { 
+    data: friendRecommendedSitters, 
+    isLoading: loadingFriendRecommended,
+    error: friendRecommendedError
+  } = useFriendRecommendedSitters(
+    currentUserId, 
+    searchFilters.friendRecommendedOnly
+  );
 
   // Mock sitter data for demonstration
   const mockSitters = [
@@ -58,20 +74,43 @@ const Search = () => {
   const handleSearch = () => {
     console.log("Search filters:", searchFilters);
     
-    // Filter sitters based on search criteria
     let filteredSitters = mockSitters;
     
-    if (searchFilters.location) {
-      // In a real app, this would filter by location
-      filteredSitters = filteredSitters.filter(() => true);
-    }
-    
-    if (searchFilters.recommended) {
-      filteredSitters = filteredSitters.filter(sitter => sitter.recommendedBy);
+    // If friend-recommended filter is active, use the data from the hook
+    if (searchFilters.friendRecommendedOnly) {
+      if (loadingFriendRecommended) {
+        console.log("Still loading friend recommendations...");
+        return;
+      }
+      
+      if (friendRecommendedError) {
+        console.error("Error loading friend recommendations:", friendRecommendedError);
+        filteredSitters = [];
+      } else {
+        filteredSitters = friendRecommendedSitters || [];
+        console.log("Using friend-recommended sitters:", filteredSitters.length);
+      }
+    } else {
+      // Apply other filters to mock data
+      if (searchFilters.location) {
+        filteredSitters = filteredSitters.filter(() => true);
+      }
     }
     
     setSearchResults(filteredSitters);
     setHasSearched(true);
+  };
+
+  const handleFriendRecommendedToggle = (enabled: boolean) => {
+    setSearchFilters(prev => ({ ...prev, friendRecommendedOnly: enabled }));
+    
+    // Auto-search when toggling friend-recommended filter
+    if (enabled) {
+      setHasSearched(true);
+      if (!loadingFriendRecommended && friendRecommendedSitters) {
+        setSearchResults(friendRecommendedSitters);
+      }
+    }
   };
 
   return (
@@ -86,6 +125,15 @@ const Search = () => {
             placeholder="Search by location"
             value={searchFilters.location}
             onChange={(e) => setSearchFilters(prev => ({ ...prev, location: e.target.value }))}
+          />
+        </div>
+
+        {/* Friend-Recommended Filter - Prominently displayed */}
+        <div className="mb-6">
+          <FriendRecommendedFilter
+            enabled={searchFilters.friendRecommendedOnly}
+            onToggle={handleFriendRecommendedToggle}
+            friendCount={0} // This could be fetched from a separate query
           />
         </div>
         
@@ -147,31 +195,24 @@ const Search = () => {
               <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </Button>
-          
-          <Button 
-            variant={searchFilters.recommended ? "default" : "outline"}
-            className={`flex-1 justify-center py-3 text-center ${
-              searchFilters.recommended 
-                ? "bg-purple-500 hover:bg-purple-600 text-white" 
-                : "bg-white border-gray-200"
-            }`}
-            onClick={() => setSearchFilters(prev => ({ ...prev, recommended: !prev.recommended }))}
-          >
-            <span>Recommended</span>
-          </Button>
         </div>
         
         <Button 
           className="w-full py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg"
           onClick={handleSearch}
+          disabled={searchFilters.friendRecommendedOnly && loadingFriendRecommended}
         >
-          Search
+          {searchFilters.friendRecommendedOnly && loadingFriendRecommended ? "Loading..." : "Search"}
         </Button>
 
         {hasSearched && (
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-4">
-              Search Results ({searchResults.length} sitters found)
+              {searchFilters.friendRecommendedOnly ? (
+                <>Friend-Recommended Sitters ({searchResults.length} found)</>
+              ) : (
+                <>Search Results ({searchResults.length} sitters found)</>
+              )}
             </h2>
             {searchResults.length > 0 ? (
               <div>
@@ -189,8 +230,19 @@ const Search = () => {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-gray-500">No sitters found matching your criteria.</p>
-                <p className="text-gray-400 text-sm mt-2">Try adjusting your filters.</p>
+                {searchFilters.friendRecommendedOnly ? (
+                  <>
+                    <p className="text-gray-500">No friend-recommended sitters found.</p>
+                    <p className="text-gray-400 text-sm mt-2">
+                      Try following more friends or search without the filter.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-gray-500">No sitters found matching your criteria.</p>
+                    <p className="text-gray-400 text-sm mt-2">Try adjusting your filters.</p>
+                  </>
+                )}
               </div>
             )}
           </div>
