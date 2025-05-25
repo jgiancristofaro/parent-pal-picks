@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -8,18 +7,22 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ArrowRight } from "lucide-react";
 
 const Home = () => {
-  // Mock user data
-  const mockUserName = "Sarah";
-  const mockUserProfileImage = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+  // Mock current user data
+  const mockCurrentUser = {
+    id: "user-2",
+    firstName: "Sophia",
+    fullName: "Sophia Carter",
+    profileImageUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  };
   
   // Dynamic hero message state
-  const [heroMessage, setHeroMessage] = useState(`Welcome back, ${mockUserName}!`);
+  const [heroMessage, setHeroMessage] = useState(`Welcome back, ${mockCurrentUser.firstName}!`);
   
   // Mock data for demonstration
   const featuredProducts = [{
     id: "1",
     name: "Top-rated Baby Monitors",
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     category: "Baby Safety"
   }, {
     id: "2",
@@ -77,8 +80,8 @@ const Home = () => {
     <div className="min-h-screen pb-20 bg-gray-50">
       <Header 
         showUserProfileImage={true}
-        userProfileImageUrl={mockUserProfileImage}
-        userFullName={mockUserName}
+        userProfileImageUrl={mockCurrentUser.profileImageUrl}
+        userFullName={mockCurrentUser.firstName}
         showBack={false}
         showSettings={true}
       />
