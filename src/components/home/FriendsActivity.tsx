@@ -11,6 +11,8 @@ interface FriendActivityItem {
   userImage: string;
   action: string;
   timeAgo: string;
+  itemType: 'product' | 'sitter';
+  itemId: string;
 }
 
 interface FriendsActivityProps {
@@ -43,13 +45,15 @@ export const FriendsActivity = ({ friendActivity }: FriendsActivityProps) => {
         <ScrollArea className="w-full whitespace-nowrap">
           <div className="flex w-max space-x-4 p-4">
             {friendActivity.map((item, index) => (
-              <div key={index} className="flex-none w-64 bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+              <div key={index} className="flex-none w-64 bg-white rounded-xl shadow-sm border border-gray-100">
                 <ActivityItem
                   userId={item.userId}
                   userName={item.userName}
                   userImage={item.userImage}
                   action={item.action}
                   timeAgo={item.timeAgo}
+                  itemType={item.itemType}
+                  itemId={item.itemId}
                 />
               </div>
             ))}
