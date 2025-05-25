@@ -34,7 +34,7 @@ export const Header = ({
         {showUserProfileImage && userProfileImageUrl ? (
           <Link to="/profile">
             <Avatar className="w-10 h-10">
-              <AvatarImage src={userProfileImageUrl} alt={userFullName || "User"} />
+              <AvatarImage src={userProfileImageUrl} alt={userFullName || "User"} className="object-cover" />
             </Avatar>
           </Link>
         ) : (
