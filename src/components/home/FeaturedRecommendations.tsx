@@ -15,8 +15,8 @@ interface FeaturedRecommendationsProps {
 
 export const FeaturedRecommendations = ({ featuredProducts }: FeaturedRecommendationsProps) => {
   return (
-    <div className="mb-8">
-      <div className="flex justify-between items-center px-4 mb-4">
+    <div className="mb-4">
+      <div className="flex justify-between items-center px-4 mb-2">
         <h2 className="text-2xl font-bold">Featured Recommendations</h2>
         <button className="text-purple-500 text-sm font-medium">View All</button>
       </div>

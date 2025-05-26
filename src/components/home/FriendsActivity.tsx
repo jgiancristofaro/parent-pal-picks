@@ -21,8 +21,8 @@ interface FriendsActivityProps {
 
 export const FriendsActivity = ({ friendActivity }: FriendsActivityProps) => {
   return (
-    <div className="mb-8">
-      <div className="flex justify-between items-center px-4 mb-4">
+    <div className="mb-4">
+      <div className="flex justify-between items-center px-4 mb-2">
         <h2 className="text-2xl font-bold">Friends' Activity</h2>
         {friendActivity.length > 0 && (
           <Link to="/activity-feed" className="flex items-center text-purple-500 text-sm font-medium hover:text-purple-600">

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export const ActionButtons = () => {
   return (
-    <div className="px-4 mb-8 flex gap-4">
+    <div className="px-4 mb-4 flex gap-4">
       <Link to="/find-sitter" className="flex-1">
         <Button className="w-full py-6 text-white bg-purple-500 hover:bg-purple-600 rounded-lg">
           Find a Sitter
