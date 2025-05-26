@@ -31,22 +31,22 @@ const Home = () => {
   const featuredProducts = [{
     id: "1",
     name: "Top-rated Baby Monitors",
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    image: "/assets/babymonitor.jpg",
     category: "Baby Safety"
   }, {
     id: "2",
     name: "Essential Baby Carriers",
-    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    image: "/assets/babycarrier.jpg",
     category: "Carrying"
   }, {
     id: "3",
     name: "Organic Baby Food",
-    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=2420&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    image: "/assets/organicbabyfood.jpg",
     category: "Nutrition"
   }, {
     id: "4",
     name: "Soft Baby Blankets",
-    image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2535&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    image: "/assets/softbabyblankets.jpg",
     category: "Comfort"
   }];
   
