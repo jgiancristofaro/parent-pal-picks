@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
@@ -17,7 +16,7 @@ export const FeaturedRecommendations = ({ featuredProducts }: FeaturedRecommenda
   return (
     <div className="mb-4">
       <div className="flex justify-between items-center px-4 mb-2">
-        <h2 className="text-2xl font-bold">Featured Recommendations</h2>
+        <h2 className="text-xl font-bold">Featured Recommendations</h2>
         <button className="text-purple-500 text-sm font-medium">View All</button>
       </div>
       <ScrollArea className="w-full whitespace-nowrap">
