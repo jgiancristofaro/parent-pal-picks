@@ -21,7 +21,7 @@ export const FeaturedRecommendations = ({ featuredProducts }: FeaturedRecommenda
         <button className="text-purple-500 text-sm font-medium">View All</button>
       </div>
       <ScrollArea className="w-full whitespace-nowrap">
-        <div className="flex w-max space-x-4 p-4">
+        <div className="flex w-max space-x-4 px-4">
           {featuredProducts.map(product => (
             <div key={product.id} className="flex-none w-48">
               <Link to={`/product/${product.id}`}>
