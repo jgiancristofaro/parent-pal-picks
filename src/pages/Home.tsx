@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -103,6 +102,8 @@ const Home = () => {
         userFullName={mockCurrentUser.firstName}
         showBack={false}
         showSettings={true}
+        showLogo={true}
+        logoUrl="/assets/logo.png"
       />
       
       {/* Conditional Notification Banner - Only shows when there's real new activity */}

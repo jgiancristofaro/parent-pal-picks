@@ -11,6 +11,8 @@ interface HeaderProps {
   showUserProfileImage?: boolean;
   userProfileImageUrl?: string | null;
   userFullName?: string | null;
+  showLogo?: boolean;
+  logoUrl?: string;
 }
 
 export const Header = ({ 
@@ -20,7 +22,9 @@ export const Header = ({
   backTo = "/",
   showUserProfileImage = false,
   userProfileImageUrl = null,
-  userFullName = null
+  userFullName = null,
+  showLogo = false,
+  logoUrl = ""
 }: HeaderProps) => {
   return (
     <header className="flex items-center justify-between px-4 py-4 bg-white border-b border-gray-100">
@@ -31,13 +35,23 @@ export const Header = ({
           </Link>
         )}
         
-        {showUserProfileImage && userProfileImageUrl ? (
+        {showUserProfileImage && userProfileImageUrl && (
           <Link to="/profile">
             <Avatar className="w-10 h-10">
               <AvatarImage src={userProfileImageUrl} alt={userFullName || "User"} className="object-cover" />
             </Avatar>
           </Link>
-        ) : (
+        )}
+
+        {showLogo && logoUrl && (
+          <img 
+            src={logoUrl} 
+            alt="ParentPal Logo" 
+            className={`h-8 ${showUserProfileImage && userProfileImageUrl ? 'ml-3' : ''}`}
+          />
+        )}
+
+        {!showLogo && !showUserProfileImage && (
           <h1 className="text-xl font-bold">{title}</h1>
         )}
       </div>
