@@ -1,13 +1,17 @@
-
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search as SearchIcon } from "lucide-react";
+import { Calendar, Search as SearchIcon } from "lucide-react";
 import { SitterCard } from "@/components/SitterCard";
 import { FriendRecommendedFilter } from "@/components/FriendRecommendedFilter";
 import { useFriendRecommendedSitters } from "@/hooks/useFriendRecommendedSitters";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface SearchFilters {
   location: string;
@@ -17,6 +21,13 @@ interface SearchFilters {
   experience: string;
   friendRecommendedOnly: boolean;
 }
+
+const timeSlots = [
+  { value: "morning", label: "Morning", time: "8am-12pm" },
+  { value: "afternoon", label: "Afternoon", time: "12pm-5pm" },
+  { value: "evening", label: "Evening", time: "5pm-9pm" },
+  { value: "anytime", label: "Any Time", time: "" }
+];
 
 const Search = () => {
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
@@ -30,6 +41,8 @@ const Search = () => {
   
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("");
 
   // Mock user ID - in a real app, this would come from authentication
   const currentUserId = "mock-user-id";
@@ -113,6 +126,24 @@ const Search = () => {
     }
   };
 
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+    if (date) {
+      setSearchFilters(prev => ({ ...prev, date: format(date, "yyyy-MM-dd") }));
+    } else {
+      setSearchFilters(prev => ({ ...prev, date: "" }));
+    }
+  };
+
+  const handleTimeSlotSelect = (value: string) => {
+    setSelectedTimeSlot(value);
+    const selectedSlot = timeSlots.find(slot => slot.value === value);
+    if (selectedSlot) {
+      const timeString = selectedSlot.time ? `${selectedSlot.label} (${selectedSlot.time})` : selectedSlot.label;
+      setSearchFilters(prev => ({ ...prev, time: timeString }));
+    }
+  };
+
   return (
     <div className="min-h-screen pb-20 bg-purple-50">
       <Header title="Find a sitter" showBack={true} />
@@ -136,40 +167,68 @@ const Search = () => {
             friendCount={0} // This could be fetched from a separate query
           />
         </div>
-        
+
+        {/* Date & Time Section */}
         <div className="mb-6">
-          <label className="block text-xl font-semibold mb-2">Date</label>
-          <div className="relative">
-            <Button 
-              variant="outline" 
-              className="w-full justify-between py-6 text-left bg-white border-gray-200"
-              onClick={() => setSearchFilters(prev => ({ ...prev, date: "2024-07-15" }))}
-            >
-              <span className={searchFilters.date ? "text-gray-900" : "text-gray-500"}>
-                {searchFilters.date || "Select date"}
-              </span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </Button>
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">When do you need care?</h3>
+          
+          {/* Date Filter */}
+          <div className="mb-4">
+            <label className="block text-lg font-semibold mb-2">Date</label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start py-6 text-left bg-white border-gray-200",
+                    !selectedDate && "text-gray-500"
+                  )}
+                >
+                  <Calendar className="mr-2 h-4 w-4" />
+                  {selectedDate ? format(selectedDate, "PPP") : "Select date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={handleDateSelect}
+                  disabled={(date) => date < new Date()}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
           </div>
-        </div>
-        
-        <div className="mb-6">
-          <label className="block text-xl font-semibold mb-2">Time</label>
-          <div className="relative">
-            <Button 
-              variant="outline" 
-              className="w-full justify-between py-6 text-left bg-white border-gray-200"
-              onClick={() => setSearchFilters(prev => ({ ...prev, time: "6:00 PM - 10:00 PM" }))}
-            >
-              <span className={searchFilters.time ? "text-gray-900" : "text-gray-500"}>
-                {searchFilters.time || "Select time"}
-              </span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </Button>
+
+          {/* Time Filter */}
+          <div className="mb-4">
+            <label className="block text-lg font-semibold mb-2">Time</label>
+            <RadioGroup value={selectedTimeSlot} onValueChange={handleTimeSlotSelect}>
+              <div className="grid grid-cols-2 gap-3">
+                {timeSlots.map((slot) => (
+                  <div key={slot.value} className="relative">
+                    <RadioGroupItem
+                      value={slot.value}
+                      id={slot.value}
+                      className="peer sr-only"
+                    />
+                    <label
+                      htmlFor={slot.value}
+                      className={cn(
+                        "flex flex-col items-center justify-center rounded-lg border-2 border-gray-200 bg-white p-4 hover:bg-gray-50 peer-data-[state=checked]:border-purple-500 peer-data-[state=checked]:bg-purple-50 cursor-pointer transition-all",
+                        "text-center"
+                      )}
+                    >
+                      <span className="font-medium text-gray-900">{slot.label}</span>
+                      {slot.time && (
+                        <span className="text-sm text-gray-500 mt-1">{slot.time}</span>
+                      )}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </RadioGroup>
           </div>
         </div>
         
