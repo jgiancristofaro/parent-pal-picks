@@ -1,17 +1,15 @@
+
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Calendar, Search as SearchIcon } from "lucide-react";
-import { SitterCard } from "@/components/SitterCard";
 import { FriendRecommendedFilter } from "@/components/FriendRecommendedFilter";
 import { useFriendRecommendedSitters } from "@/hooks/useFriendRecommendedSitters";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { SearchFilters } from "@/components/search/SearchFilters";
+import { DateTimeFilters } from "@/components/search/DateTimeFilters";
+import { AdditionalFilters } from "@/components/search/AdditionalFilters";
+import { SearchResults } from "@/components/search/SearchResults";
 
 interface SearchFilters {
   location: string;
@@ -21,13 +19,6 @@ interface SearchFilters {
   experience: string;
   friendRecommendedOnly: boolean;
 }
-
-const timeSlots = [
-  { value: "morning", label: "Morning", time: "8am-12pm" },
-  { value: "afternoon", label: "Afternoon", time: "12pm-5pm" },
-  { value: "evening", label: "Evening", time: "5pm-9pm" },
-  { value: "anytime", label: "Any Time", time: "" }
-];
 
 const Search = () => {
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
@@ -137,6 +128,12 @@ const Search = () => {
 
   const handleTimeSlotSelect = (value: string) => {
     setSelectedTimeSlot(value);
+    const timeSlots = [
+      { value: "morning", label: "Morning", time: "8am-12pm" },
+      { value: "afternoon", label: "Afternoon", time: "12pm-5pm" },
+      { value: "evening", label: "Evening", time: "5pm-9pm" },
+      { value: "anytime", label: "Any Time", time: "" }
+    ];
     const selectedSlot = timeSlots.find(slot => slot.value === value);
     if (selectedSlot) {
       const timeString = selectedSlot.time ? `${selectedSlot.label} (${selectedSlot.time})` : selectedSlot.label;
@@ -144,20 +141,27 @@ const Search = () => {
     }
   };
 
+  const handleLocationChange = (location: string) => {
+    setSearchFilters(prev => ({ ...prev, location }));
+  };
+
+  const handleAvailabilityFilter = () => {
+    setSearchFilters(prev => ({ ...prev, availability: "Available today" }));
+  };
+
+  const handleExperienceFilter = () => {
+    setSearchFilters(prev => ({ ...prev, experience: "3+ years" }));
+  };
+
   return (
     <div className="min-h-screen pb-20 bg-purple-50">
       <Header title="Find a sitter" showBack={true} />
       
       <div className="p-4">
-        <div className="relative mb-6">
-          <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-          <Input 
-            className="pl-10 py-6 bg-white rounded-lg border-gray-200" 
-            placeholder="Search by location"
-            value={searchFilters.location}
-            onChange={(e) => setSearchFilters(prev => ({ ...prev, location: e.target.value }))}
-          />
-        </div>
+        <SearchFilters 
+          location={searchFilters.location}
+          onLocationChange={handleLocationChange}
+        />
 
         {/* Friend-Recommended Filter - Prominently displayed */}
         <div className="mb-6">
@@ -168,93 +172,17 @@ const Search = () => {
           />
         </div>
 
-        {/* Date & Time Section */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-800">When do you need care?</h3>
-          
-          {/* Date Filter */}
-          <div className="mb-4">
-            <label className="block text-lg font-semibold mb-2">Date</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start py-6 text-left bg-white border-gray-200",
-                    !selectedDate && "text-gray-500"
-                  )}
-                >
-                  <Calendar className="mr-2 h-4 w-4" />
-                  {selectedDate ? format(selectedDate, "PPP") : "Select date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <CalendarComponent
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={handleDateSelect}
-                  disabled={(date) => date < new Date()}
-                  initialFocus
-                  className="p-3 pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {/* Time Filter */}
-          <div className="mb-4">
-            <label className="block text-lg font-semibold mb-2">Time</label>
-            <RadioGroup value={selectedTimeSlot} onValueChange={handleTimeSlotSelect}>
-              <div className="grid grid-cols-2 gap-3">
-                {timeSlots.map((slot) => (
-                  <div key={slot.value} className="relative">
-                    <RadioGroupItem
-                      value={slot.value}
-                      id={slot.value}
-                      className="peer sr-only"
-                    />
-                    <label
-                      htmlFor={slot.value}
-                      className={cn(
-                        "flex flex-col items-center justify-center rounded-lg border-2 border-gray-200 bg-white p-4 hover:bg-gray-50 peer-data-[state=checked]:border-purple-500 peer-data-[state=checked]:bg-purple-50 cursor-pointer transition-all",
-                        "text-center"
-                      )}
-                    >
-                      <span className="font-medium text-gray-900">{slot.label}</span>
-                      {slot.time && (
-                        <span className="text-sm text-gray-500 mt-1">{slot.time}</span>
-                      )}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </RadioGroup>
-          </div>
-        </div>
+        <DateTimeFilters
+          selectedDate={selectedDate}
+          selectedTimeSlot={selectedTimeSlot}
+          onDateSelect={handleDateSelect}
+          onTimeSlotSelect={handleTimeSlotSelect}
+        />
         
-        <div className="flex gap-4 mb-6">
-          <Button 
-            variant="outline" 
-            className="flex-1 justify-between py-3 text-left bg-white border-gray-200"
-            onClick={() => setSearchFilters(prev => ({ ...prev, availability: "Available today" }))}
-          >
-            <span>Availability</span>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            className="flex-1 justify-between py-3 text-left bg-white border-gray-200"
-            onClick={() => setSearchFilters(prev => ({ ...prev, experience: "3+ years" }))}
-          >
-            <span>Experience</span>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </Button>
-        </div>
+        <AdditionalFilters
+          onAvailabilityFilter={handleAvailabilityFilter}
+          onExperienceFilter={handleExperienceFilter}
+        />
         
         <Button 
           className="w-full py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg"
@@ -264,48 +192,11 @@ const Search = () => {
           {searchFilters.friendRecommendedOnly && loadingFriendRecommended ? "Loading..." : "Search"}
         </Button>
 
-        {hasSearched && (
-          <div className="mt-6">
-            <h2 className="text-xl font-semibold mb-4">
-              {searchFilters.friendRecommendedOnly ? (
-                <>Friend-Recommended Sitters ({searchResults.length} found)</>
-              ) : (
-                <>Search Results ({searchResults.length} sitters found)</>
-              )}
-            </h2>
-            {searchResults.length > 0 ? (
-              <div>
-                {searchResults.map((sitter) => (
-                  <SitterCard
-                    key={sitter.id}
-                    id={sitter.id}
-                    name={sitter.name}
-                    image={sitter.image}
-                    rating={sitter.rating}
-                    experience={sitter.experience}
-                    recommendedBy={sitter.recommendedBy}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                {searchFilters.friendRecommendedOnly ? (
-                  <>
-                    <p className="text-gray-500">No friend-recommended sitters found.</p>
-                    <p className="text-gray-400 text-sm mt-2">
-                      Try following more friends or search without the filter.
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-gray-500">No sitters found matching your criteria.</p>
-                    <p className="text-gray-400 text-sm mt-2">Try adjusting your filters.</p>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+        <SearchResults
+          searchResults={searchResults}
+          hasSearched={hasSearched}
+          friendRecommendedOnly={searchFilters.friendRecommendedOnly}
+        />
       </div>
       
       <BottomNavigation />
