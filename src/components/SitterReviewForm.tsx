@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StarIcon } from "@/components/StarIcon";
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,6 +15,11 @@ interface Sitter {
   experience: string | null;
   profile_image_url: string | null;
   hourly_rate: number | null;
+}
+
+interface UserLocation {
+  id: string;
+  location_nickname: string;
 }
 
 interface SitterReviewFormProps {
@@ -25,8 +32,32 @@ export const SitterReviewForm = ({ onCancel }: SitterReviewFormProps) => {
   const [rating, setRating] = useState(0);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [selectedLocationId, setSelectedLocationId] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+
+  // Fetch user's saved locations
+  const { data: userLocations = [] } = useQuery({
+    queryKey: ['user-locations'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('user_locations')
+        .select('id, location_nickname')
+        .eq('user_id', user.id)
+        .order('is_primary', { ascending: false })
+        .order('location_nickname');
+
+      if (error) {
+        console.error('Error fetching user locations:', error);
+        return [];
+      }
+      return data as UserLocation[];
+    },
+    enabled: true,
+  });
 
   useEffect(() => {
     fetchSitters();
@@ -76,15 +107,23 @@ export const SitterReviewForm = ({ onCancel }: SitterReviewFormProps) => {
       return;
     }
 
+    // Prepare review data
+    const reviewData: any = {
+      user_id: user.id,
+      sitter_id: selectedSitter.id,
+      rating,
+      title: title.trim(),
+      content: content.trim(),
+    };
+
+    // Add service_location_id if a location was selected
+    if (selectedLocationId) {
+      reviewData.service_location_id = selectedLocationId;
+    }
+
     const { error } = await supabase
       .from("reviews")
-      .insert({
-        user_id: user.id,
-        sitter_id: selectedSitter.id,
-        rating,
-        title: title.trim(),
-        content: content.trim(),
-      });
+      .insert(reviewData);
 
     setIsSubmitting(false);
 
@@ -194,6 +233,30 @@ export const SitterReviewForm = ({ onCancel }: SitterReviewFormProps) => {
                 ))}
               </div>
             </div>
+
+            {userLocations.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium mb-2">Which home was this service for?</label>
+                <Select value={selectedLocationId} onValueChange={setSelectedLocationId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a home (Optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {userLocations.map((location) => (
+                      <SelectItem key={location.id} value={location.id}>
+                        {location.location_nickname}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {userLocations.length === 0 && (
+              <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+                Add a home in your settings to tag this review to a specific location.
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium mb-2">Review Title</label>
