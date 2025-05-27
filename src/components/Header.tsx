@@ -47,7 +47,7 @@ export const Header = ({
           <img 
             src={logoUrl} 
             alt="ParentPal Logo" 
-            className={`h-6 w-auto ${showUserProfileImage && userProfileImageUrl ? 'ml-3' : ''}`}
+            className={`h-10 w-auto ${showUserProfileImage && userProfileImageUrl ? 'ml-3' : ''}`}
           />
         )}
 
