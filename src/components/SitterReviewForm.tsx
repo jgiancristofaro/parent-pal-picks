@@ -1,13 +1,11 @@
 
 import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { StarIcon } from "@/components/StarIcon";
 import { useToast } from "@/hooks/use-toast";
+import { useUserLocations } from "@/hooks/useUserLocations";
+import { SitterSelector } from "@/components/review/SitterSelector";
+import { LocationSelector } from "@/components/review/LocationSelector";
+import { ReviewForm } from "@/components/review/ReviewForm";
 
 interface Sitter {
   id: string;
@@ -15,11 +13,6 @@ interface Sitter {
   experience: string | null;
   profile_image_url: string | null;
   hourly_rate: number | null;
-}
-
-interface UserLocation {
-  id: string;
-  location_nickname: string;
 }
 
 interface SitterReviewFormProps {
@@ -37,27 +30,7 @@ export const SitterReviewForm = ({ onCancel }: SitterReviewFormProps) => {
   const { toast } = useToast();
 
   // Fetch user's saved locations
-  const { data: userLocations = [] } = useQuery({
-    queryKey: ['user-locations'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-
-      const { data, error } = await supabase
-        .from('user_locations')
-        .select('id, location_nickname')
-        .eq('user_id', user.id)
-        .order('is_primary', { ascending: false })
-        .order('location_nickname');
-
-      if (error) {
-        console.error('Error fetching user locations:', error);
-        return [];
-      }
-      return data as UserLocation[];
-    },
-    enabled: true,
-  });
+  const { data: userLocations = [] } = useUserLocations();
 
   useEffect(() => {
     fetchSitters();
@@ -154,151 +127,41 @@ export const SitterReviewForm = ({ onCancel }: SitterReviewFormProps) => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {!selectedSitter ? (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Select a Sitter</h3>
-            <div className="grid gap-3">
-              {sitters.map((sitter) => (
-                <button
-                  key={sitter.id}
-                  type="button"
-                  onClick={() => setSelectedSitter(sitter)}
-                  className="flex items-center p-3 bg-white rounded-lg border hover:border-blue-300 transition-colors text-left"
-                >
-                  {sitter.profile_image_url && (
-                    <img
-                      src={sitter.profile_image_url}
-                      alt={sitter.name}
-                      className="w-12 h-12 rounded-full object-cover mr-3"
-                    />
-                  )}
-                  <div>
-                    <div className="font-semibold">{sitter.name}</div>
-                    {sitter.experience && (
-                      <div className="text-sm text-gray-500">{sitter.experience}</div>
-                    )}
-                    {sitter.hourly_rate && (
-                      <div className="text-sm text-green-600">${sitter.hourly_rate}/hr</div>
-                    )}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            <div className="flex items-center p-3 bg-white rounded-lg border">
-              {selectedSitter.profile_image_url && (
-                <img
-                  src={selectedSitter.profile_image_url}
-                  alt={selectedSitter.name}
-                  className="w-12 h-12 rounded-full object-cover mr-3"
-                />
-              )}
-              <div className="flex-grow">
-                <div className="font-semibold">{selectedSitter.name}</div>
-                {selectedSitter.experience && (
-                  <div className="text-sm text-gray-500">{selectedSitter.experience}</div>
-                )}
-                {selectedSitter.hourly_rate && (
-                  <div className="text-sm text-green-600">${selectedSitter.hourly_rate}/hr</div>
-                )}
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setSelectedSitter(null)}
-                className="text-blue-600"
-              >
-                Change
-              </Button>
-            </div>
+      {!selectedSitter ? (
+        <SitterSelector
+          sitters={sitters}
+          selectedSitter={selectedSitter}
+          onSitterSelect={setSelectedSitter}
+          onSitterChange={() => setSelectedSitter(null)}
+        />
+      ) : (
+        <div className="space-y-6">
+          <SitterSelector
+            sitters={sitters}
+            selectedSitter={selectedSitter}
+            onSitterSelect={setSelectedSitter}
+            onSitterChange={() => setSelectedSitter(null)}
+          />
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Rating</label>
-              <div className="flex space-x-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => setRating(star)}
-                    className="p-1"
-                  >
-                    <StarIcon
-                      filled={star <= rating}
-                      className="w-8 h-8 text-yellow-500"
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
+          <LocationSelector
+            userLocations={userLocations}
+            selectedLocationId={selectedLocationId}
+            onLocationChange={setSelectedLocationId}
+          />
 
-            {userLocations.length > 0 && (
-              <div>
-                <label className="block text-sm font-medium mb-2">Which home was this service for?</label>
-                <Select value={selectedLocationId} onValueChange={setSelectedLocationId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a home (Optional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {userLocations.map((location) => (
-                      <SelectItem key={location.id} value={location.id}>
-                        {location.location_nickname}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {userLocations.length === 0 && (
-              <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
-                Add a home in your settings to tag this review to a specific location.
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Review Title</label>
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Summarize your experience"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Your Review</label>
-              <Textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Tell other parents about your experience with this sitter..."
-                rows={4}
-                required
-              />
-            </div>
-
-            <div className="flex space-x-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex-1 bg-blue-500 hover:bg-blue-600"
-              >
-                {isSubmitting ? "Submitting..." : "Submit Review"}
-              </Button>
-            </div>
-          </div>
-        )}
-      </form>
+          <ReviewForm
+            rating={rating}
+            title={title}
+            content={content}
+            isSubmitting={isSubmitting}
+            onRatingChange={setRating}
+            onTitleChange={setTitle}
+            onContentChange={setContent}
+            onSubmit={handleSubmit}
+            onCancel={onCancel}
+          />
+        </div>
+      )}
     </div>
   );
 };
