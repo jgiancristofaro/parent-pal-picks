@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Plus, Edit, Trash2, Home, Building, MapPin } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { LocationForm } from "@/components/settings/LocationForm";
+import { useUserLocations } from "@/hooks/useUserLocations";
 
 interface UserLocation {
   id: string;
@@ -31,34 +32,23 @@ const ManageLocations = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch user locations
-  const { data: locations = [], isLoading, error } = useQuery({
-    queryKey: ['user-locations'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase
-        .from('user_locations')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('is_primary', { ascending: false })
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as UserLocation[];
-    },
-  });
+  // Use the refactored useUserLocations hook
+  const { data: locations = [], isLoading, error } = useUserLocations();
 
   // Delete location mutation
   const deleteLocationMutation = useMutation({
     mutationFn: async (locationId: string) => {
+      console.log('ManageLocations: Deleting location:', locationId);
       const { error } = await supabase
         .from('user_locations')
         .delete()
         .eq('id', locationId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('ManageLocations: Error deleting location:', error);
+        throw error;
+      }
+      console.log('ManageLocations: Successfully deleted location:', locationId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-locations'] });
@@ -68,6 +58,7 @@ const ManageLocations = () => {
       });
     },
     onError: (error) => {
+      console.error('ManageLocations: Delete mutation error:', error);
       toast({
         title: "Error deleting location",
         description: error.message,
@@ -122,12 +113,32 @@ const ManageLocations = () => {
   }
 
   if (error) {
+    console.error('ManageLocations: Rendering error state:', error);
+    
+    // Check if this is an authentication error
+    const isAuthError = error.message?.includes('user') || error.message?.includes('auth') || error.message?.includes('uuid');
+    
     return (
       <div className="min-h-screen bg-gray-50">
         <Header title="My Homes" showBack={true} backTo="/settings" showSettings={false} />
         <div className="px-4 py-6">
           <div className="text-center py-8">
-            <p className="text-red-500">Error loading locations</p>
+            <div className="max-w-md mx-auto">
+              <h3 className="text-lg font-semibold text-red-600 mb-2">
+                {isAuthError ? "Authentication Required" : "Error Loading Locations"}
+              </h3>
+              <p className="text-red-500 mb-4">
+                {isAuthError 
+                  ? "You need to be logged in to view your home locations. Please log in and try again."
+                  : `Unable to load your home locations: ${error.message}`
+                }
+              </p>
+              {isAuthError && (
+                <Button onClick={() => window.location.href = '/login'}>
+                  Go to Login
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>
