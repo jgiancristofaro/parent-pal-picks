@@ -256,31 +256,43 @@ export type Database = {
           address_details: Json | null
           building_identifier: string
           created_at: string
+          dwelling_type: Database["public"]["Enums"]["dwelling_type_enum"]
           id: string
           is_primary: boolean | null
+          latitude: number | null
           location_nickname: string
+          longitude: number | null
           updated_at: string
           user_id: string
+          zip_code: string
         }
         Insert: {
           address_details?: Json | null
           building_identifier: string
           created_at?: string
+          dwelling_type?: Database["public"]["Enums"]["dwelling_type_enum"]
           id?: string
           is_primary?: boolean | null
+          latitude?: number | null
           location_nickname: string
+          longitude?: number | null
           updated_at?: string
           user_id: string
+          zip_code?: string
         }
         Update: {
           address_details?: Json | null
           building_identifier?: string
           created_at?: string
+          dwelling_type?: Database["public"]["Enums"]["dwelling_type_enum"]
           id?: string
           is_primary?: boolean | null
+          latitude?: number | null
           location_nickname?: string
+          longitude?: number | null
           updated_at?: string
           user_id?: string
+          zip_code?: string
         }
         Relationships: []
       }
@@ -326,7 +338,10 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      dwelling_type_enum:
+        | "APARTMENT_BUILDING"
+        | "SINGLE_FAMILY_HOME"
+        | "TOWNHOUSE"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -441,6 +456,12 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      dwelling_type_enum: [
+        "APARTMENT_BUILDING",
+        "SINGLE_FAMILY_HOME",
+        "TOWNHOUSE",
+      ],
+    },
   },
 } as const

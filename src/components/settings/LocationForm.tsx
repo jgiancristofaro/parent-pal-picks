@@ -6,15 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 
 interface LocationFormData {
   location_nickname: string;
   building_identifier: string;
+  dwelling_type: string;
+  zip_code: string;
   street: string;
   city: string;
-  zip: string;
   is_primary: boolean;
 }
 
@@ -27,9 +28,10 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
   const [formData, setFormData] = useState<LocationFormData>({
     location_nickname: initialData?.location_nickname || "",
     building_identifier: initialData?.building_identifier || "",
+    dwelling_type: initialData?.dwelling_type || "APARTMENT_BUILDING",
+    zip_code: initialData?.zip_code || "",
     street: initialData?.address_details?.street || "",
     city: initialData?.address_details?.city || "",
-    zip: initialData?.address_details?.zip || "",
     is_primary: initialData?.is_primary || false,
   });
   
@@ -42,11 +44,12 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
 
       const locationData = {
         location_nickname: data.location_nickname,
-        building_identifier: data.building_identifier,
+        building_identifier: data.building_identifier || null,
+        dwelling_type: data.dwelling_type,
+        zip_code: data.zip_code,
         address_details: {
           street: data.street,
           city: data.city,
-          zip: data.zip,
         },
         is_primary: data.is_primary,
         user_id: user.id,
@@ -93,10 +96,20 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
       return;
     }
 
-    if (!formData.building_identifier.trim()) {
+    if (!formData.zip_code.trim()) {
       toast({
         title: "Validation Error",
-        description: "Building identifier is required.",
+        description: "ZIP code is required.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Only require building identifier for apartment buildings
+    if (formData.dwelling_type === 'APARTMENT_BUILDING' && !formData.building_identifier.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Building identifier is required for apartment buildings.",
         variant: "destructive",
       });
       return;
@@ -110,6 +123,15 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
       ...prev,
       [field]: value,
     }));
+  };
+
+  const getDwellingTypeLabel = (type: string) => {
+    switch (type) {
+      case 'APARTMENT_BUILDING': return 'Apartment Building';
+      case 'SINGLE_FAMILY_HOME': return 'Single Family Home';
+      case 'TOWNHOUSE': return 'Townhouse';
+      default: return type;
+    }
   };
 
   return (
@@ -127,19 +149,47 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="building_identifier">Building Identifier *</Label>
+        <Label htmlFor="dwelling_type">Dwelling Type *</Label>
+        <Select value={formData.dwelling_type} onValueChange={(value) => handleInputChange('dwelling_type', value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select dwelling type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="APARTMENT_BUILDING">Apartment Building</SelectItem>
+            <SelectItem value="SINGLE_FAMILY_HOME">Single Family Home</SelectItem>
+            <SelectItem value="TOWNHOUSE">Townhouse</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="zip_code">ZIP Code *</Label>
         <Input
-          id="building_identifier"
+          id="zip_code"
           type="text"
-          placeholder="e.g., The Grand Plaza Main Tower"
-          value={formData.building_identifier}
-          onChange={(e) => handleInputChange('building_identifier', e.target.value)}
+          placeholder="e.g., 10001"
+          value={formData.zip_code}
+          onChange={(e) => handleInputChange('zip_code', e.target.value)}
           required
         />
-        <p className="text-sm text-gray-500">
-          Use a consistent name that neighbors in your building would recognize and use.
-        </p>
       </div>
+
+      {formData.dwelling_type === 'APARTMENT_BUILDING' && (
+        <div className="space-y-2">
+          <Label htmlFor="building_identifier">Building Identifier *</Label>
+          <Input
+            id="building_identifier"
+            type="text"
+            placeholder="e.g., The Grand Plaza Main Tower"
+            value={formData.building_identifier}
+            onChange={(e) => handleInputChange('building_identifier', e.target.value)}
+            required
+          />
+          <p className="text-sm text-gray-500">
+            Use a consistent name that neighbors in your building would recognize and use.
+          </p>
+        </div>
+      )}
 
       <div className="space-y-4">
         <Label className="text-base font-medium">Address Details (Optional)</Label>
@@ -156,27 +206,15 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="city">City</Label>
-            <Input
-              id="city"
-              type="text"
-              placeholder="New York"
-              value={formData.city}
-              onChange={(e) => handleInputChange('city', e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="zip">ZIP Code</Label>
-            <Input
-              id="zip"
-              type="text"
-              placeholder="10001"
-              value={formData.zip}
-              onChange={(e) => handleInputChange('zip', e.target.value)}
-            />
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="city">City</Label>
+          <Input
+            id="city"
+            type="text"
+            placeholder="New York"
+            value={formData.city}
+            onChange={(e) => handleInputChange('city', e.target.value)}
+          />
         </div>
       </div>
 

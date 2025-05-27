@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -22,6 +23,9 @@ const Search = () => {
   // Fetch user's saved locations
   const { data: userLocations = [], isLoading: locationsLoading } = useUserLocations();
 
+  // Get apartment buildings only for hyper-local filter
+  const apartmentBuildings = userLocations.filter(loc => loc.dwelling_type === 'APARTMENT_BUILDING');
+
   // Fetch hyper-local sitters when filter is active
   const { data: hyperLocalSittersRaw = [], isLoading: hyperLocalLoading } = useHyperLocalSitters(
     mockCurrentUserId,
@@ -29,14 +33,16 @@ const Search = () => {
     hyperLocalFilterActive && !!selectedLocationIdForFilter
   );
 
-  // Transform hyper-local sitters to match SitterCard format
+  // Transform hyper-local sitters to match SitterCard format and add location context
+  const selectedLocation = userLocations.find(loc => loc.id === selectedLocationIdForFilter);
   const hyperLocalSitters = hyperLocalSittersRaw.map(sitter => ({
     id: sitter.id,
     name: sitter.name,
     image: sitter.profile_image_url || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     rating: sitter.rating || 0,
     experience: sitter.experience || "Experience not specified",
-    friendRecommendationCount: 0 // Hyper-local sitters don't show friend recommendations
+    friendRecommendationCount: 0,
+    workedInUserLocationNickname: selectedLocation?.location_nickname
   }));
 
   // Enhanced mock sitter data with friendRecommendationCount
@@ -87,9 +93,9 @@ const Search = () => {
   const handleHyperLocalToggle = (checked: boolean) => {
     setHyperLocalFilterActive(checked);
     
-    // Auto-select location if user has exactly one
-    if (checked && userLocations.length === 1) {
-      setSelectedLocationIdForFilter(userLocations[0].id);
+    // Auto-select location if user has exactly one apartment building
+    if (checked && apartmentBuildings.length === 1) {
+      setSelectedLocationIdForFilter(apartmentBuildings[0].id);
     } else if (!checked) {
       setSelectedLocationIdForFilter(null);
     }
@@ -135,59 +141,66 @@ const Search = () => {
           />
         </div>
 
-        {/* Hyper-Local Filter */}
-        <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200">
-          <div className="flex items-center space-x-3 mb-3">
-            <Switch
-              id="hyper-local-filter"
-              checked={hyperLocalFilterActive}
-              onCheckedChange={handleHyperLocalToggle}
-              disabled={userLocations.length === 0}
-            />
-            <Label htmlFor="hyper-local-filter" className="text-sm font-medium">
-              Sitters from my building
-            </Label>
-          </div>
-          
-          {userLocations.length === 0 && (
-            <p className="text-xs text-gray-500 ml-8">
-              Add a home in your settings to use this filter.
-            </p>
-          )}
-
-          {hyperLocalFilterActive && userLocations.length > 1 && (
-            <div className="ml-8">
-              <Select 
-                value={selectedLocationIdForFilter || ""} 
-                onValueChange={setSelectedLocationIdForFilter}
-              >
-                <SelectTrigger className="w-full max-w-xs">
-                  <SelectValue placeholder="Select your home" />
-                </SelectTrigger>
-                <SelectContent>
-                  {userLocations.map((location) => (
-                    <SelectItem key={location.id} value={location.id}>
-                      {location.location_nickname}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        {/* Hyper-Local Filter - Only show if user has apartment buildings */}
+        {apartmentBuildings.length > 0 && (
+          <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200">
+            <div className="flex items-center space-x-3 mb-3">
+              <Switch
+                id="hyper-local-filter"
+                checked={hyperLocalFilterActive}
+                onCheckedChange={handleHyperLocalToggle}
+              />
+              <Label htmlFor="hyper-local-filter" className="text-sm font-medium">
+                Sitters from my building
+              </Label>
             </div>
-          )}
-
-          {hyperLocalFilterActive && userLocations.length === 1 && (
-            <p className="text-xs text-gray-600 ml-8">
-              Filtering for: {userLocations[0].location_nickname}
+            
+            <p className="text-xs text-gray-500 ml-8 mb-3">
+              Find sitters who have worked in your apartment building based on neighbor reviews.
             </p>
-          )}
-        </div>
+
+            {hyperLocalFilterActive && apartmentBuildings.length > 1 && (
+              <div className="ml-8">
+                <Select 
+                  value={selectedLocationIdForFilter || ""} 
+                  onValueChange={setSelectedLocationIdForFilter}
+                >
+                  <SelectTrigger className="w-full max-w-xs">
+                    <SelectValue placeholder="Select your building" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {apartmentBuildings.map((location) => (
+                      <SelectItem key={location.id} value={location.id}>
+                        {location.location_nickname}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {hyperLocalFilterActive && apartmentBuildings.length === 1 && (
+              <p className="text-xs text-gray-600 ml-8">
+                Filtering for: {apartmentBuildings[0].location_nickname}
+              </p>
+            )}
+          </div>
+        )}
+
+        {apartmentBuildings.length === 0 && (
+          <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200">
+            <p className="text-sm text-gray-500">
+              Add an apartment building in your settings to get hyper-local sitter recommendations from your neighbors.
+            </p>
+          </div>
+        )}
 
         {/* Hyper-Local Sitter Recommendations (Original Component - shown when no filters) */}
-        {!searchTerm && !hyperLocalFilterActive && (
+        {!searchTerm && !hyperLocalFilterActive && apartmentBuildings.length > 0 && (
           <HyperLocalSitters 
             currentUserId={mockCurrentUserId}
-            selectedLocationId={userLocations[0]?.id}
-            locationNickname={userLocations[0]?.location_nickname}
+            selectedLocationId={apartmentBuildings[0]?.id}
+            locationNickname={apartmentBuildings[0]?.location_nickname}
           />
         )}
 
@@ -195,7 +208,7 @@ const Search = () => {
         <div className="mt-6">
           <h2 className="text-xl font-semibold mb-4">
             {searchTerm && `Search Results (${displayedSitters.length} found)`}
-            {!searchTerm && hyperLocalFilterActive && selectedLocationIdForFilter && `Sitters from ${userLocations.find(loc => loc.id === selectedLocationIdForFilter)?.location_nickname} (${displayedSitters.length} found)`}
+            {!searchTerm && hyperLocalFilterActive && selectedLocationIdForFilter && `Sitters from ${apartmentBuildings.find(loc => loc.id === selectedLocationIdForFilter)?.location_nickname} (${displayedSitters.length} found)`}
             {!searchTerm && !hyperLocalFilterActive && 'All Sitters'}
           </h2>
           <div className="grid grid-cols-2 gap-4">
@@ -208,6 +221,7 @@ const Search = () => {
                 rating={sitter.rating}
                 experience={sitter.experience}
                 friendRecommendationCount={sitter.friendRecommendationCount}
+                workedInUserLocationNickname={sitter.workedInUserLocationNickname}
               />
             ))}
           </div>
