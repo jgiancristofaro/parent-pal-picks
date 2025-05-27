@@ -11,7 +11,7 @@ import Home from "./pages/Home";
 import Search from "./pages/Search";
 import Profile from "./pages/Profile";
 import SitterProfile from "./pages/SitterProfile";
-import Essentials from "./pages/Essentials";
+import ProductSearchPage from "./pages/ProductSearchPage";
 import Settings from "./pages/Settings";
 import PaymentMethods from "./pages/PaymentMethods";
 import Notifications from "./pages/Notifications";
@@ -41,7 +41,7 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/:userId" element={<Profile />} />
           <Route path="/sitter/:id" element={<SitterProfile />} />
-          <Route path="/shop" element={<Essentials />} />
+          <Route path="/shop" element={<ProductSearchPage />} />
           <Route path="/add-review" element={<AddReview />} />
           <Route path="/activity-feed" element={<ActivityFeedPage />} />
           <Route path="/settings" element={<Settings />} />
