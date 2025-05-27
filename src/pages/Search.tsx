@@ -2,53 +2,14 @@
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
-import { Button } from "@/components/ui/button";
-import { FriendRecommendedFilter } from "@/components/FriendRecommendedFilter";
-import { useFriendRecommendedSitters } from "@/hooks/useFriendRecommendedSitters";
-import { format } from "date-fns";
-import { SearchFilters } from "@/components/search/SearchFilters";
-import { DateTimeFilters } from "@/components/search/DateTimeFilters";
-import { AdditionalFilters } from "@/components/search/AdditionalFilters";
-import { SearchResults } from "@/components/search/SearchResults";
-
-interface SearchFilters {
-  location: string;
-  date: string;
-  time: string;
-  availability: string;
-  experience: string;
-  friendRecommendedOnly: boolean;
-}
+import { Input } from "@/components/ui/input";
+import { Search as SearchIcon } from "lucide-react";
+import { SitterCard } from "@/components/SitterCard";
 
 const Search = () => {
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
-    location: "",
-    date: "",
-    time: "",
-    availability: "",
-    experience: "",
-    friendRecommendedOnly: false
-  });
-  
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date>();
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Mock user ID - in a real app, this would come from authentication
-  const currentUserId = "mock-user-id";
-
-  // Fetch friend-recommended sitters
-  const { 
-    data: friendRecommendedSitters, 
-    isLoading: loadingFriendRecommended,
-    error: friendRecommendedError
-  } = useFriendRecommendedSitters(
-    currentUserId, 
-    searchFilters.friendRecommendedOnly
-  );
-
-  // Mock sitter data for demonstration
+  // Enhanced mock sitter data with friendRecommendationCount
   const mockSitters = [
     {
       id: "1",
@@ -56,14 +17,15 @@ const Search = () => {
       image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       rating: 4.8,
       experience: "5+ years experience",
-      recommendedBy: "Sarah M."
+      friendRecommendationCount: 5
     },
     {
       id: "2", 
       name: "Sophia Bennett",
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       rating: 4.9,
-      experience: "3+ years experience"
+      experience: "3+ years experience",
+      friendRecommendationCount: 3
     },
     {
       id: "3",
@@ -71,132 +33,70 @@ const Search = () => {
       image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=2564&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       rating: 4.7,
       experience: "2+ years experience",
-      recommendedBy: "Kelly R."
+      friendRecommendationCount: 1
+    },
+    {
+      id: "4",
+      name: "Jessica Williams",
+      image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=2488&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      rating: 4.6,
+      experience: "4+ years experience",
+      friendRecommendationCount: 0
+    },
+    {
+      id: "5",
+      name: "Ashley Davis",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      rating: 4.9,
+      experience: "6+ years experience",
+      friendRecommendationCount: 2
     }
   ];
 
-  const handleSearch = () => {
-    console.log("Search filters:", searchFilters);
-    
-    let filteredSitters = mockSitters;
-    
-    // If friend-recommended filter is active, use the data from the hook
-    if (searchFilters.friendRecommendedOnly) {
-      if (loadingFriendRecommended) {
-        console.log("Still loading friend recommendations...");
-        return;
-      }
-      
-      if (friendRecommendedError) {
-        console.error("Error loading friend recommendations:", friendRecommendedError);
-        filteredSitters = [];
-      } else {
-        filteredSitters = friendRecommendedSitters || [];
-        console.log("Using friend-recommended sitters:", filteredSitters.length);
-      }
-    } else {
-      // Apply other filters to mock data
-      if (searchFilters.location) {
-        filteredSitters = filteredSitters.filter(() => true);
-      }
-    }
-    
-    setSearchResults(filteredSitters);
-    setHasSearched(true);
-  };
-
-  const handleFriendRecommendedToggle = (enabled: boolean) => {
-    setSearchFilters(prev => ({ ...prev, friendRecommendedOnly: enabled }));
-    
-    // Auto-search when toggling friend-recommended filter
-    if (enabled) {
-      setHasSearched(true);
-      if (!loadingFriendRecommended && friendRecommendedSitters) {
-        setSearchResults(friendRecommendedSitters);
-      }
-    }
-  };
-
-  const handleDateSelect = (date: Date | undefined) => {
-    setSelectedDate(date);
-    if (date) {
-      setSearchFilters(prev => ({ ...prev, date: format(date, "yyyy-MM-dd") }));
-    } else {
-      setSearchFilters(prev => ({ ...prev, date: "" }));
-    }
-  };
-
-  const handleTimeSlotSelect = (value: string) => {
-    setSelectedTimeSlot(value);
-    const timeSlots = [
-      { value: "morning", label: "Morning", time: "8am-12pm" },
-      { value: "afternoon", label: "Afternoon", time: "12pm-5pm" },
-      { value: "evening", label: "Evening", time: "5pm-9pm" },
-      { value: "anytime", label: "Any Time", time: "" }
-    ];
-    const selectedSlot = timeSlots.find(slot => slot.value === value);
-    if (selectedSlot) {
-      const timeString = selectedSlot.time ? `${selectedSlot.label} (${selectedSlot.time})` : selectedSlot.label;
-      setSearchFilters(prev => ({ ...prev, time: timeString }));
-    }
-  };
-
-  const handleLocationChange = (location: string) => {
-    setSearchFilters(prev => ({ ...prev, location }));
-  };
-
-  const handleAvailabilityFilter = () => {
-    setSearchFilters(prev => ({ ...prev, availability: "Available today" }));
-  };
-
-  const handleExperienceFilter = () => {
-    setSearchFilters(prev => ({ ...prev, experience: "3+ years" }));
-  };
+  // Filter and sort sitters based on search term
+  const filteredSitters = searchTerm 
+    ? mockSitters.filter(sitter => 
+        sitter.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : mockSitters.sort((a, b) => b.friendRecommendationCount - a.friendRecommendationCount);
 
   return (
     <div className="min-h-screen pb-20 bg-purple-50">
-      <Header title="Find a sitter" showBack={true} />
+      <Header title="Find a sitter" showBack={true} showSettings={false} />
       
       <div className="p-4">
-        <SearchFilters 
-          location={searchFilters.location}
-          onLocationChange={handleLocationChange}
-        />
-
-        {/* Friend-Recommended Filter - Prominently displayed */}
-        <div className="mb-6">
-          <FriendRecommendedFilter
-            enabled={searchFilters.friendRecommendedOnly}
-            onToggle={handleFriendRecommendedToggle}
-            friendCount={0} // This could be fetched from a separate query
+        {/* Search Bar */}
+        <div className="relative mb-6">
+          <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <Input 
+            className="pl-10 py-3 bg-white rounded-lg border-gray-200" 
+            placeholder="Search sitters by name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-        <DateTimeFilters
-          selectedDate={selectedDate}
-          selectedTimeSlot={selectedTimeSlot}
-          onDateSelect={handleDateSelect}
-          onTimeSlotSelect={handleTimeSlotSelect}
-        />
-        
-        <AdditionalFilters
-          onAvailabilityFilter={handleAvailabilityFilter}
-          onExperienceFilter={handleExperienceFilter}
-        />
-        
-        <Button 
-          className="w-full py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg"
-          onClick={handleSearch}
-          disabled={searchFilters.friendRecommendedOnly && loadingFriendRecommended}
-        >
-          {searchFilters.friendRecommendedOnly && loadingFriendRecommended ? "Loading..." : "Search"}
-        </Button>
+        {/* Sitter Results Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          {filteredSitters.map((sitter) => (
+            <SitterCard
+              key={sitter.id}
+              id={sitter.id}
+              name={sitter.name}
+              image={sitter.image}
+              rating={sitter.rating}
+              experience={sitter.experience}
+              friendRecommendationCount={sitter.friendRecommendationCount}
+            />
+          ))}
+        </div>
 
-        <SearchResults
-          searchResults={searchResults}
-          hasSearched={hasSearched}
-          friendRecommendedOnly={searchFilters.friendRecommendedOnly}
-        />
+        {filteredSitters.length === 0 && searchTerm && (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No sitters found matching "{searchTerm}"</p>
+            <p className="text-gray-400 text-sm mt-2">Try searching with a different name.</p>
+          </div>
+        )}
       </div>
       
       <BottomNavigation />

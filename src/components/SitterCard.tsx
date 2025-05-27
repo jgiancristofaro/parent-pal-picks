@@ -9,6 +9,7 @@ interface SitterCardProps {
   rating: number;
   experience?: string;
   recommendedBy?: string;
+  friendRecommendationCount: number;
 }
 
 export const SitterCard = ({ 
@@ -17,12 +18,19 @@ export const SitterCard = ({
   image, 
   rating, 
   experience, 
-  recommendedBy 
+  recommendedBy,
+  friendRecommendationCount
 }: SitterCardProps) => {
+  const formatFriendRecommendation = (count: number) => {
+    if (count === 0) return "New sitter";
+    if (count === 1) return "Recommended by 1 friend";
+    return `Recommended by ${count} friends`;
+  };
+
   return (
     <Link to={`/sitter/${id}`}>
-      <div className="flex items-center p-4 mb-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
-        <div className="w-16 h-16 rounded-full overflow-hidden mr-4 flex-shrink-0">
+      <div className="flex flex-col p-3 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+        <div className="w-full aspect-square rounded-lg overflow-hidden mb-3">
           <img 
             src={image} 
             alt={name} 
@@ -30,14 +38,16 @@ export const SitterCard = ({
           />
         </div>
         <div className="flex-grow">
-          <h3 className="font-semibold text-gray-800">{name}</h3>
-          <div className="flex items-center mt-1">
-            <StarIcon filled={true} className="w-4 h-4 text-yellow-500" />
-            <span className="text-sm text-gray-600 ml-1">{rating}</span>
+          <h3 className="font-semibold text-gray-800 text-sm mb-1">{name}</h3>
+          <div className="flex items-center mb-1">
+            <StarIcon filled={true} className="w-3 h-3 text-yellow-500" />
+            <span className="text-xs text-gray-600 ml-1">{rating}</span>
           </div>
-          {experience && <p className="text-sm text-gray-500 mt-1">{experience}</p>}
-          {recommendedBy && (
-            <p className="text-xs text-purple-600 mt-1">Recommended by {recommendedBy}</p>
+          {experience && <p className="text-xs text-gray-500 mb-1">{experience}</p>}
+          {recommendedBy ? (
+            <p className="text-xs text-purple-600">Recommended by {recommendedBy}</p>
+          ) : (
+            <p className="text-xs text-purple-600">{formatFriendRecommendation(friendRecommendationCount)}</p>
           )}
         </div>
       </div>
