@@ -1,4 +1,5 @@
 
+
 interface HeroSectionProps {
   userName: string;
 }
@@ -13,7 +14,7 @@ export const HeroSection = ({ userName }: HeroSectionProps) => {
         backgroundRepeat: 'no-repeat'
       }}>
         <div className="relative h-full flex flex-col justify-center px-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          <h1 className="text-2xl font-bold font-serif text-gray-800 mb-2">
             Welcome back,
             <br />
             {userName}!
