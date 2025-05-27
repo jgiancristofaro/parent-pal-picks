@@ -30,6 +30,7 @@ export const SearchResults = ({ searchResults, hasSearched, friendRecommendedOnl
               rating={sitter.rating}
               experience={sitter.experience}
               recommendedBy={sitter.recommendedBy}
+              friendRecommendationCount={sitter.friendRecommendationCount || 0}
             />
           ))}
         </div>
