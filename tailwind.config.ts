@@ -105,7 +105,6 @@ export default {
 			},
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
-        serif: ['Merriweather', 'serif'],
       },
 		}
 	},

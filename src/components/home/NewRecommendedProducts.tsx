@@ -21,7 +21,7 @@ export const NewRecommendedProducts = ({ newlyRecommendedProducts }: NewRecommen
   return (
     <div className="mb-4">
       <div className="flex justify-between items-center px-4 mb-2">
-        <h2 className="text-xl font-bold font-serif">New Products for You</h2>
+        <h2 className="text-xl font-bold">New Products for You</h2>
         {newlyRecommendedProducts.length > 0 && (
           <Link to="/newly-recommended-products" className="flex items-center text-purple-500 text-sm font-medium hover:text-purple-600">
             View All
