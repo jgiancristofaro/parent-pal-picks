@@ -23,6 +23,7 @@ import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import AddReview from "./pages/AddReview";
 import ActivityFeedPage from "./pages/ActivityFeedPage";
+import ManageLocations from "./pages/ManageLocations";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/add-review" element={<AddReview />} />
           <Route path="/activity-feed" element={<ActivityFeedPage />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/settings/my-homes" element={<ManageLocations />} />
           <Route path="/payment-methods" element={<PaymentMethods />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/language" element={<Language />} />

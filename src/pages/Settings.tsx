@@ -1,8 +1,9 @@
+
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, CreditCard, Bell, Globe, Shield, Lock, HelpCircle, Info, LogOut } from "lucide-react";
+import { ChevronRight, CreditCard, Bell, Globe, Shield, Lock, HelpCircle, Info, LogOut, Home } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -36,6 +37,13 @@ const Settings = () => {
           icon: null,
           avatar: true,
           href: "/profile"
+        },
+        {
+          id: "my-homes",
+          title: "My Homes",
+          description: "Manage your home locations",
+          icon: Home,
+          href: "/settings/my-homes"
         },
         {
           id: "payment",
