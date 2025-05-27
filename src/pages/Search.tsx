@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -24,11 +23,21 @@ const Search = () => {
   const { data: userLocations = [], isLoading: locationsLoading } = useUserLocations();
 
   // Fetch hyper-local sitters when filter is active
-  const { data: hyperLocalSitters = [], isLoading: hyperLocalLoading } = useHyperLocalSitters(
+  const { data: hyperLocalSittersRaw = [], isLoading: hyperLocalLoading } = useHyperLocalSitters(
     mockCurrentUserId,
     selectedLocationIdForFilter,
     hyperLocalFilterActive && !!selectedLocationIdForFilter
   );
+
+  // Transform hyper-local sitters to match SitterCard format
+  const hyperLocalSitters = hyperLocalSittersRaw.map(sitter => ({
+    id: sitter.id,
+    name: sitter.name,
+    image: sitter.profile_image_url || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    rating: sitter.rating || 0,
+    experience: sitter.experience || "Experience not specified",
+    friendRecommendationCount: 0 // Hyper-local sitters don't show friend recommendations
+  }));
 
   // Enhanced mock sitter data with friendRecommendationCount
   const mockSitters = [
