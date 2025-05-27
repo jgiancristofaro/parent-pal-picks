@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -30,10 +31,10 @@ const Search = () => {
   const selectedUserHomeDetails = userLocations.find(loc => loc.id === selectedUserHomeId);
 
   // Fetch local sitters when local scope is active
-  const shouldFetchLocalSitters = localSearchScope !== "ANY" && selectedUserHomeId;
+  const shouldFetchLocalSitters = localSearchScope !== "ANY" && selectedUserHomeId !== null;
   const { data: localSittersRaw = [], isLoading: localSittersLoading } = useLocalSitters(
     mockCurrentUserId,
-    selectedUserHomeId,
+    selectedUserHomeId || undefined,
     localSearchScope as 'BUILDING' | 'AREA_ZIP',
     shouldFetchLocalSitters
   );
