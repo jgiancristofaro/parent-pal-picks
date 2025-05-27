@@ -24,6 +24,7 @@ import NotFound from "./pages/NotFound";
 import AddReview from "./pages/AddReview";
 import ActivityFeedPage from "./pages/ActivityFeedPage";
 import ManageLocations from "./pages/ManageLocations";
+import ManageLocationsMock from "./pages/ManageLocationsMock";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
           <Route path="/activity-feed" element={<ActivityFeedPage />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/settings/my-homes" element={<ManageLocations />} />
+          <Route path="/settings/my-homes-mock" element={<ManageLocationsMock />} />
           <Route path="/payment-methods" element={<PaymentMethods />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/language" element={<Language />} />

@@ -7,174 +7,53 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Plus, Edit, Trash2, Home, Building, MapPin } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { LocationForm } from "@/components/settings/LocationForm";
 import { useMockUserLocations } from "@/hooks/useMockUserLocations";
 
-const MockLocationForm = ({ initialData, onSuccess }: { initialData?: any; onSuccess: () => void }) => {
-  const [formData, setFormData] = useState({
-    location_nickname: initialData?.location_nickname || "",
-    building_identifier: initialData?.building_identifier || "",
-    dwelling_type: initialData?.dwelling_type || "APARTMENT_BUILDING",
-    zip_code: initialData?.zip_code || "",
-    street: initialData?.address_details?.street || "",
-    city: initialData?.address_details?.city || "",
-    is_primary: initialData?.is_primary || false,
-  });
-
-  const { addLocation, updateLocation } = useMockUserLocations();
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const locationData = {
-      location_nickname: formData.location_nickname,
-      building_identifier: formData.building_identifier || null,
-      dwelling_type: formData.dwelling_type,
-      zip_code: formData.zip_code,
-      address_details: {
-        street: formData.street,
-        city: formData.city,
-      },
-      is_primary: formData.is_primary,
-      latitude: null,
-      longitude: null,
-    };
-
-    if (initialData) {
-      updateLocation(initialData.id, locationData);
-    } else {
-      addLocation(locationData);
-    }
-    
-    onSuccess();
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <label htmlFor="location_nickname" className="text-sm font-medium">
-          Location Nickname *
-        </label>
-        <input
-          id="location_nickname"
-          type="text"
-          placeholder="My Home"
-          value={formData.location_nickname}
-          onChange={(e) => setFormData(prev => ({...prev, location_nickname: e.target.value}))}
-          className="w-full p-2 border rounded"
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="dwelling_type" className="text-sm font-medium">
-          Dwelling Type *
-        </label>
-        <select
-          id="dwelling_type"
-          value={formData.dwelling_type}
-          onChange={(e) => setFormData(prev => ({...prev, dwelling_type: e.target.value}))}
-          className="w-full p-2 border rounded"
-        >
-          <option value="APARTMENT_BUILDING">Apartment Building</option>
-          <option value="SINGLE_FAMILY_HOME">Single Family Home</option>
-          <option value="TOWNHOUSE">Townhouse</option>
-        </select>
-      </div>
-
-      {formData.dwelling_type === 'APARTMENT_BUILDING' && (
-        <div className="space-y-2">
-          <label htmlFor="building_identifier" className="text-sm font-medium">
-            Building Identifier *
-          </label>
-          <input
-            id="building_identifier"
-            type="text"
-            placeholder="e.g., The Grand Plaza Main Tower"
-            value={formData.building_identifier}
-            onChange={(e) => setFormData(prev => ({...prev, building_identifier: e.target.value}))}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-      )}
-
-      <div className="space-y-2">
-        <label htmlFor="zip_code" className="text-sm font-medium">
-          ZIP Code *
-        </label>
-        <input
-          id="zip_code"
-          type="text"
-          placeholder="10001"
-          value={formData.zip_code}
-          onChange={(e) => setFormData(prev => ({...prev, zip_code: e.target.value}))}
-          className="w-full p-2 border rounded"
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="street" className="text-sm font-medium">
-          Street Address (Optional)
-        </label>
-        <input
-          id="street"
-          type="text"
-          placeholder="123 Main Street"
-          value={formData.street}
-          onChange={(e) => setFormData(prev => ({...prev, street: e.target.value}))}
-          className="w-full p-2 border rounded"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="city" className="text-sm font-medium">
-          City (Optional)
-        </label>
-        <input
-          id="city"
-          type="text"
-          placeholder="New York"
-          value={formData.city}
-          onChange={(e) => setFormData(prev => ({...prev, city: e.target.value}))}
-          className="w-full p-2 border rounded"
-        />
-      </div>
-
-      <div className="flex items-center space-x-2">
-        <input
-          id="is_primary"
-          type="checkbox"
-          checked={formData.is_primary}
-          onChange={(e) => setFormData(prev => ({...prev, is_primary: e.target.checked}))}
-        />
-        <label htmlFor="is_primary" className="text-sm font-medium">
-          Set as primary home
-        </label>
-      </div>
-
-      <div className="flex justify-end space-x-2 pt-4">
-        <Button type="submit">
-          {initialData ? "Update Location" : "Add Location"}
-        </Button>
-      </div>
-    </form>
-  );
-};
+interface UserLocation {
+  id: string;
+  location_nickname: string;
+  building_identifier: string | null;
+  dwelling_type: string;
+  zip_code: string;
+  address_details: any;
+  is_primary: boolean;
+  latitude: number | null;
+  longitude: number | null;
+  created_at: string;
+  updated_at: string;
+}
 
 const ManageLocationsMock = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [editingLocation, setEditingLocation] = useState<any>(null);
+  const [editingLocation, setEditingLocation] = useState<UserLocation | null>(null);
   const { toast } = useToast();
-  const { data: locations = [], isLoading, deleteLocation } = useMockUserLocations();
 
-  const handleLocationSaved = () => {
+  // Use the mock locations hook
+  const { 
+    data: locations = [], 
+    isLoading, 
+    addLocation, 
+    updateLocation, 
+    deleteLocation 
+  } = useMockUserLocations();
+
+  const handleLocationSaved = (location: any) => {
+    if (editingLocation) {
+      updateLocation(editingLocation.id, location);
+      toast({
+        title: "Location updated",
+        description: "Your home location has been successfully updated.",
+      });
+    } else {
+      addLocation(location);
+      toast({
+        title: "Location added",
+        description: "Your home location has been successfully added.",
+      });
+    }
     setIsAddDialogOpen(false);
     setEditingLocation(null);
-    toast({
-      title: "Location saved",
-      description: "Your home location has been successfully saved.",
-    });
   };
 
   const handleDeleteLocation = (locationId: string) => {
@@ -206,7 +85,7 @@ const ManageLocationsMock = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header title="My Homes (Mock)" showBack={true} backTo="/settings" showSettings={false} />
+        <Header title="My Homes (Mock)" showBack={true} backTo="/" showSettings={false} />
         <div className="px-4 py-6">
           <div className="text-center py-8">
             <p className="text-gray-500">Loading your home locations...</p>
@@ -218,19 +97,14 @@ const ManageLocationsMock = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header title="My Homes (Mock)" showBack={true} backTo="/settings" showSettings={false} />
+      <Header title="My Homes (Mock)" showBack={true} backTo="/" showSettings={false} />
       
       <div className="px-4 py-6">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Manage Your Locations</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Manage Your Locations (Mock Data)</h1>
           <p className="text-gray-600">
-            Add your home locations to get hyper-local sitter recommendations from neighbors in your building.
+            This page uses mock data for testing purposes.
           </p>
-          <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-700">
-              <strong>Demo Mode:</strong> This is a mock version with sample data for testing. In the real app, this would connect to your authenticated account.
-            </p>
-          </div>
         </div>
 
         {locations.length === 0 ? (
@@ -254,7 +128,7 @@ const ManageLocationsMock = () => {
                   <DialogHeader>
                     <DialogTitle>Add New Home Location</DialogTitle>
                   </DialogHeader>
-                  <MockLocationForm onSuccess={handleLocationSaved} />
+                  <LocationForm onSuccess={handleLocationSaved} />
                 </DialogContent>
               </Dialog>
             </CardContent>
@@ -276,7 +150,7 @@ const ManageLocationsMock = () => {
                   <DialogHeader>
                     <DialogTitle>Add New Home Location</DialogTitle>
                   </DialogHeader>
-                  <MockLocationForm onSuccess={handleLocationSaved} />
+                  <LocationForm onSuccess={handleLocationSaved} />
                 </DialogContent>
               </Dialog>
             </div>
@@ -311,7 +185,7 @@ const ManageLocationsMock = () => {
                               <DialogHeader>
                                 <DialogTitle>Edit Home Location</DialogTitle>
                               </DialogHeader>
-                              <MockLocationForm 
+                              <LocationForm 
                                 initialData={location} 
                                 onSuccess={handleLocationSaved} 
                               />
