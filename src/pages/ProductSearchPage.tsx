@@ -139,7 +139,7 @@ const ProductSearchPage = () => {
       
       <div className="p-4">
         {/* Search Bar */}
-        <div className="relative mb-4">
+        <div className="relative mb-2">
           <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           <Input 
             className="pl-10 py-3 bg-white rounded-lg border-gray-200" 
@@ -150,7 +150,7 @@ const ProductSearchPage = () => {
         </div>
 
         {/* Friend Recommended Toggle */}
-        <div className="flex items-center justify-between mb-4 p-3 bg-white rounded-lg border border-gray-200">
+        <div className="flex items-center justify-between mb-3 p-3 bg-white rounded-lg border border-gray-200">
           <span className="text-sm font-medium text-gray-700">Recommended by People I Follow</span>
           <Switch
             checked={friendRecommendedOnly}
@@ -165,6 +165,7 @@ const ProductSearchPage = () => {
               <Button
                 key={category}
                 variant={selectedCategory === category ? "default" : "outline"}
+                size="sm"
                 className={`whitespace-nowrap rounded-full px-4 py-2 text-sm ${
                   selectedCategory === category
                     ? "bg-purple-500 text-white hover:bg-purple-600"
