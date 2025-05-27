@@ -3,11 +3,18 @@ import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Search as SearchIcon } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 
 const ProductSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [friendRecommendedOnly, setFriendRecommendedOnly] = useState(false);
+
+  // Define product categories
+  const categories = ['Diapers', 'Bottles', 'Clothing', 'Baby Monitors', 'Strollers', 'Car Seats', 'Baby Food', 'Toys', 'Baby Care', 'Bedding'];
 
   // Mock product data with diverse categories and recommendation counts
   const mockProducts = [
@@ -93,13 +100,38 @@ const ProductSearchPage = () => {
     }
   ];
 
-  // Filter and sort products based on search term
-  const filteredProducts = searchTerm 
-    ? mockProducts.filter(product => 
+  // Handle category pill click
+  const handleCategoryClick = (category: string) => {
+    if (selectedCategory === category) {
+      setSelectedCategory(null);
+    } else {
+      setSelectedCategory(category);
+    }
+  };
+
+  // Filter and sort products based on search term, category, and friend recommendations
+  const filteredProducts = mockProducts
+    .filter(product => {
+      // Filter by search term
+      const matchesSearch = searchTerm === "" || 
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : mockProducts.sort((a, b) => b.friendRecommendationCount - a.friendRecommendationCount);
+        product.category.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // Filter by selected category
+      const matchesCategory = selectedCategory === null || product.category === selectedCategory;
+      
+      // Filter by friend recommendations
+      const matchesFriendFilter = !friendRecommendedOnly || product.friendRecommendationCount > 0;
+      
+      return matchesSearch && matchesCategory && matchesFriendFilter;
+    })
+    .sort((a, b) => {
+      // Sort by friend recommendation count if no search term
+      if (searchTerm === "") {
+        return b.friendRecommendationCount - a.friendRecommendationCount;
+      }
+      return 0;
+    });
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
@@ -107,7 +139,7 @@ const ProductSearchPage = () => {
       
       <div className="p-4">
         {/* Search Bar */}
-        <div className="relative mb-6">
+        <div className="relative mb-4">
           <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           <Input 
             className="pl-10 py-3 bg-white rounded-lg border-gray-200" 
@@ -115,6 +147,35 @@ const ProductSearchPage = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+        </div>
+
+        {/* Friend Recommended Toggle */}
+        <div className="flex items-center justify-between mb-4 p-3 bg-white rounded-lg border border-gray-200">
+          <span className="text-sm font-medium text-gray-700">Recommended by People I Follow</span>
+          <Switch
+            checked={friendRecommendedOnly}
+            onCheckedChange={setFriendRecommendedOnly}
+          />
+        </div>
+
+        {/* Category Filter Pills */}
+        <div className="mb-6">
+          <div className="flex overflow-x-auto space-x-2 px-1 py-2">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
+                className={`whitespace-nowrap rounded-full px-4 py-2 text-sm ${
+                  selectedCategory === category
+                    ? "bg-purple-500 text-white hover:bg-purple-600"
+                    : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                }`}
+                onClick={() => handleCategoryClick(category)}
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
         </div>
 
         {/* Product Results Grid */}
@@ -132,10 +193,10 @@ const ProductSearchPage = () => {
           ))}
         </div>
 
-        {filteredProducts.length === 0 && searchTerm && (
+        {filteredProducts.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-gray-500">No products found matching "{searchTerm}"</p>
-            <p className="text-gray-400 text-sm mt-2">Try searching with a different name or category.</p>
+            <p className="text-gray-500">No products found matching your filters</p>
+            <p className="text-gray-400 text-sm mt-2">Try adjusting your search criteria or filters.</p>
           </div>
         )}
       </div>
