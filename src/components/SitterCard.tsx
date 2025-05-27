@@ -1,6 +1,8 @@
 
 import { Link } from "react-router-dom";
 import { StarIcon } from "./StarIcon";
+import { Badge } from "@/components/ui/badge";
+import { Building } from "lucide-react";
 
 interface SitterCardProps {
   id: string;
@@ -10,6 +12,7 @@ interface SitterCardProps {
   experience?: string;
   recommendedBy?: string;
   friendRecommendationCount: number;
+  workedInUserLocationNickname?: string;
 }
 
 export const SitterCard = ({ 
@@ -19,7 +22,8 @@ export const SitterCard = ({
   rating, 
   experience, 
   recommendedBy,
-  friendRecommendationCount
+  friendRecommendationCount,
+  workedInUserLocationNickname
 }: SitterCardProps) => {
   const formatFriendRecommendation = (count: number) => {
     if (count === 0) return "New sitter";
@@ -44,6 +48,17 @@ export const SitterCard = ({
             <span className="text-xs text-gray-600 ml-1">{rating}</span>
           </div>
           {experience && <p className="text-xs text-gray-500 mb-1">{experience}</p>}
+          
+          {/* Special badge for hyper-local sitters */}
+          {workedInUserLocationNickname && (
+            <div className="flex items-center mb-1">
+              <Building className="w-3 h-3 text-purple-600 mr-1" />
+              <span className="text-xs text-purple-600 font-medium">
+                Worked in your {workedInUserLocationNickname} building
+              </span>
+            </div>
+          )}
+          
           {recommendedBy ? (
             <p className="text-xs text-purple-600">Recommended by {recommendedBy}</p>
           ) : (
