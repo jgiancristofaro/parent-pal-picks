@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -10,7 +9,7 @@ import { Search as SearchIcon } from "lucide-react";
 import { SitterCard } from "@/components/SitterCard";
 import { HyperLocalSitters } from "@/components/search/HyperLocalSitters";
 import { useUserLocations } from "@/hooks/useUserLocations";
-import { useHyperLocalSitters } from "@/hooks/useHyperLocalSitters";
+import { useLocalSitters } from "@/hooks/useLocalSitters";
 
 const Search = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,9 +26,10 @@ const Search = () => {
   const apartmentBuildings = userLocations.filter(loc => loc.dwelling_type === 'APARTMENT_BUILDING');
 
   // Fetch hyper-local sitters when filter is active
-  const { data: hyperLocalSittersRaw = [], isLoading: hyperLocalLoading } = useHyperLocalSitters(
+  const { data: hyperLocalSittersRaw = [], isLoading: hyperLocalLoading } = useLocalSitters(
     mockCurrentUserId,
     selectedLocationIdForFilter,
+    'BUILDING',
     hyperLocalFilterActive && !!selectedLocationIdForFilter
   );
 
@@ -206,6 +206,7 @@ const Search = () => {
             currentUserId={mockCurrentUserId}
             selectedLocationId={apartmentBuildings[0]?.id}
             locationNickname={apartmentBuildings[0]?.location_nickname}
+            searchScope="BUILDING"
           />
         )}
 

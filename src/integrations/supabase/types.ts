@@ -301,22 +301,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_new_activity_count: {
-        Args: { user_id: string }
-        Returns: number
-      }
-      get_recent_activity_summary: {
-        Args: { user_id: string }
-        Returns: {
-          activity_count: number
-          most_recent_user_name: string
-          most_recent_activity: string
-        }[]
-      }
-      get_sitters_for_user_location: {
+      get_local_sitters: {
         Args: {
           current_user_id_param: string
           selected_user_location_id_param: string
+          search_scope_param: string
         }
         Returns: {
           bio: string | null
@@ -330,6 +319,18 @@ export type Database = {
           rating: number | null
           review_count: number | null
           updated_at: string
+        }[]
+      }
+      get_new_activity_count: {
+        Args: { user_id: string }
+        Returns: number
+      }
+      get_recent_activity_summary: {
+        Args: { user_id: string }
+        Returns: {
+          activity_count: number
+          most_recent_user_name: string
+          most_recent_activity: string
         }[]
       }
       update_activity_feed_view: {
