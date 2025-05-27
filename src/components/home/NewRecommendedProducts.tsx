@@ -35,7 +35,7 @@ export const NewRecommendedProducts = ({ newlyRecommendedProducts }: NewRecommen
           <p className="text-gray-600">No new product recommendations yet.</p>
         </div>
       ) : (
-        <ScrollArea className="w-full whitespace-nowrap">
+        <ScrollArea className="w-full whitespace-nowrap no-scrollbar">
           <div className="flex w-max space-x-4 px-4">
             {newlyRecommendedProducts.map((product) => (
               <div key={product.id} className="flex-none w-48">

@@ -41,7 +41,7 @@ export const FriendsActivity = ({ friendActivity }: FriendsActivityProps) => {
           </Link>
         </div>
       ) : (
-        <ScrollArea className="w-full whitespace-nowrap">
+        <ScrollArea className="w-full whitespace-nowrap no-scrollbar">
           <div className="flex w-max space-x-4 px-4">
             {friendActivity.map((item, index) => (
               <div key={index} className="flex-none w-64 bg-white rounded-xl shadow-sm border border-gray-100">

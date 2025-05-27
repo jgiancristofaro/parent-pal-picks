@@ -36,7 +36,7 @@ export const NewRecommendedSitters = ({ newlyRecommendedSitters }: NewRecommende
           <p className="text-gray-600">No new sitter recommendations yet.</p>
         </div>
       ) : (
-        <ScrollArea className="w-full whitespace-nowrap">
+        <ScrollArea className="w-full whitespace-nowrap no-scrollbar">
           <div className="flex w-max space-x-4 px-4">
             {newlyRecommendedSitters.map((sitter) => (
               <div key={sitter.id} className="flex-none w-48">
