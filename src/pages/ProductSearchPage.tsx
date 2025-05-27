@@ -160,13 +160,13 @@ const ProductSearchPage = () => {
 
         {/* Category Filter Pills */}
         <div className="mb-6">
-          <div className="flex overflow-x-auto space-x-2 px-1 pt-0">
+          <div className="flex overflow-x-auto space-x-2 px-1 pt-0 no-scrollbar">
             {categories.map((category) => (
               <Button
                 key={category}
                 variant={selectedCategory === category ? "default" : "outline"}
                 size="sm"
-                className={`whitespace-nowrap rounded-full px-3 py-1 text-xs ${
+                className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs ${
                   selectedCategory === category
                     ? "bg-purple-500 text-white hover:bg-purple-600"
                     : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
