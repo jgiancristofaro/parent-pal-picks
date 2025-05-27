@@ -3,21 +3,32 @@ import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search as SearchIcon } from "lucide-react";
 import { SitterCard } from "@/components/SitterCard";
 import { HyperLocalSitters } from "@/components/search/HyperLocalSitters";
+import { useUserLocations } from "@/hooks/useUserLocations";
+import { useHyperLocalSitters } from "@/hooks/useHyperLocalSitters";
 
 const Search = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [hyperLocalFilterActive, setHyperLocalFilterActive] = useState(false);
+  const [selectedLocationIdForFilter, setSelectedLocationIdForFilter] = useState<string | null>(null);
 
   // Mock current user ID for demonstration - in a real app this would come from auth
   const mockCurrentUserId = "user-2";
-  
-  // Mock user location for demonstration - in a real app this would be selected by user
-  const mockUserLocation = {
-    id: "location-123",
-    nickname: "Home"
-  };
+
+  // Fetch user's saved locations
+  const { data: userLocations = [], isLoading: locationsLoading } = useUserLocations();
+
+  // Fetch hyper-local sitters when filter is active
+  const { data: hyperLocalSitters = [], isLoading: hyperLocalLoading } = useHyperLocalSitters(
+    mockCurrentUserId,
+    selectedLocationIdForFilter,
+    hyperLocalFilterActive && !!selectedLocationIdForFilter
+  );
 
   // Enhanced mock sitter data with friendRecommendationCount
   const mockSitters = [
@@ -63,12 +74,41 @@ const Search = () => {
     }
   ];
 
-  // Filter and sort sitters based on search term
-  const filteredSitters = searchTerm 
-    ? mockSitters.filter(sitter => 
+  // Handle location filter toggle
+  const handleHyperLocalToggle = (checked: boolean) => {
+    setHyperLocalFilterActive(checked);
+    
+    // Auto-select location if user has exactly one
+    if (checked && userLocations.length === 1) {
+      setSelectedLocationIdForFilter(userLocations[0].id);
+    } else if (!checked) {
+      setSelectedLocationIdForFilter(null);
+    }
+  };
+
+  // Determine which sitters to display
+  const getDisplayedSitters = () => {
+    let sittersToShow = mockSitters;
+
+    // If hyper-local filter is active and we have results, use those
+    if (hyperLocalFilterActive && selectedLocationIdForFilter && hyperLocalSitters.length > 0) {
+      sittersToShow = hyperLocalSitters;
+    }
+
+    // Apply search term filter
+    if (searchTerm) {
+      sittersToShow = sittersToShow.filter(sitter => 
         sitter.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : mockSitters.sort((a, b) => b.friendRecommendationCount - a.friendRecommendationCount);
+      );
+    } else if (!hyperLocalFilterActive) {
+      // Sort by friend recommendations when no search term and no hyper-local filter
+      sittersToShow = sittersToShow.sort((a, b) => b.friendRecommendationCount - a.friendRecommendationCount);
+    }
+
+    return sittersToShow;
+  };
+
+  const displayedSitters = getDisplayedSitters();
 
   return (
     <div className="min-h-screen pb-20 bg-purple-50">
@@ -76,7 +116,7 @@ const Search = () => {
       
       <div className="p-4">
         {/* Search Bar */}
-        <div className="relative mb-6">
+        <div className="relative mb-4">
           <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           <Input 
             className="pl-10 py-3 bg-white rounded-lg border-gray-200" 
@@ -86,22 +126,71 @@ const Search = () => {
           />
         </div>
 
-        {/* Hyper-Local Sitter Recommendations */}
-        {!searchTerm && (
+        {/* Hyper-Local Filter */}
+        <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200">
+          <div className="flex items-center space-x-3 mb-3">
+            <Switch
+              id="hyper-local-filter"
+              checked={hyperLocalFilterActive}
+              onCheckedChange={handleHyperLocalToggle}
+              disabled={userLocations.length === 0}
+            />
+            <Label htmlFor="hyper-local-filter" className="text-sm font-medium">
+              Sitters from my building
+            </Label>
+          </div>
+          
+          {userLocations.length === 0 && (
+            <p className="text-xs text-gray-500 ml-8">
+              Add a home in your settings to use this filter.
+            </p>
+          )}
+
+          {hyperLocalFilterActive && userLocations.length > 1 && (
+            <div className="ml-8">
+              <Select 
+                value={selectedLocationIdForFilter || ""} 
+                onValueChange={setSelectedLocationIdForFilter}
+              >
+                <SelectTrigger className="w-full max-w-xs">
+                  <SelectValue placeholder="Select your home" />
+                </SelectTrigger>
+                <SelectContent>
+                  {userLocations.map((location) => (
+                    <SelectItem key={location.id} value={location.id}>
+                      {location.location_nickname}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {hyperLocalFilterActive && userLocations.length === 1 && (
+            <p className="text-xs text-gray-600 ml-8">
+              Filtering for: {userLocations[0].location_nickname}
+            </p>
+          )}
+        </div>
+
+        {/* Hyper-Local Sitter Recommendations (Original Component - shown when no filters) */}
+        {!searchTerm && !hyperLocalFilterActive && (
           <HyperLocalSitters 
             currentUserId={mockCurrentUserId}
-            selectedLocationId={mockUserLocation.id}
-            locationNickname={mockUserLocation.nickname}
+            selectedLocationId={userLocations[0]?.id}
+            locationNickname={userLocations[0]?.location_nickname}
           />
         )}
 
         {/* All Sitters Results Grid */}
         <div className="mt-6">
           <h2 className="text-xl font-semibold mb-4">
-            {searchTerm ? `Search Results (${filteredSitters.length} found)` : 'All Sitters'}
+            {searchTerm && `Search Results (${displayedSitters.length} found)`}
+            {!searchTerm && hyperLocalFilterActive && selectedLocationIdForFilter && `Sitters from ${userLocations.find(loc => loc.id === selectedLocationIdForFilter)?.location_nickname} (${displayedSitters.length} found)`}
+            {!searchTerm && !hyperLocalFilterActive && 'All Sitters'}
           </h2>
           <div className="grid grid-cols-2 gap-4">
-            {filteredSitters.map((sitter) => (
+            {displayedSitters.map((sitter) => (
               <SitterCard
                 key={sitter.id}
                 id={sitter.id}
@@ -115,10 +204,20 @@ const Search = () => {
           </div>
         </div>
 
-        {filteredSitters.length === 0 && searchTerm && (
+        {displayedSitters.length === 0 && (searchTerm || hyperLocalFilterActive) && (
           <div className="text-center py-8">
-            <p className="text-gray-500">No sitters found matching "{searchTerm}"</p>
-            <p className="text-gray-400 text-sm mt-2">Try searching with a different name.</p>
+            {searchTerm && (
+              <>
+                <p className="text-gray-500">No sitters found matching "{searchTerm}"</p>
+                <p className="text-gray-400 text-sm mt-2">Try searching with a different name.</p>
+              </>
+            )}
+            {!searchTerm && hyperLocalFilterActive && (
+              <>
+                <p className="text-gray-500">No sitters found from your building yet.</p>
+                <p className="text-gray-400 text-sm mt-2">Try searching all sitters or check back later.</p>
+              </>
+            )}
           </div>
         )}
       </div>
