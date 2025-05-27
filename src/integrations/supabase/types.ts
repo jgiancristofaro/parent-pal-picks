@@ -134,6 +134,7 @@ export type Database = {
           id: string
           product_id: string | null
           rating: number
+          service_location_id: string | null
           sitter_id: string | null
           title: string
           updated_at: string
@@ -145,6 +146,7 @@ export type Database = {
           id?: string
           product_id?: string | null
           rating: number
+          service_location_id?: string | null
           sitter_id?: string | null
           title: string
           updated_at?: string
@@ -156,6 +158,7 @@ export type Database = {
           id?: string
           product_id?: string | null
           rating?: number
+          service_location_id?: string | null
           sitter_id?: string | null
           title?: string
           updated_at?: string
@@ -167,6 +170,13 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_service_location_id_fkey"
+            columns: ["service_location_id"]
+            isOneToOne: false
+            referencedRelation: "user_locations"
             referencedColumns: ["id"]
           },
           {
@@ -241,6 +251,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_locations: {
+        Row: {
+          address_details: Json | null
+          building_identifier: string
+          created_at: string
+          id: string
+          is_primary: boolean | null
+          location_nickname: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address_details?: Json | null
+          building_identifier: string
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          location_nickname: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address_details?: Json | null
+          building_identifier?: string
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          location_nickname?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -256,6 +299,25 @@ export type Database = {
           activity_count: number
           most_recent_user_name: string
           most_recent_activity: string
+        }[]
+      }
+      get_sitters_for_user_location: {
+        Args: {
+          current_user_id_param: string
+          selected_user_location_id_param: string
+        }
+        Returns: {
+          bio: string | null
+          certifications: string[] | null
+          created_at: string
+          experience: string | null
+          hourly_rate: number | null
+          id: string
+          name: string
+          profile_image_url: string | null
+          rating: number | null
+          review_count: number | null
+          updated_at: string
         }[]
       }
       update_activity_feed_view: {

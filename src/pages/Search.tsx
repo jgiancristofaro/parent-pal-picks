@@ -5,9 +5,19 @@ import { BottomNavigation } from "@/components/BottomNavigation";
 import { Input } from "@/components/ui/input";
 import { Search as SearchIcon } from "lucide-react";
 import { SitterCard } from "@/components/SitterCard";
+import { HyperLocalSitters } from "@/components/search/HyperLocalSitters";
 
 const Search = () => {
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Mock current user ID for demonstration - in a real app this would come from auth
+  const mockCurrentUserId = "user-2";
+  
+  // Mock user location for demonstration - in a real app this would be selected by user
+  const mockUserLocation = {
+    id: "location-123",
+    nickname: "Home"
+  };
 
   // Enhanced mock sitter data with friendRecommendationCount
   const mockSitters = [
@@ -76,19 +86,33 @@ const Search = () => {
           />
         </div>
 
-        {/* Sitter Results Grid */}
-        <div className="grid grid-cols-2 gap-4">
-          {filteredSitters.map((sitter) => (
-            <SitterCard
-              key={sitter.id}
-              id={sitter.id}
-              name={sitter.name}
-              image={sitter.image}
-              rating={sitter.rating}
-              experience={sitter.experience}
-              friendRecommendationCount={sitter.friendRecommendationCount}
-            />
-          ))}
+        {/* Hyper-Local Sitter Recommendations */}
+        {!searchTerm && (
+          <HyperLocalSitters 
+            currentUserId={mockCurrentUserId}
+            selectedLocationId={mockUserLocation.id}
+            locationNickname={mockUserLocation.nickname}
+          />
+        )}
+
+        {/* All Sitters Results Grid */}
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold mb-4">
+            {searchTerm ? `Search Results (${filteredSitters.length} found)` : 'All Sitters'}
+          </h2>
+          <div className="grid grid-cols-2 gap-4">
+            {filteredSitters.map((sitter) => (
+              <SitterCard
+                key={sitter.id}
+                id={sitter.id}
+                name={sitter.name}
+                image={sitter.image}
+                rating={sitter.rating}
+                experience={sitter.experience}
+                friendRecommendationCount={sitter.friendRecommendationCount}
+              />
+            ))}
+          </div>
         </div>
 
         {filteredSitters.length === 0 && searchTerm && (
