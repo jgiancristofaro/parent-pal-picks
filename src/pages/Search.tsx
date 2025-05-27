@@ -45,7 +45,7 @@ const Search = () => {
     workedInUserLocationNickname: selectedLocation?.location_nickname
   }));
 
-  // Enhanced mock sitter data with friendRecommendationCount
+  // Enhanced mock sitter data with friendRecommendationCount and workedInUserLocationNickname
   const mockSitters = [
     {
       id: "1",
@@ -53,7 +53,8 @@ const Search = () => {
       image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       rating: 4.8,
       experience: "5+ years experience",
-      friendRecommendationCount: 5
+      friendRecommendationCount: 5,
+      workedInUserLocationNickname: undefined
     },
     {
       id: "2", 
@@ -61,7 +62,8 @@ const Search = () => {
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       rating: 4.9,
       experience: "3+ years experience",
-      friendRecommendationCount: 3
+      friendRecommendationCount: 3,
+      workedInUserLocationNickname: undefined
     },
     {
       id: "3",
@@ -69,7 +71,8 @@ const Search = () => {
       image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=2564&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       rating: 4.7,
       experience: "2+ years experience",
-      friendRecommendationCount: 1
+      friendRecommendationCount: 1,
+      workedInUserLocationNickname: undefined
     },
     {
       id: "4",
@@ -77,7 +80,8 @@ const Search = () => {
       image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=2488&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       rating: 4.6,
       experience: "4+ years experience",
-      friendRecommendationCount: 0
+      friendRecommendationCount: 0,
+      workedInUserLocationNickname: undefined
     },
     {
       id: "5",
@@ -85,7 +89,8 @@ const Search = () => {
       image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       rating: 4.9,
       experience: "6+ years experience",
-      friendRecommendationCount: 2
+      friendRecommendationCount: 2,
+      workedInUserLocationNickname: undefined
     }
   ];
 

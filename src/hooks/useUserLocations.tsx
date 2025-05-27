@@ -5,6 +5,15 @@ import { supabase } from "@/integrations/supabase/client";
 interface UserLocation {
   id: string;
   location_nickname: string;
+  dwelling_type: string;
+  building_identifier: string | null;
+  zip_code: string;
+  address_details: any;
+  is_primary: boolean;
+  latitude: number | null;
+  longitude: number | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export const useUserLocations = () => {
@@ -16,7 +25,7 @@ export const useUserLocations = () => {
 
       const { data, error } = await supabase
         .from('user_locations')
-        .select('id, location_nickname')
+        .select('*')
         .eq('user_id', user.id)
         .order('is_primary', { ascending: false })
         .order('location_nickname');

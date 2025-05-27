@@ -9,10 +9,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 
+type DwellingType = "APARTMENT_BUILDING" | "SINGLE_FAMILY_HOME" | "TOWNHOUSE";
+
 interface LocationFormData {
   location_nickname: string;
   building_identifier: string;
-  dwelling_type: string;
+  dwelling_type: DwellingType;
   zip_code: string;
   street: string;
   city: string;
@@ -28,7 +30,7 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
   const [formData, setFormData] = useState<LocationFormData>({
     location_nickname: initialData?.location_nickname || "",
     building_identifier: initialData?.building_identifier || "",
-    dwelling_type: initialData?.dwelling_type || "APARTMENT_BUILDING",
+    dwelling_type: (initialData?.dwelling_type as DwellingType) || "APARTMENT_BUILDING",
     zip_code: initialData?.zip_code || "",
     street: initialData?.address_details?.street || "",
     city: initialData?.address_details?.city || "",
@@ -67,7 +69,7 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
         // Create new location
         const { error } = await supabase
           .from('user_locations')
-          .insert([locationData]);
+          .insert(locationData);
 
         if (error) throw error;
       }
@@ -125,6 +127,13 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
     }));
   };
 
+  const handleDwellingTypeChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      dwelling_type: value as DwellingType,
+    }));
+  };
+
   const getDwellingTypeLabel = (type: string) => {
     switch (type) {
       case 'APARTMENT_BUILDING': return 'Apartment Building';
@@ -150,7 +159,7 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
 
       <div className="space-y-2">
         <Label htmlFor="dwelling_type">Dwelling Type *</Label>
-        <Select value={formData.dwelling_type} onValueChange={(value) => handleInputChange('dwelling_type', value)}>
+        <Select value={formData.dwelling_type} onValueChange={handleDwellingTypeChange}>
           <SelectTrigger>
             <SelectValue placeholder="Select dwelling type" />
           </SelectTrigger>
