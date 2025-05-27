@@ -9,9 +9,6 @@ import { FriendsActivity } from "@/components/home/FriendsActivity";
 import { NewRecommendedSitters } from "@/components/home/NewRecommendedSitters";
 import { NewRecommendedProducts } from "@/components/home/NewRecommendedProducts";
 import { FeaturedRecommendations } from "@/components/home/FeaturedRecommendations";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { Home as HomeIcon } from "lucide-react";
 
 const Home = () => {
   // Mock current user data
@@ -195,16 +192,6 @@ const Home = () => {
           onActivityFeedClick={handleActivityFeedClick}
         />
       )}
-      
-      {/* Mock Locations Access */}
-      <div className="px-4 py-2 bg-blue-50 border-b border-blue-100">
-        <Link to="/settings/my-homes-mock">
-          <Button variant="outline" className="w-full flex items-center justify-center gap-2 text-blue-600 border-blue-200 hover:bg-blue-100">
-            <HomeIcon className="w-4 h-4" />
-            <span>View Mock Homes Page</span>
-          </Button>
-        </Link>
-      </div>
       
       <HeroSection userName={mockCurrentUser.firstName} />
       <ActionButtons />
