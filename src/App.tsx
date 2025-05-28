@@ -10,6 +10,8 @@ import ExistingUserLoginPage from "./pages/ExistingUserLoginPage";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
 import SearchMock from "./pages/SearchMock";
+import SearchSelection from "./pages/SearchSelection";
+import FindParents from "./pages/FindParents";
 import Profile from "./pages/Profile";
 import SitterProfile from "./pages/SitterProfile";
 import ProductSearchPage from "./pages/ProductSearchPage";
@@ -18,6 +20,7 @@ import PaymentMethods from "./pages/PaymentMethods";
 import Notifications from "./pages/Notifications";
 import Language from "./pages/Language";
 import Privacy from "./pages/Privacy";
+import PrivacySettings from "./pages/PrivacySettings";
 import Security from "./pages/Security";
 import Help from "./pages/Help";
 import About from "./pages/About";
@@ -38,9 +41,10 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/login-existing" element={<ExistingUserLoginPage />} />
           <Route path="/" element={<Home />} />
-          <Route path="/search" element={<Search />} />
+          <Route path="/search" element={<SearchSelection />} />
           <Route path="/search-mock" element={<SearchMock />} />
           <Route path="/find-sitter" element={<Search />} />
+          <Route path="/find-parents" element={<FindParents />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/:userId" element={<Profile />} />
           <Route path="/sitter/:id" element={<SitterProfile />} />
@@ -53,6 +57,7 @@ const App = () => (
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/language" element={<Language />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/privacy-settings" element={<PrivacySettings />} />
           <Route path="/security" element={<Security />} />
           <Route path="/help" element={<Help />} />
           <Route path="/about" element={<About />} />
