@@ -44,7 +44,20 @@ const FindParents = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        // Check if it's a rate limiting error
+        if (error.message?.includes('Rate limit exceeded')) {
+          toast({
+            title: 'Search limit reached',
+            description: phone 
+              ? 'You\'ve reached the phone search limit. Please wait before searching again.'
+              : 'You\'ve reached the search limit. Please wait before searching again.',
+            variant: 'destructive',
+          });
+          return [];
+        }
+        throw error;
+      }
       return data || [];
     } catch (error) {
       console.error('Search error:', error);

@@ -38,7 +38,13 @@ export const ParentSearchResultCard = ({ profile, onFollowStatusChange }: Parent
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        // Check if it's a rate limiting error
+        if (error.message?.includes('Rate limit exceeded')) {
+          throw new Error('You\'ve reached the follow request limit. Please wait before sending more requests.');
+        }
+        throw error;
+      }
       return data;
     },
     onSuccess: (data) => {
@@ -54,7 +60,7 @@ export const ParentSearchResultCard = ({ profile, onFollowStatusChange }: Parent
     onError: (error) => {
       toast({
         title: 'Error',
-        description: 'Failed to send follow request',
+        description: error.message || 'Failed to send follow request',
         variant: 'destructive',
       });
     },

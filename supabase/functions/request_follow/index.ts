@@ -16,6 +16,50 @@ interface RequestFollowResponse {
   message: string;
 }
 
+// Rate limiting configuration
+const FOLLOW_REQUEST_RATE_LIMIT = {
+  max: 20, // 20 follow requests per hour
+  windowMinutes: 60
+};
+
+async function checkRateLimit(
+  supabaseClient: any,
+  identifier: string,
+  maxRequests: number,
+  windowMinutes: number
+): Promise<boolean> {
+  try {
+    const { data, error } = await supabaseClient.rpc('check_rate_limit', {
+      p_identifier: identifier,
+      p_endpoint: 'request_follow',
+      p_request_type: 'follow_request',
+      p_max_requests: maxRequests,
+      p_window_minutes: windowMinutes
+    });
+
+    if (error) {
+      console.error('Rate limit check error:', error);
+      return true; // Allow on error to prevent blocking users
+    }
+
+    return data === true;
+  } catch (error) {
+    console.error('Rate limit check failed:', error);
+    return true; // Allow on error
+  }
+}
+
+function getClientIP(req: Request): string {
+  const forwardedFor = req.headers.get('x-forwarded-for');
+  const realIP = req.headers.get('x-real-ip');
+  const cfConnectingIP = req.headers.get('cf-connecting-ip');
+  
+  return forwardedFor?.split(',')[0]?.trim() || 
+         realIP || 
+         cfConnectingIP || 
+         'unknown';
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -25,7 +69,7 @@ Deno.serve(async (req) => {
   try {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '', // Use service role for rate limiting
     );
 
     const { current_user_id, target_user_id }: RequestFollowRequest = await req.json();
@@ -44,10 +88,46 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Check rate limit
+    const clientIP = getClientIP(req);
+    const identifier = current_user_id || clientIP;
+
+    const isAllowed = await checkRateLimit(
+      supabaseClient,
+      identifier,
+      FOLLOW_REQUEST_RATE_LIMIT.max,
+      FOLLOW_REQUEST_RATE_LIMIT.windowMinutes
+    );
+
+    if (!isAllowed) {
+      console.log(`Follow request rate limit exceeded by ${identifier}`);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Rate limit exceeded',
+          message: 'Too many follow requests. Please wait before sending more requests.',
+          retryAfter: FOLLOW_REQUEST_RATE_LIMIT.windowMinutes * 60 // seconds
+        }),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json',
+            'Retry-After': (FOLLOW_REQUEST_RATE_LIMIT.windowMinutes * 60).toString()
+          } 
+        }
+      );
+    }
+
     console.log('Request follow:', { current_user_id, target_user_id });
 
+    // Switch back to anon key for regular operations
+    const anonSupabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    );
+
     // Get target user's privacy setting
-    const { data: targetProfile, error: profileError } = await supabaseClient
+    const { data: targetProfile, error: profileError } = await anonSupabaseClient
       .from('profiles')
       .select('profile_privacy_setting')
       .eq('id', target_user_id)
@@ -68,7 +148,7 @@ Deno.serve(async (req) => {
 
     if (targetProfile.profile_privacy_setting === 'public') {
       // For public profiles, directly create follow relationship
-      const { error: followError } = await supabaseClient
+      const { error: followError } = await anonSupabaseClient
         .from('user_follows')
         .insert({
           follower_id: current_user_id,
@@ -88,7 +168,7 @@ Deno.serve(async (req) => {
     } else {
       // For private profiles, create follow request
       // First check if a pending request already exists
-      const { data: existingRequest, error: existingError } = await supabaseClient
+      const { data: existingRequest, error: existingError } = await anonSupabaseClient
         .from('follow_requests')
         .select('id')
         .eq('requester_id', current_user_id)
@@ -109,7 +189,7 @@ Deno.serve(async (req) => {
         response.message = 'Follow request already pending';
       } else {
         // Create new follow request
-        const { error: requestError } = await supabaseClient
+        const { error: requestError } = await anonSupabaseClient
           .from('follow_requests')
           .insert({
             requester_id: current_user_id,
