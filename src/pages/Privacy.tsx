@@ -2,9 +2,13 @@
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Switch } from "@/components/ui/switch";
-import { Eye, Users, MapPin, Phone } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Eye, Users, MapPin, Phone, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Privacy = () => {
+  const navigate = useNavigate();
+
   const privacySettings = [
     {
       id: "profile_visibility",
@@ -41,6 +45,22 @@ const Privacy = () => {
       <Header title="Privacy" showBack={true} showSettings={false} backTo="/settings" />
       
       <div className="px-4 py-6">
+        {/* Privacy & Discovery Settings Button */}
+        <div className="mb-6">
+          <Button 
+            onClick={() => navigate('/privacy-settings')}
+            className="w-full flex items-center justify-between p-4 h-auto bg-purple-500 hover:bg-purple-600"
+          >
+            <div className="flex items-center space-x-3">
+              <Settings className="w-6 h-6" />
+              <div className="text-left">
+                <div className="font-medium">Privacy & Discovery Settings</div>
+                <div className="text-sm opacity-90">Manage profile privacy and searchability</div>
+              </div>
+            </div>
+          </Button>
+        </div>
+
         <div className="bg-white rounded-lg shadow-sm">
           {privacySettings.map((setting, index) => (
             <div 
