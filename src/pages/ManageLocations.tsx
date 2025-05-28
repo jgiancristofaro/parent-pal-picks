@@ -174,11 +174,13 @@ const ManageLocations = () => {
                     Add New Home
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
+                <DialogContent className="sm:max-w-[425px] max-h-[80vh] p-0">
+                  <DialogHeader className="p-6 pb-0">
                     <DialogTitle>Add New Home Location</DialogTitle>
                   </DialogHeader>
-                  <LocationForm onSuccess={handleLocationSaved} />
+                  <div className="p-6 pt-2">
+                    <LocationForm onSuccess={handleLocationSaved} />
+                  </div>
                 </DialogContent>
               </Dialog>
             </CardContent>
@@ -196,11 +198,13 @@ const ManageLocations = () => {
                     Add New Home
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
+                <DialogContent className="sm:max-w-[425px] max-h-[80vh] p-0">
+                  <DialogHeader className="p-6 pb-0">
                     <DialogTitle>Add New Home Location</DialogTitle>
                   </DialogHeader>
-                  <LocationForm onSuccess={handleLocationSaved} />
+                  <div className="p-6 pt-2">
+                    <LocationForm onSuccess={handleLocationSaved} />
+                  </div>
                 </DialogContent>
               </Dialog>
             </div>
@@ -231,14 +235,16 @@ const ManageLocations = () => {
                                 <Edit className="w-4 h-4" />
                               </Button>
                             </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px]">
-                              <DialogHeader>
+                            <DialogContent className="sm:max-w-[425px] max-h-[80vh] p-0">
+                              <DialogHeader className="p-6 pb-0">
                                 <DialogTitle>Edit Home Location</DialogTitle>
                               </DialogHeader>
-                              <LocationForm 
-                                initialData={location} 
-                                onSuccess={handleLocationSaved} 
-                              />
+                              <div className="p-6 pt-2">
+                                <LocationForm 
+                                  initialData={location} 
+                                  onSuccess={handleLocationSaved} 
+                                />
+                              </div>
                             </DialogContent>
                           </Dialog>
 

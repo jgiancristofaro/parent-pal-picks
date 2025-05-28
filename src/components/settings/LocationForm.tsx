@@ -17,29 +17,33 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
   } = useLocationForm(initialData, onSuccess);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <BasicInfoFields
-        formData={formData}
-        onInputChange={handleInputChange}
-        onDwellingTypeChange={handleDwellingTypeChange}
-      />
+    <form onSubmit={handleSubmit} className="flex flex-col h-full max-h-[70vh]">
+      {/* Scrollable content area */}
+      <div className="flex-1 overflow-y-auto no-scrollbar space-y-4 pr-2">
+        <BasicInfoFields
+          formData={formData}
+          onInputChange={handleInputChange}
+          onDwellingTypeChange={handleDwellingTypeChange}
+        />
 
-      <BuildingIdentifierField
-        formData={formData}
-        onInputChange={handleInputChange}
-      />
+        <BuildingIdentifierField
+          formData={formData}
+          onInputChange={handleInputChange}
+        />
 
-      <AddressDetailsSection
-        formData={formData}
-        onInputChange={handleInputChange}
-      />
+        <AddressDetailsSection
+          formData={formData}
+          onInputChange={handleInputChange}
+        />
 
-      <PrimaryHomeCheckbox
-        formData={formData}
-        onInputChange={handleInputChange}
-      />
+        <PrimaryHomeCheckbox
+          formData={formData}
+          onInputChange={handleInputChange}
+        />
+      </div>
 
-      <div className="flex justify-end space-x-2 pt-4">
+      {/* Fixed submit button area */}
+      <div className="flex justify-end space-x-2 pt-4 border-t bg-white">
         <Button 
           type="submit" 
           disabled={saveLocationMutation.isPending}
