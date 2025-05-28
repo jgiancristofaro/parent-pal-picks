@@ -5,17 +5,17 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Eye } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { HyperLocalSitters } from "@/components/search/HyperLocalSitters";
 import { SearchInput } from "@/components/search/SearchInput";
 import { HomeSelector } from "@/components/search/HomeSelector";
 import { LocalScopeFilter } from "@/components/search/LocalScopeFilter";
 import { SearchResultsGrid } from "@/components/search/SearchResultsGrid";
 import { useSearchFilters } from "@/hooks/useSearchFilters";
-import { useSitterData } from "@/hooks/useSitterData";
+import { useMockSitterData } from "@/hooks/useMockSitterData";
 
-const Search = () => {
-  // Mock current user ID for demonstration - in a real app this would come from auth
+const SearchMock = () => {
+  // Mock current user ID for demonstration
   const mockCurrentUserId = "user-2";
 
   // Custom hooks for managing state and data
@@ -36,7 +36,7 @@ const Search = () => {
     localSittersLoading,
     shouldFetchLocalSitters,
     displayedSitters
-  } = useSitterData({
+  } = useMockSitterData({
     mockCurrentUserId,
     selectedUserHomeId,
     localSearchScope,
@@ -46,22 +46,22 @@ const Search = () => {
 
   return (
     <div className="min-h-screen pb-20 bg-purple-50">
-      <Header title="Find a sitter" showBack={true} showSettings={false} />
+      <Header title="Find a sitter (Mock)" showBack={false} showSettings={false} />
       
       <div className="p-4">
-        {/* Demo Link */}
-        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        {/* Info Banner */}
+        <div className="mb-4 p-4 bg-blue-100 border border-blue-200 rounded-lg">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-yellow-900">Want to see hyper-local features?</h3>
-              <p className="text-sm text-yellow-700">
-                View the mock search page to see how the interface changes with configured homes.
+              <h3 className="font-semibold text-blue-900">Mock Search Demo</h3>
+              <p className="text-sm text-blue-700">
+                This page shows how search works with configured homes. You have 3 mock homes set up.
               </p>
             </div>
-            <Link to="/search-mock">
+            <Link to="/search">
               <Button variant="outline" size="sm">
-                <Eye className="w-4 h-4 mr-2" />
-                View Mock Demo
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Real Search
               </Button>
             </Link>
           </div>
@@ -73,14 +73,14 @@ const Search = () => {
           onSearchTermChange={setSearchTerm}
         />
 
-        {/* Home Selection */}
+        {/* Home Selection - This is the key feature that's hidden without homes */}
         <HomeSelector 
           userLocations={userLocations}
           selectedUserHomeId={selectedUserHomeId}
           onSelectedUserHomeIdChange={setSelectedUserHomeId}
         />
 
-        {/* Dynamic Local Options Filter */}
+        {/* Dynamic Local Options Filter - This changes based on dwelling type */}
         <LocalScopeFilter 
           selectedUserHomeDetails={selectedUserHomeDetails}
           localSearchScope={localSearchScope}
@@ -131,4 +131,4 @@ const Search = () => {
   );
 };
 
-export default Search;
+export default SearchMock;
