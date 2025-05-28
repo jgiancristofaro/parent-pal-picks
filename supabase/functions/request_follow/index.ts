@@ -22,6 +22,16 @@ const FOLLOW_REQUEST_RATE_LIMIT = {
   windowMinutes: 60
 };
 
+// Security logging utility
+function logSecurityEvent(event: string, details: any = {}) {
+  console.log(JSON.stringify({
+    timestamp: new Date().toISOString(),
+    function: 'request_follow',
+    event,
+    ...details
+  }));
+}
+
 async function checkRateLimit(
   supabaseClient: any,
   identifier: string,
@@ -38,13 +48,19 @@ async function checkRateLimit(
     });
 
     if (error) {
-      console.error('Rate limit check error:', error);
+      logSecurityEvent('rate_limit_check_error', {
+        error: error.message,
+        identifier: identifier.substring(0, 8) + '...'
+      });
       return true; // Allow on error to prevent blocking users
     }
 
     return data === true;
   } catch (error) {
-    console.error('Rate limit check failed:', error);
+    logSecurityEvent('rate_limit_check_failed', {
+      error: error.message,
+      identifier: identifier.substring(0, 8) + '...'
+    });
     return true; // Allow on error
   }
 }
@@ -75,6 +91,11 @@ Deno.serve(async (req) => {
     const { current_user_id, target_user_id }: RequestFollowRequest = await req.json();
 
     if (!current_user_id || !target_user_id) {
+      logSecurityEvent('invalid_request_params', {
+        has_current_user_id: !!current_user_id,
+        has_target_user_id: !!target_user_id,
+        client_ip: getClientIP(req)
+      });
       return new Response(
         JSON.stringify({ error: 'current_user_id and target_user_id are required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -82,6 +103,10 @@ Deno.serve(async (req) => {
     }
 
     if (current_user_id === target_user_id) {
+      logSecurityEvent('self_follow_attempt', {
+        user_id: current_user_id,
+        client_ip: getClientIP(req)
+      });
       return new Response(
         JSON.stringify({ error: 'Cannot follow yourself' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -100,7 +125,13 @@ Deno.serve(async (req) => {
     );
 
     if (!isAllowed) {
-      console.log(`Follow request rate limit exceeded by ${identifier}`);
+      logSecurityEvent('follow_request_rate_limit_exceeded', {
+        requester_id: current_user_id,
+        target_user_id: target_user_id,
+        client_ip: clientIP,
+        limit: FOLLOW_REQUEST_RATE_LIMIT.max,
+        window_minutes: FOLLOW_REQUEST_RATE_LIMIT.windowMinutes
+      });
       return new Response(
         JSON.stringify({ 
           error: 'Rate limit exceeded',
@@ -118,7 +149,11 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log('Request follow:', { current_user_id, target_user_id });
+    logSecurityEvent('follow_request_initiated', {
+      requester_id: current_user_id,
+      target_user_id: target_user_id,
+      client_ip: clientIP
+    });
 
     // Create client with user JWT for RLS compliance
     const authHeaders = req.headers.get('authorization');
@@ -140,7 +175,11 @@ Deno.serve(async (req) => {
       .single();
 
     if (profileError || !targetProfile) {
-      console.error('Target profile error:', profileError);
+      logSecurityEvent('target_profile_not_found', {
+        requester_id: current_user_id,
+        target_user_id: target_user_id,
+        error: profileError?.message
+      });
       return new Response(
         JSON.stringify({ error: 'Target user not found' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -162,12 +201,23 @@ Deno.serve(async (req) => {
         });
 
       if (followError) {
-        console.error('Follow insert error:', followError);
+        logSecurityEvent('follow_creation_failed', {
+          requester_id: current_user_id,
+          target_user_id: target_user_id,
+          error: followError.message,
+          error_code: followError.code
+        });
         return new Response(
           JSON.stringify({ error: 'Failed to follow user' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
+
+      logSecurityEvent('follow_relationship_created', {
+        requester_id: current_user_id,
+        target_user_id: target_user_id,
+        profile_privacy: 'public'
+      });
 
       response.status = 'following';
       response.message = 'Now following user';
@@ -182,7 +232,11 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (existingError) {
-        console.error('Existing request check error:', existingError);
+        logSecurityEvent('existing_request_check_failed', {
+          requester_id: current_user_id,
+          target_user_id: target_user_id,
+          error: existingError.message
+        });
         return new Response(
           JSON.stringify({ error: 'Failed to check existing requests' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -190,6 +244,11 @@ Deno.serve(async (req) => {
       }
 
       if (existingRequest) {
+        logSecurityEvent('duplicate_follow_request_attempt', {
+          requester_id: current_user_id,
+          target_user_id: target_user_id,
+          existing_request_id: existingRequest.id
+        });
         response.status = 'request_pending';
         response.message = 'Follow request already pending';
       } else {
@@ -203,12 +262,23 @@ Deno.serve(async (req) => {
           });
 
         if (requestError) {
-          console.error('Follow request insert error:', requestError);
+          logSecurityEvent('follow_request_creation_failed', {
+            requester_id: current_user_id,
+            target_user_id: target_user_id,
+            error: requestError.message,
+            error_code: requestError.code
+          });
           return new Response(
             JSON.stringify({ error: 'Failed to send follow request' }),
             { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
+
+        logSecurityEvent('follow_request_sent', {
+          requester_id: current_user_id,
+          target_user_id: target_user_id,
+          profile_privacy: 'private'
+        });
 
         response.status = 'request_pending';
         response.message = 'Follow request sent';
@@ -221,7 +291,11 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Request follow error:', error);
+    logSecurityEvent('unexpected_error', {
+      error: error.message,
+      stack: error.stack?.substring(0, 500),
+      client_ip: getClientIP(req)
+    });
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

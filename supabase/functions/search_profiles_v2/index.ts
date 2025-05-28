@@ -27,6 +27,16 @@ const RATE_LIMITS = {
   NAME_SEARCH: { max: 50, windowMinutes: 60 },  // 50 name searches per hour
 };
 
+// Security logging utility
+function logSecurityEvent(event: string, details: any = {}) {
+  console.log(JSON.stringify({
+    timestamp: new Date().toISOString(),
+    function: 'search_profiles_v2',
+    event,
+    ...details
+  }));
+}
+
 async function checkRateLimit(
   supabaseClient: any,
   identifier: string,
@@ -44,13 +54,21 @@ async function checkRateLimit(
     });
 
     if (error) {
-      console.error('Rate limit check error:', error);
+      logSecurityEvent('rate_limit_check_error', {
+        error: error.message,
+        identifier: identifier.substring(0, 8) + '...',
+        request_type: requestType
+      });
       return true; // Allow on error to prevent blocking users
     }
 
     return data === true;
   } catch (error) {
-    console.error('Rate limit check failed:', error);
+    logSecurityEvent('rate_limit_check_failed', {
+      error: error.message,
+      identifier: identifier.substring(0, 8) + '...',
+      request_type: requestType
+    });
     return true; // Allow on error
   }
 }
@@ -81,6 +99,11 @@ Deno.serve(async (req) => {
     const { search_term, search_phone, current_user_id }: SearchProfilesRequest = await req.json();
 
     if (!current_user_id) {
+      logSecurityEvent('unauthorized_search_attempt', {
+        client_ip: getClientIP(req),
+        has_search_term: !!search_term,
+        has_search_phone: !!search_phone
+      });
       return new Response(
         JSON.stringify({ error: 'current_user_id is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -92,6 +115,13 @@ Deno.serve(async (req) => {
     const requestType = isPhoneSearch ? 'phone_search' : 'name_search';
     const rateLimit = isPhoneSearch ? RATE_LIMITS.PHONE_SEARCH : RATE_LIMITS.NAME_SEARCH;
     
+    // Log search attempt
+    logSecurityEvent('search_attempt', {
+      user_id: current_user_id,
+      search_type: requestType,
+      client_ip: getClientIP(req)
+    });
+
     // Use user ID as primary identifier, fallback to IP
     const clientIP = getClientIP(req);
     const identifier = current_user_id || clientIP;
@@ -106,7 +136,13 @@ Deno.serve(async (req) => {
     );
 
     if (!isAllowed) {
-      console.log(`Rate limit exceeded for ${requestType} by ${identifier}`);
+      logSecurityEvent('rate_limit_exceeded', {
+        user_id: current_user_id,
+        search_type: requestType,
+        client_ip: clientIP,
+        limit: rateLimit.max,
+        window_minutes: rateLimit.windowMinutes
+      });
       return new Response(
         JSON.stringify({ 
           error: 'Rate limit exceeded',
@@ -150,7 +186,11 @@ Deno.serve(async (req) => {
         });
 
       if (phoneError) {
-        console.error('Phone search error:', phoneError);
+        logSecurityEvent('phone_search_error', {
+          user_id: current_user_id,
+          error: phoneError.message,
+          error_code: phoneError.code
+        });
         return new Response(
           JSON.stringify({ error: 'Failed to search profiles by phone' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -158,6 +198,10 @@ Deno.serve(async (req) => {
       }
 
       profiles = phoneResults || [];
+      logSecurityEvent('phone_search_completed', {
+        user_id: current_user_id,
+        results_count: profiles.length
+      });
     }
     // Search by name/username (RLS will automatically filter)
     else if (search_term) {
@@ -167,7 +211,11 @@ Deno.serve(async (req) => {
         .or(`full_name.ilike.%${search_term}%,username.ilike.%${search_term}%`);
 
       if (nameError) {
-        console.error('Name search error:', nameError);
+        logSecurityEvent('name_search_error', {
+          user_id: current_user_id,
+          error: nameError.message,
+          error_code: nameError.code
+        });
         return new Response(
           JSON.stringify({ error: 'Failed to search profiles by name' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -175,7 +223,16 @@ Deno.serve(async (req) => {
       }
 
       profiles = nameResults || [];
+      logSecurityEvent('name_search_completed', {
+        user_id: current_user_id,
+        results_count: profiles.length
+      });
     } else {
+      logSecurityEvent('invalid_search_params', {
+        user_id: current_user_id,
+        has_search_term: !!search_term,
+        has_search_phone: !!search_phone
+      });
       return new Response(
         JSON.stringify({ error: 'Either search_term or search_phone must be provided' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -204,7 +261,11 @@ Deno.serve(async (req) => {
       .in('requestee_id', profileIds);
 
     if (followError || requestsError) {
-      console.error('Follow status query error:', followError || requestsError);
+      logSecurityEvent('follow_status_query_error', {
+        user_id: current_user_id,
+        follow_error: followError?.message,
+        requests_error: requestsError?.message
+      });
       return new Response(
         JSON.stringify({ error: 'Failed to determine follow status' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -230,7 +291,11 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Search profiles error:', error);
+    logSecurityEvent('unexpected_error', {
+      error: error.message,
+      stack: error.stack?.substring(0, 500),
+      client_ip: getClientIP(req)
+    });
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
