@@ -12,6 +12,9 @@ export const useFollowRequests = () => {
   const { data: incomingRequests = [], isLoading: isLoadingIncoming } = useQuery({
     queryKey: ['follow-requests', 'incoming'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       const { data, error } = await supabase
         .from('follow_requests')
         .select(`
@@ -23,6 +26,7 @@ export const useFollowRequests = () => {
             avatar_url
           )
         `)
+        .eq('requestee_id', user.id)
         .eq('status', 'pending');
 
       if (error) throw error;
@@ -34,6 +38,9 @@ export const useFollowRequests = () => {
   const { data: outgoingRequests = [], isLoading: isLoadingOutgoing } = useQuery({
     queryKey: ['follow-requests', 'outgoing'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       const { data, error } = await supabase
         .from('follow_requests')
         .select(`
@@ -44,7 +51,8 @@ export const useFollowRequests = () => {
             username,
             avatar_url
           )
-        `);
+        `)
+        .eq('requester_id', user.id);
 
       if (error) throw error;
       return data as (FollowRequest & { requestee: any })[];
@@ -54,9 +62,13 @@ export const useFollowRequests = () => {
   // Send follow request
   const sendFollowRequestMutation = useMutation({
     mutationFn: async (requesteeId: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       const { data, error } = await supabase
         .from('follow_requests')
         .insert({
+          requester_id: user.id,
           requestee_id: requesteeId,
         })
         .select()
