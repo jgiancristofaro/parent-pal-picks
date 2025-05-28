@@ -1,1 +1,52 @@
+
 project_id = "jmyfwrbwpbbbmoournsg"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[auth]
+enabled = true
+port = 54320
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://localhost:3000"]
+jwt_expiry = 3600
+refresh_token_rotation_enabled = true
+security_update_password_require_reauthentication = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+
+[db]
+enabled = true
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+enabled = true
+port = 54324
+smtp_port = 54325
+pop3_port = 54326
+
+[functions.search_profiles_v2]
+verify_jwt = true
+
+[functions.request_follow]
+verify_jwt = true
+
+[functions.unfollow_user]
+verify_jwt = true
+
+[functions.respond_to_follow_request]
+verify_jwt = true
+
+[functions.get_pending_follow_requests]
+verify_jwt = true
