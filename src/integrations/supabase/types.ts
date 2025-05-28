@@ -64,6 +64,33 @@ export type Database = {
           },
         ]
       }
+      follow_requests: {
+        Row: {
+          created_at: string
+          id: string
+          requestee_id: string
+          requester_id: string
+          status: Database["public"]["Enums"]["follow_request_status_enum"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          requestee_id: string
+          requester_id: string
+          status?: Database["public"]["Enums"]["follow_request_status_enum"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          requestee_id?: string
+          requester_id?: string
+          status?: Database["public"]["Enums"]["follow_request_status_enum"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string | null
@@ -98,30 +125,39 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
-          full_name: string | null
+          full_name: string
           id: string
           last_activity_feed_view_at: string | null
           last_login_at: string | null
+          phone_number: string | null
+          phone_number_searchable: boolean
+          profile_privacy_setting: Database["public"]["Enums"]["profile_privacy_enum"]
           updated_at: string
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
-          full_name?: string | null
+          full_name: string
           id: string
           last_activity_feed_view_at?: string | null
           last_login_at?: string | null
+          phone_number?: string | null
+          phone_number_searchable?: boolean
+          profile_privacy_setting?: Database["public"]["Enums"]["profile_privacy_enum"]
           updated_at?: string
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
-          full_name?: string | null
+          full_name?: string
           id?: string
           last_activity_feed_view_at?: string | null
           last_login_at?: string | null
+          phone_number?: string | null
+          phone_number_searchable?: boolean
+          profile_privacy_setting?: Database["public"]["Enums"]["profile_privacy_enum"]
           updated_at?: string
           username?: string | null
         }
@@ -197,6 +233,8 @@ export type Database = {
           hourly_rate: number | null
           id: string
           name: string
+          phone_number: string | null
+          phone_number_searchable: boolean
           profile_image_url: string | null
           rating: number | null
           review_count: number | null
@@ -210,6 +248,8 @@ export type Database = {
           hourly_rate?: number | null
           id?: string
           name: string
+          phone_number?: string | null
+          phone_number_searchable?: boolean
           profile_image_url?: string | null
           rating?: number | null
           review_count?: number | null
@@ -223,6 +263,8 @@ export type Database = {
           hourly_rate?: number | null
           id?: string
           name?: string
+          phone_number?: string | null
+          phone_number_searchable?: boolean
           profile_image_url?: string | null
           rating?: number | null
           review_count?: number | null
@@ -315,6 +357,8 @@ export type Database = {
           hourly_rate: number | null
           id: string
           name: string
+          phone_number: string | null
+          phone_number_searchable: boolean
           profile_image_url: string | null
           rating: number | null
           review_count: number | null
@@ -333,6 +377,48 @@ export type Database = {
           most_recent_activity: string
         }[]
       }
+      gtrgm_compress: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gtrgm_decompress: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gtrgm_in: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gtrgm_options: {
+        Args: { "": unknown }
+        Returns: undefined
+      }
+      gtrgm_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      search_profile_by_phone: {
+        Args: { search_phone: string }
+        Returns: {
+          id: string
+          full_name: string
+          username: string
+          avatar_url: string
+          profile_privacy_setting: Database["public"]["Enums"]["profile_privacy_enum"]
+        }[]
+      }
+      set_limit: {
+        Args: { "": number }
+        Returns: number
+      }
+      show_limit: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      show_trgm: {
+        Args: { "": string }
+        Returns: string[]
+      }
       update_activity_feed_view: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -343,6 +429,8 @@ export type Database = {
         | "APARTMENT_BUILDING"
         | "SINGLE_FAMILY_HOME"
         | "TOWNHOUSE"
+      follow_request_status_enum: "pending" | "approved" | "denied"
+      profile_privacy_enum: "public" | "private"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -463,6 +551,8 @@ export const Constants = {
         "SINGLE_FAMILY_HOME",
         "TOWNHOUSE",
       ],
+      follow_request_status_enum: ["pending", "approved", "denied"],
+      profile_privacy_enum: ["public", "private"],
     },
   },
 } as const
