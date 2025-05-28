@@ -128,42 +128,57 @@ Deno.serve(async (req) => {
 
     console.log('Search params:', { search_term, search_phone, current_user_id });
 
-    // Switch back to anon key for regular operations
+    // Create client with user JWT for RLS compliance
+    const authHeaders = req.headers.get('authorization');
     const anonSupabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: authHeaders ? { authorization: authHeaders } : {}
+        }
+      }
     );
 
-    let profilesQuery = anonSupabaseClient
-      .from('profiles')
-      .select('id, full_name, username, avatar_url, profile_privacy_setting')
-      .neq('id', current_user_id);
+    let profiles: any[] = [];
 
-    // Search by phone number (exact match)
+    // Search by phone number using secure function
     if (search_phone) {
-      profilesQuery = profilesQuery
-        .eq('phone_number', search_phone)
-        .eq('phone_number_searchable', true);
+      const { data: phoneResults, error: phoneError } = await anonSupabaseClient
+        .rpc('search_profile_by_phone_secure', {
+          search_phone: search_phone
+        });
+
+      if (phoneError) {
+        console.error('Phone search error:', phoneError);
+        return new Response(
+          JSON.stringify({ error: 'Failed to search profiles by phone' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      profiles = phoneResults || [];
     }
-    // Search by name/username (fuzzy match)
+    // Search by name/username (RLS will automatically filter)
     else if (search_term) {
-      profilesQuery = profilesQuery.or(
-        `full_name.ilike.%${search_term}%,username.ilike.%${search_term}%`
-      );
+      const { data: nameResults, error: nameError } = await anonSupabaseClient
+        .from('profiles')
+        .select('id, full_name, username, avatar_url, profile_privacy_setting')
+        .or(`full_name.ilike.%${search_term}%,username.ilike.%${search_term}%`);
+
+      if (nameError) {
+        console.error('Name search error:', nameError);
+        return new Response(
+          JSON.stringify({ error: 'Failed to search profiles by name' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      profiles = nameResults || [];
     } else {
       return new Response(
         JSON.stringify({ error: 'Either search_term or search_phone must be provided' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const { data: profiles, error: profilesError } = await profilesQuery;
-
-    if (profilesError) {
-      console.error('Profiles query error:', profilesError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to search profiles' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -176,17 +191,15 @@ Deno.serve(async (req) => {
 
     const profileIds = profiles.map(p => p.id);
 
-    // Get follow status for each profile
+    // Get follow status for each profile (RLS will filter automatically)
     const { data: followRelations, error: followError } = await anonSupabaseClient
       .from('user_follows')
       .select('following_id')
-      .eq('follower_id', current_user_id)
       .in('following_id', profileIds);
 
     const { data: pendingRequests, error: requestsError } = await anonSupabaseClient
       .from('follow_requests')
       .select('requestee_id')
-      .eq('requester_id', current_user_id)
       .eq('status', 'pending')
       .in('requestee_id', profileIds);
 

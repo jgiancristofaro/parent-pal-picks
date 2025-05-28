@@ -13,8 +13,9 @@ export const usePhoneSearch = () => {
     mutationFn: async (phoneNumber: string) => {
       console.log('Searching for profile with phone number:', phoneNumber);
 
+      // Use the secure phone search function instead of direct RPC
       const { data, error } = await supabase
-        .rpc('search_profile_by_phone', {
+        .rpc('search_profile_by_phone_secure', {
           search_phone: phoneNumber
         });
 

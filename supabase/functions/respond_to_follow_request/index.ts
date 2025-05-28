@@ -24,11 +24,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-    );
-
     const { request_id, current_user_id, response_action }: RespondToFollowRequestRequest = await req.json();
 
     if (!request_id || !current_user_id || !response_action) {
@@ -47,12 +42,23 @@ Deno.serve(async (req) => {
 
     console.log('Respond to follow request:', { request_id, current_user_id, response_action });
 
-    // Verify that current_user_id is the requestee for this request
+    // Create client with user JWT for RLS compliance
+    const authHeaders = req.headers.get('authorization');
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: authHeaders ? { authorization: authHeaders } : {}
+        }
+      }
+    );
+
+    // Get the follow request (RLS will ensure user can only access their own requests)
     const { data: followRequest, error: requestError } = await supabaseClient
       .from('follow_requests')
       .select('requester_id, requestee_id, status')
       .eq('id', request_id)
-      .eq('requestee_id', current_user_id)
       .eq('status', 'pending')
       .single();
 
@@ -66,7 +72,7 @@ Deno.serve(async (req) => {
 
     const newStatus = response_action === 'approve' ? 'approved' : 'denied';
 
-    // Update the follow request status
+    // Update the follow request status (RLS will handle permissions)
     const { error: updateError } = await supabaseClient
       .from('follow_requests')
       .update({ status: newStatus })

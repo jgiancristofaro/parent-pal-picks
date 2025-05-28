@@ -25,11 +25,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-    );
-
     const { current_user_id }: GetPendingFollowRequestsRequest = await req.json();
 
     if (!current_user_id) {
@@ -41,7 +36,20 @@ Deno.serve(async (req) => {
 
     console.log('Get pending follow requests for user:', current_user_id);
 
+    // Create client with user JWT for RLS compliance
+    const authHeaders = req.headers.get('authorization');
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: authHeaders ? { authorization: authHeaders } : {}
+        }
+      }
+    );
+
     // Fetch pending follow requests with requester profile information
+    // RLS will automatically filter to only requests for the current user
     const { data: pendingRequests, error: requestsError } = await supabaseClient
       .from('follow_requests')
       .select(`
@@ -53,7 +61,6 @@ Deno.serve(async (req) => {
           avatar_url
         )
       `)
-      .eq('requestee_id', current_user_id)
       .eq('status', 'pending')
       .order('created_at', { ascending: false });
 

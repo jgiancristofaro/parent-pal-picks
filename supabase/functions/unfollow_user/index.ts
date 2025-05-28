@@ -23,11 +23,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-    );
-
     const { current_user_id, target_user_id }: UnfollowUserRequest = await req.json();
 
     if (!current_user_id || !target_user_id) {
@@ -39,11 +34,22 @@ Deno.serve(async (req) => {
 
     console.log('Unfollow user:', { current_user_id, target_user_id });
 
-    // Delete from user_follows
+    // Create client with user JWT for RLS compliance
+    const authHeaders = req.headers.get('authorization');
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: authHeaders ? { authorization: authHeaders } : {}
+        }
+      }
+    );
+
+    // Delete from user_follows (RLS will ensure only own follows can be deleted)
     const { error: unfollowError } = await supabaseClient
       .from('user_follows')
       .delete()
-      .eq('follower_id', current_user_id)
       .eq('following_id', target_user_id);
 
     if (unfollowError) {
@@ -54,11 +60,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Also delete any pending follow requests
+    // Also delete any pending follow requests (RLS will handle permissions)
     const { error: cancelRequestError } = await supabaseClient
       .from('follow_requests')
       .delete()
-      .eq('requester_id', current_user_id)
       .eq('requestee_id', target_user_id)
       .eq('status', 'pending');
 

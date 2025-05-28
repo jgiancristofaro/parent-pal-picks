@@ -120,13 +120,19 @@ Deno.serve(async (req) => {
 
     console.log('Request follow:', { current_user_id, target_user_id });
 
-    // Switch back to anon key for regular operations
+    // Create client with user JWT for RLS compliance
+    const authHeaders = req.headers.get('authorization');
     const anonSupabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: authHeaders ? { authorization: authHeaders } : {}
+        }
+      }
     );
 
-    // Get target user's privacy setting
+    // Get target user's privacy setting (RLS will handle access control)
     const { data: targetProfile, error: profileError } = await anonSupabaseClient
       .from('profiles')
       .select('profile_privacy_setting')
@@ -171,7 +177,6 @@ Deno.serve(async (req) => {
       const { data: existingRequest, error: existingError } = await anonSupabaseClient
         .from('follow_requests')
         .select('id')
-        .eq('requester_id', current_user_id)
         .eq('requestee_id', target_user_id)
         .eq('status', 'pending')
         .maybeSingle();

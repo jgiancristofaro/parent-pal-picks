@@ -390,6 +390,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      get_follow_status: {
+        Args: { target_user_id: string }
+        Returns: string
+      }
       get_local_sitters: {
         Args: {
           current_user_id_param: string
@@ -445,6 +449,16 @@ export type Database = {
         Returns: unknown
       }
       search_profile_by_phone: {
+        Args: { search_phone: string }
+        Returns: {
+          id: string
+          full_name: string
+          username: string
+          avatar_url: string
+          profile_privacy_setting: Database["public"]["Enums"]["profile_privacy_enum"]
+        }[]
+      }
+      search_profile_by_phone_secure: {
         Args: { search_phone: string }
         Returns: {
           id: string
