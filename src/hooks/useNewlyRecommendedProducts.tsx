@@ -44,7 +44,7 @@ export const useNewlyRecommendedProducts = (
       const followedUserIds = followedUsers.map(f => f.following_id);
 
       // Get products recommended by followed users (reviews with rating >= 4)
-      const { data, error } = await supabase
+      const { data: reviewsData, error } = await supabase
         .from('reviews')
         .select(`
           product_id,
@@ -54,10 +54,6 @@ export const useNewlyRecommendedProducts = (
             name,
             image_url,
             category
-          ),
-          profiles!reviews_user_id_fkey(
-            full_name,
-            avatar_url
           )
         `)
         .not('product_id', 'is', null)
@@ -71,16 +67,37 @@ export const useNewlyRecommendedProducts = (
         throw error;
       }
 
-      const transformedData = (data || []).map(item => ({
-        product_id: item.product_id!,
-        product_name: item.products.name,
-        product_image_url: item.products.image_url,
-        product_category: item.products.category,
-        recommender_user_id: item.user_id,
-        recommender_full_name: item.profiles.full_name,
-        recommender_avatar_url: item.profiles.avatar_url,
-        recommendation_timestamp: item.created_at
-      })) as NewlyRecommendedProduct[];
+      // Now get user profiles for the recommenders
+      const userIds = [...new Set((reviewsData || []).map(review => review.user_id))];
+      
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', userIds);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
+      }
+
+      // Create a map for quick profile lookup
+      const profilesMap = new Map(
+        (profilesData || []).map(profile => [profile.id, profile])
+      );
+
+      const transformedData = (reviewsData || []).map(item => {
+        const profile = profilesMap.get(item.user_id);
+        return {
+          product_id: item.product_id!,
+          product_name: item.products.name,
+          product_image_url: item.products.image_url,
+          product_category: item.products.category,
+          recommender_user_id: item.user_id,
+          recommender_full_name: profile?.full_name || 'Unknown User',
+          recommender_avatar_url: profile?.avatar_url || null,
+          recommendation_timestamp: item.created_at
+        };
+      }) as NewlyRecommendedProduct[];
 
       console.log('Newly recommended products found:', transformedData.length);
       return transformedData;
