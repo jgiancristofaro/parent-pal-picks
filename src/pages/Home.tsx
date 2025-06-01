@@ -52,33 +52,6 @@ const Home = () => {
     image: "/assets/softbabyblankets.jpg",
     category: "Comfort"
   }];
-  
-  // Mock friends activity with enhanced data structure
-  const friendActivity = [{
-    userId: "101",
-    userName: "Olivia Bennett",
-    userImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    action: "Recommended a sitter",
-    timeAgo: "2d",
-    itemType: "sitter" as const,
-    itemId: "sitter-123"
-  }, {
-    userId: "102",
-    userName: "Ethan Chen",
-    userImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    action: "Booked a sitter",
-    timeAgo: "3d",
-    itemType: "sitter" as const,
-    itemId: "sitter-456"
-  }, {
-    userId: "103",
-    userName: "Sarah Williams",
-    userImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    action: "Recommended baby bottles",
-    timeAgo: "4d",
-    itemType: "product" as const,
-    itemId: "product-789"
-  }];
 
   // Show notification banner when there's new activity
   useEffect(() => {
@@ -120,7 +93,7 @@ const Home = () => {
       
       <HeroSection userName={mockCurrentUser.firstName} />
       <ActionButtons />
-      <FriendsActivity friendActivity={friendActivity} />
+      <FriendsActivity currentUserId={mockCurrentUser.id} />
       <NewRecommendedSitters currentUserId={mockCurrentUser.id} />
       <NewRecommendedProducts currentUserId={mockCurrentUser.id} />
       <FeaturedRecommendations featuredProducts={featuredProducts} />

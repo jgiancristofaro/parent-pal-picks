@@ -394,6 +394,23 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: string
       }
+      get_friends_activity_feed: {
+        Args: { p_current_user_id: string; p_limit?: number; p_offset?: number }
+        Returns: {
+          activity_id: string
+          activity_type: string
+          actor_id: string
+          actor_full_name: string
+          actor_avatar_url: string
+          activity_timestamp: string
+          item_id: string
+          item_name: string
+          item_image_url: string
+          item_category: string
+          review_rating: number
+          review_title: string
+        }[]
+      }
       get_local_sitters: {
         Args: {
           current_user_id_param: string
