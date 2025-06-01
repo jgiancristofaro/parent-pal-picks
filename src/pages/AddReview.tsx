@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ProductReviewForm } from "@/components/ProductReviewForm";
 import { SitterReviewForm } from "@/components/SitterReviewForm";
 import { ProductSearch } from "@/components/review/ProductSearch";
+import { NewProductReviewFlow } from "@/components/review/NewProductReviewFlow";
 
 interface Product {
   id: string;
@@ -42,6 +43,19 @@ const AddReview = () => {
   const handleBackToProductOptions = () => {
     setProductReviewType(null);
     setSelectedProduct(null);
+  };
+
+  const handleSelectExistingProduct = (product: any) => {
+    // Convert the duplicate product format to our Product interface
+    const formattedProduct: Product = {
+      id: product.id,
+      name: product.name,
+      category: null, // We don't have category in the duplicate check response
+      image_url: product.image_url,
+      brand_name: product.brand_name,
+    };
+    setSelectedProduct(formattedProduct);
+    setProductReviewType("existing");
   };
 
   return (
@@ -134,6 +148,11 @@ const AddReview = () => {
           <ProductSearch
             onProductSelect={handleProductSelect}
             onBack={handleBackToProductOptions}
+          />
+        ) : reviewType === "product" && productReviewType === "new" ? (
+          <NewProductReviewFlow
+            onCancel={handleReset}
+            onSelectExistingProduct={handleSelectExistingProduct}
           />
         ) : reviewType === "product" ? (
           <ProductReviewForm 
