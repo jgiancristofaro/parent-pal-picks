@@ -3,22 +3,42 @@ import { Link } from "react-router-dom";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ArrowRight } from "lucide-react";
 import { SitterCard } from "@/components/SitterCard";
-
-interface NewlyRecommendedSitter {
-  id: string;
-  name: string;
-  image: string;
-  rating: number;
-  experience: string;
-  recommendedBy: string;
-  recommendationDate: string;
-}
+import { useNewlyRecommendedSitters } from "@/hooks/useNewlyRecommendedSitters";
 
 interface NewRecommendedSittersProps {
-  newlyRecommendedSitters: NewlyRecommendedSitter[];
+  currentUserId?: string;
 }
 
-export const NewRecommendedSitters = ({ newlyRecommendedSitters }: NewRecommendedSittersProps) => {
+export const NewRecommendedSitters = ({ currentUserId }: NewRecommendedSittersProps) => {
+  const { data: newlyRecommendedSitters = [], isLoading, error } = useNewlyRecommendedSitters(currentUserId);
+
+  if (isLoading) {
+    return (
+      <div className="mb-4">
+        <div className="flex justify-between items-center px-4 mb-2">
+          <h2 className="text-xl font-bold">New Sitters for You</h2>
+        </div>
+        <div className="mx-4 bg-white rounded-xl shadow-sm p-8 text-center border border-gray-100">
+          <p className="text-gray-600">Loading new sitter recommendations...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    console.error('Error loading newly recommended sitters:', error);
+    return (
+      <div className="mb-4">
+        <div className="flex justify-between items-center px-4 mb-2">
+          <h2 className="text-xl font-bold">New Sitters for You</h2>
+        </div>
+        <div className="mx-4 bg-white rounded-xl shadow-sm p-8 text-center border border-gray-100">
+          <p className="text-gray-600">Unable to load recommendations right now.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mb-4">
       <div className="flex justify-between items-center px-4 mb-2">
@@ -39,15 +59,15 @@ export const NewRecommendedSitters = ({ newlyRecommendedSitters }: NewRecommende
         <ScrollArea className="w-full whitespace-nowrap no-scrollbar">
           <div className="flex w-max space-x-4 px-4">
             {newlyRecommendedSitters.map((sitter) => (
-              <div key={sitter.id} className="flex-none w-48">
+              <div key={`${sitter.sitter_id}-${sitter.recommender_user_id}`} className="flex-none w-48">
                 <SitterCard
-                  id={sitter.id}
-                  name={sitter.name}
-                  image={sitter.image}
-                  rating={sitter.rating}
-                  experience={sitter.experience}
-                  recommendedBy={sitter.recommendedBy}
-                  friendRecommendationCount={0}
+                  id={sitter.sitter_id}
+                  name={sitter.sitter_name}
+                  image={sitter.sitter_profile_image_url || '/placeholder.svg'}
+                  rating={sitter.sitter_rating || 0}
+                  experience="Recommended by friends"
+                  recommendedBy={sitter.recommender_full_name}
+                  friendRecommendationCount={1}
                 />
               </div>
             ))}
