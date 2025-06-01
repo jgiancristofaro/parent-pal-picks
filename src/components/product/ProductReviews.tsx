@@ -58,7 +58,7 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
           content,
           has_verified_experience,
           created_at,
-          profiles!user_id(id, full_name, avatar_url)
+          profiles:user_id(id, full_name, avatar_url)
         `)
         .eq("product_id", productId)
         .order("created_at", { ascending: false });
