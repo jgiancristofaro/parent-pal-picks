@@ -8,6 +8,7 @@ import { LocationSelector } from "@/components/review/LocationSelector";
 import { ReviewForm } from "@/components/review/ReviewForm";
 import { SitterSearch } from "@/components/review/SitterSearch";
 import { EnhancedSitterReviewForm } from "@/components/review/EnhancedSitterReviewForm";
+import { NewSitterReviewForm } from "@/components/review/NewSitterReviewForm";
 
 interface Sitter {
   id: string;
@@ -72,24 +73,10 @@ export const SitterReviewForm = ({ onCancel, reviewType }: SitterReviewFormProps
 
   if (reviewType === "new") {
     return (
-      <div className="space-y-6">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Create New Sitter Profile
-          </h2>
-          <p className="text-gray-600">
-            This feature is coming soon! For now, please use "Find an Existing Sitter to Review".
-          </p>
-        </div>
-        <div className="flex justify-center">
-          <button
-            onClick={onCancel}
-            className="px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
-          >
-            Back
-          </button>
-        </div>
-      </div>
+      <NewSitterReviewForm
+        userLocations={userLocations}
+        onCancel={onCancel}
+      />
     );
   }
 
