@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -6,6 +5,7 @@ import { useUserLocations } from "@/hooks/useUserLocations";
 import { SitterSelector } from "@/components/review/SitterSelector";
 import { LocationSelector } from "@/components/review/LocationSelector";
 import { ReviewForm } from "@/components/review/ReviewForm";
+import { SitterSearch } from "@/components/review/SitterSearch";
 
 interface Sitter {
   id: string;
@@ -28,6 +28,7 @@ export const SitterReviewForm = ({ onCancel, reviewType }: SitterReviewFormProps
   const [content, setContent] = useState("");
   const [selectedLocationId, setSelectedLocationId] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSearch, setShowSearch] = useState(true);
   const { toast } = useToast();
 
   // Fetch user's saved locations
@@ -55,6 +56,21 @@ export const SitterReviewForm = ({ onCancel, reviewType }: SitterReviewFormProps
     } else {
       setSitters(data || []);
     }
+  };
+
+  const handleSitterSelect = (sitter: Sitter) => {
+    setSelectedSitter(sitter);
+    setShowSearch(false);
+  };
+
+  const handleCreateNew = () => {
+    // This will be handled by the parent component
+    onCancel(); // Go back to show the "new" option
+  };
+
+  const handleBackToSearch = () => {
+    setSelectedSitter(null);
+    setShowSearch(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -142,6 +158,16 @@ export const SitterReviewForm = ({ onCancel, reviewType }: SitterReviewFormProps
     );
   }
 
+  if (reviewType === "existing" && showSearch && !selectedSitter) {
+    return (
+      <SitterSearch
+        onSitterSelect={handleSitterSelect}
+        onCreateNew={handleCreateNew}
+        onBack={onCancel}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -166,7 +192,7 @@ export const SitterReviewForm = ({ onCancel, reviewType }: SitterReviewFormProps
             sitters={sitters}
             selectedSitter={selectedSitter}
             onSitterSelect={setSelectedSitter}
-            onSitterChange={() => setSelectedSitter(null)}
+            onSitterChange={handleBackToSearch}
           />
 
           <LocationSelector
