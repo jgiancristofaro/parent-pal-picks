@@ -25,6 +25,24 @@ export const useNewlyRecommendedProducts = (
 
       console.log('Fetching newly recommended products for user:', currentUserId);
 
+      // First get the list of followed users
+      const { data: followedUsers, error: followError } = await supabase
+        .from('user_follows')
+        .select('following_id')
+        .eq('follower_id', currentUserId);
+
+      if (followError) {
+        console.error('Error fetching followed users:', followError);
+        throw followError;
+      }
+
+      if (!followedUsers || followedUsers.length === 0) {
+        console.log('No followed users found');
+        return [];
+      }
+
+      const followedUserIds = followedUsers.map(f => f.following_id);
+
       // Get products recommended by followed users (reviews with rating >= 4)
       const { data, error } = await supabase
         .from('reviews')
@@ -44,13 +62,7 @@ export const useNewlyRecommendedProducts = (
         `)
         .not('product_id', 'is', null)
         .gte('rating', 4)
-        .in('user_id', 
-          // Subquery to get followed users
-          supabase
-            .from('user_follows')
-            .select('following_id')
-            .eq('follower_id', currentUserId)
-        )
+        .in('user_id', followedUserIds)
         .order('created_at', { ascending: false })
         .limit(limit);
 

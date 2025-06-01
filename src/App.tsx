@@ -29,6 +29,7 @@ import AddReview from "./pages/AddReview";
 import ActivityFeedPage from "./pages/ActivityFeedPage";
 import ManageLocations from "./pages/ManageLocations";
 import OnboardingPage from "./pages/OnboardingPage";
+import NewlyRecommendedSittersPage from "./pages/NewlyRecommendedSittersPage";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => (
           <Route path="/shop" element={<ProductSearchPage />} />
           <Route path="/add-review" element={<AddReview />} />
           <Route path="/activity-feed" element={<ActivityFeedPage />} />
+          <Route path="/newly-recommended-sitters" element={<NewlyRecommendedSittersPage />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/settings/my-homes" element={<ManageLocations />} />
           <Route path="/payment-methods" element={<PaymentMethods />} />
