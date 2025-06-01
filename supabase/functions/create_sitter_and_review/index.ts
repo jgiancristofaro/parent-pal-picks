@@ -113,12 +113,12 @@ serve(async (req) => {
       const { data: profileEmailCheck } = await supabase
         .from('profiles')
         .select('id')
-        .eq('email', email.toLowerCase().trim())
+        .eq('full_name', `${first_name.trim()} ${last_name.trim()}`)
         .limit(1)
 
       if (profileEmailCheck && profileEmailCheck.length > 0) {
         return new Response(
-          JSON.stringify({ error: 'A profile with this email already exists. Please search for the existing sitter to review.' }),
+          JSON.stringify({ error: 'A profile with this name already exists. Please search for the existing sitter to review.' }),
           { 
             status: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -126,16 +126,16 @@ serve(async (req) => {
         )
       }
 
-      // Check for email duplicates in sitters table (if email field exists)
+      // Check for email duplicates in sitters table
       const { data: sitterEmailCheck } = await supabase
         .from('sitters')
         .select('id')
-        .eq('email', email.toLowerCase().trim())
+        .eq('name', `${first_name.trim()} ${last_name.trim()}`)
         .limit(1)
 
       if (sitterEmailCheck && sitterEmailCheck.length > 0) {
         return new Response(
-          JSON.stringify({ error: 'A profile with this email already exists. Please search for the existing sitter to review.' }),
+          JSON.stringify({ error: 'A sitter with this name already exists. Please search for the existing sitter to review.' }),
           { 
             status: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -181,7 +181,7 @@ serve(async (req) => {
 
         if (phoneExists) {
           return new Response(
-            JSON.stringify({ error: 'A profile with this phone number already exists. Please search for the existing sitter to review.' }),
+            JSON.stringify({ error: 'A sitter with this phone number already exists. Please search for the existing sitter to review.' }),
             { 
               status: 400,
               headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -195,7 +195,6 @@ serve(async (req) => {
     const sitterName = `${first_name.trim()} ${last_name.trim()}`
     const sitterData = {
       name: sitterName,
-      email: email ? email.toLowerCase().trim() : null,
       phone_number: phone_number ? phone_number.trim() : null,
       phone_number_searchable: false, // Default to private
       rating: rating, // Initialize with first review rating
@@ -232,7 +231,8 @@ serve(async (req) => {
       rating: rating,
       title: title.trim(),
       content: content.trim(),
-      worked_with_sitter_certification: certification_checkbox_value
+      worked_with_sitter_certification: certification_checkbox_value,
+      has_verified_experience: true // Set to true since they worked with the sitter
     }
 
     console.log('Creating review with data:', reviewData);

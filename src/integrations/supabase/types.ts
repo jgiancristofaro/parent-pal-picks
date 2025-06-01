@@ -64,6 +64,27 @@ export type Database = {
           },
         ]
       }
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       follow_requests: {
         Row: {
           created_at: string
@@ -93,33 +114,65 @@ export type Database = {
       }
       products: {
         Row: {
+          average_rating: number | null
+          brand_name: string
           category: string | null
+          category_id: string
           created_at: string
+          created_by_user_id: string | null
           description: string | null
+          external_purchase_link: string | null
           id: string
           image_url: string | null
+          image_urls: string[] | null
           name: string
+          price: number | null
+          review_count: number | null
           updated_at: string
         }
         Insert: {
+          average_rating?: number | null
+          brand_name: string
           category?: string | null
+          category_id: string
           created_at?: string
+          created_by_user_id?: string | null
           description?: string | null
+          external_purchase_link?: string | null
           id?: string
           image_url?: string | null
+          image_urls?: string[] | null
           name: string
+          price?: number | null
+          review_count?: number | null
           updated_at?: string
         }
         Update: {
+          average_rating?: number | null
+          brand_name?: string
           category?: string | null
+          category_id?: string
           created_at?: string
+          created_by_user_id?: string | null
           description?: string | null
+          external_purchase_link?: string | null
           id?: string
           image_url?: string | null
+          image_urls?: string[] | null
           name?: string
+          price?: number | null
+          review_count?: number | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_products_category_id"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -200,6 +253,7 @@ export type Database = {
         Row: {
           content: string
           created_at: string
+          has_verified_experience: boolean
           id: string
           product_id: string | null
           rating: number
@@ -213,6 +267,7 @@ export type Database = {
         Insert: {
           content: string
           created_at?: string
+          has_verified_experience: boolean
           id?: string
           product_id?: string | null
           rating: number
@@ -226,6 +281,7 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
+          has_verified_experience?: boolean
           id?: string
           product_id?: string | null
           rating?: number
