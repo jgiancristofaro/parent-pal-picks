@@ -112,11 +112,11 @@ export const EnhancedSitterReviewForm = ({
           description: "Failed to submit review",
           variant: "destructive",
         });
-      } else if (data && data.error) {
+      } else if (data && typeof data === 'object' && data !== null && 'error' in data) {
         // Handle business logic errors returned by the function
         toast({
           title: "Error",
-          description: data.error,
+          description: String(data.error),
           variant: "destructive",
         });
       } else {
