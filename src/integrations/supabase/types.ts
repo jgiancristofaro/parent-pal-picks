@@ -420,6 +420,20 @@ export type Database = {
         Args: { user_id: string }
         Returns: number
       }
+      get_newly_recommended_products_from_followed_users: {
+        Args: { p_current_user_id: string; p_limit?: number; p_offset?: number }
+        Returns: {
+          product_id: string
+          product_name: string
+          product_image_url: string
+          product_category: string
+          recommendation_rating: number
+          recommender_user_id: string
+          recommender_full_name: string
+          recommender_avatar_url: string
+          recommendation_timestamp: string
+        }[]
+      }
       get_newly_recommended_sitters_from_followed_users: {
         Args: { p_current_user_id: string; p_limit?: number; p_offset?: number }
         Returns: {
