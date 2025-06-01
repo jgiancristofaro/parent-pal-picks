@@ -1,6 +1,7 @@
 
 import { Header } from "@/components/Header";
 import { useNewlyRecommendedProducts } from "@/hooks/useNewlyRecommendedProducts";
+import { RecommendedProductFeedItem } from "@/components/RecommendedProductFeedItem";
 
 const NewlyRecommendedProductsPage = () => {
   // Mock current user data - in a real app this would come from auth context
@@ -61,12 +62,17 @@ const NewlyRecommendedProductsPage = () => {
           <div className="space-y-4">
             {newlyRecommendedProducts.map((recommendation) => (
               <div key={`${recommendation.product_id}-${recommendation.recommender_user_id}`} className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                <div className="p-4">
-                  <div>Product Recommendation Item Placeholder</div>
-                  <div className="text-sm text-gray-500 mt-2">
-                    {recommendation.product_name} recommended by {recommendation.recommender_full_name}
-                  </div>
-                </div>
+                <RecommendedProductFeedItem
+                  productId={recommendation.product_id}
+                  productName={recommendation.product_name}
+                  productImageUrl={recommendation.product_image_url}
+                  productCategory={recommendation.product_category}
+                  recommendationRating={recommendation.recommendation_rating ? Number(recommendation.recommendation_rating) : null}
+                  recommenderUserId={recommendation.recommender_user_id}
+                  recommenderFullName={recommendation.recommender_full_name}
+                  recommenderAvatarUrl={recommendation.recommender_avatar_url}
+                  recommendationTimestamp={recommendation.recommendation_timestamp}
+                />
               </div>
             ))}
           </div>
