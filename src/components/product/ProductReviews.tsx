@@ -14,7 +14,7 @@ interface Review {
   content: string;
   has_verified_experience: boolean;
   created_at: string;
-  user: {
+  profiles: {
     id: string;
     full_name: string;
     avatar_url: string | null;
@@ -58,7 +58,7 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
           content,
           has_verified_experience,
           created_at,
-          user:profiles(id, full_name, avatar_url)
+          profiles!user_id(id, full_name, avatar_url)
         `)
         .eq("product_id", productId)
         .order("created_at", { ascending: false });
@@ -102,7 +102,7 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
       
       // Filter reviews to only show those from followed users
       const filtered = reviews.filter(review => 
-        followingIds.includes(review.user.id)
+        followingIds.includes(review.profiles.id)
       );
       
       setFilteredReviews(filtered);
@@ -185,18 +185,18 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
               <div className="flex items-start space-x-4">
                 <Avatar className="w-12 h-12">
                   <AvatarImage 
-                    src={review.user.avatar_url || undefined} 
-                    alt={review.user.full_name} 
+                    src={review.profiles.avatar_url || undefined} 
+                    alt={review.profiles.full_name} 
                   />
                   <AvatarFallback>
-                    {review.user.full_name?.charAt(0) || 'U'}
+                    {review.profiles.full_name?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <span className="font-semibold">{review.user.full_name}</span>
+                      <span className="font-semibold">{review.profiles.full_name}</span>
                       {review.has_verified_experience && (
                         <Badge variant="default" className="bg-green-100 text-green-800 text-xs">
                           Verified Experience
