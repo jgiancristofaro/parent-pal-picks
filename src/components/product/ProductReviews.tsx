@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ interface Review {
   content: string;
   has_verified_experience: boolean;
   created_at: string;
+  user_id: string;
   profiles: {
     id: string;
     full_name: string;
@@ -48,23 +50,62 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
 
   const fetchReviews = async () => {
     try {
-      const { data, error } = await supabase
+      // First, fetch reviews
+      const { data: reviewsData, error: reviewsError } = await supabase
         .from("reviews")
-        .select(`
-          id,
-          rating,
-          title,
-          content,
-          has_verified_experience,
-          created_at,
-          profiles!reviews_user_id_fkey(id, full_name, avatar_url)
-        `)
+        .select("id, rating, title, content, has_verified_experience, created_at, user_id")
         .eq("product_id", productId)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (reviewsError) throw reviewsError;
 
-      setReviews(data || []);
+      if (!reviewsData || reviewsData.length === 0) {
+        setReviews([]);
+        setLoading(false);
+        return;
+      }
+
+      // Get unique user IDs from reviews
+      const userIds = [...new Set(reviewsData.map(review => review.user_id))];
+
+      // Fetch profiles for all users
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url")
+        .in("id", userIds);
+
+      if (profilesError) {
+        console.error("Error fetching profiles:", profilesError);
+        // Continue with reviews but without profile data
+        const reviewsWithoutProfiles = reviewsData.map(review => ({
+          ...review,
+          profiles: {
+            id: review.user_id,
+            full_name: "Unknown User",
+            avatar_url: null
+          }
+        }));
+        setReviews(reviewsWithoutProfiles);
+        setLoading(false);
+        return;
+      }
+
+      // Create a map of profiles for quick lookup
+      const profilesMap = new Map(
+        profilesData?.map(profile => [profile.id, profile]) || []
+      );
+
+      // Combine reviews with profile data
+      const combinedReviews = reviewsData.map(review => ({
+        ...review,
+        profiles: profilesMap.get(review.user_id) || {
+          id: review.user_id,
+          full_name: "Unknown User",
+          avatar_url: null
+        }
+      }));
+
+      setReviews(combinedReviews);
     } catch (error) {
       console.error("Error fetching reviews:", error);
       toast({
