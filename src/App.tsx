@@ -28,6 +28,7 @@ import NotFound from "./pages/NotFound";
 import AddReview from "./pages/AddReview";
 import ActivityFeedPage from "./pages/ActivityFeedPage";
 import ManageLocations from "./pages/ManageLocations";
+import OnboardingPage from "./pages/OnboardingPage";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/login-existing" element={<ExistingUserLoginPage />} />
           <Route path="/" element={<Home />} />
