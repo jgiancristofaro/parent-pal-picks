@@ -1,5 +1,7 @@
+
 import { Header } from "@/components/Header";
 import { useFriendsActivityFeed } from "@/hooks/useFriendsActivityFeed";
+import { GenericActivityFeedItem } from "@/components/GenericActivityFeedItem";
 
 const ActivityFeedPage = () => {
   // Mock current user data - in a real app this would come from auth context
@@ -60,12 +62,20 @@ const ActivityFeedPage = () => {
           <div className="space-y-4">
             {friendsActivity.map((activity) => (
               <div key={activity.activity_id} className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                <div className="p-4">
-                  <div>Activity Item Placeholder</div>
-                  <div className="text-sm text-gray-500 mt-2">
-                    {activity.actor_full_name} {activity.activity_type === 'product_review' ? 'reviewed a product' : 'reviewed a sitter'}: {activity.item_name}
-                  </div>
-                </div>
+                <GenericActivityFeedItem
+                  activityId={activity.activity_id}
+                  activityType={activity.activity_type as 'product_review' | 'sitter_review'}
+                  actorId={activity.actor_id}
+                  actorFullName={activity.actor_full_name}
+                  actorAvatarUrl={activity.actor_avatar_url}
+                  activityTimestamp={activity.activity_timestamp}
+                  itemId={activity.item_id}
+                  itemName={activity.item_name}
+                  itemImageUrl={activity.item_image_url}
+                  itemCategory={activity.item_category}
+                  reviewRating={activity.review_rating}
+                  reviewTitle={activity.review_title}
+                />
               </div>
             ))}
           </div>
