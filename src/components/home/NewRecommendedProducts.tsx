@@ -10,7 +10,7 @@ interface NewRecommendedProductsProps {
 }
 
 export const NewRecommendedProducts = ({ currentUserId }: NewRecommendedProductsProps) => {
-  const { data: newlyRecommendedProducts = [], isLoading, error } = useNewlyRecommendedProducts(currentUserId);
+  const { data: newlyRecommendedProducts = [], isLoading, error } = useNewlyRecommendedProducts(currentUserId, 5);
 
   if (isLoading) {
     return (
@@ -66,6 +66,8 @@ export const NewRecommendedProducts = ({ currentUserId }: NewRecommendedProducts
                   image={product.product_image_url || '/placeholder.svg'}
                   category={product.product_category || 'Product'}
                   recommendedBy={product.recommender_full_name}
+                  rating={product.recommendation_rating ? Number(product.recommendation_rating) : undefined}
+                  friendRecommendationCount={1}
                 />
               </div>
             ))}
