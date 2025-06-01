@@ -28,10 +28,10 @@ export const RecommendedProductFeedItem = ({
 }: RecommendedProductFeedItemProps) => {
   return (
     <Link to={`/product/${productId}`} className="block group">
-      <div className="flex items-center space-x-4 p-4 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all">
+      <div className="flex items-center space-x-5 p-4 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all">
         {/* Product Image */}
         <div className="flex-shrink-0">
-          <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100">
+          <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100">
             {productImageUrl ? (
               <img 
                 src={productImageUrl} 
@@ -47,7 +47,7 @@ export const RecommendedProductFeedItem = ({
         </div>
         
         {/* Product Details */}
-        <div className="flex-grow min-h-[5rem] flex flex-col justify-center">
+        <div className="flex-grow min-h-[6rem] flex flex-col justify-center">
           <div className="flex items-center justify-between mb-1">
             <h4 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
               {productName}
