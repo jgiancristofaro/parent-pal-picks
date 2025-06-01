@@ -267,7 +267,7 @@ export const EnhancedSitterReviewForm = ({
           <Checkbox
             id="certification"
             checked={certified}
-            onCheckedChange={setCertified}
+            onCheckedChange={(checked) => setCertified(checked === true)}
             className="mt-1"
           />
           <label htmlFor="certification" className="text-sm font-medium leading-5">
