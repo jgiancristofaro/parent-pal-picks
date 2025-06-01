@@ -1,20 +1,30 @@
-
 import React, { useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Button } from "@/components/ui/button";
 import { ProductReviewForm } from "@/components/ProductReviewForm";
 import { SitterReviewForm } from "@/components/SitterReviewForm";
+import { ProductSearch } from "@/components/review/ProductSearch";
+
+interface Product {
+  id: string;
+  name: string;
+  category: string | null;
+  image_url: string | null;
+  brand_name: string;
+}
 
 const AddReview = () => {
   const [reviewType, setReviewType] = useState<"product" | "sitter" | null>(null);
   const [sitterReviewType, setSitterReviewType] = useState<"existing" | "new" | null>(null);
   const [productReviewType, setProductReviewType] = useState<"existing" | "new" | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const handleReset = () => {
     setReviewType(null);
     setSitterReviewType(null);
     setProductReviewType(null);
+    setSelectedProduct(null);
   };
 
   const handleSitterTypeSelect = (type: "existing" | "new") => {
@@ -23,6 +33,15 @@ const AddReview = () => {
 
   const handleProductTypeSelect = (type: "existing" | "new") => {
     setProductReviewType(type);
+  };
+
+  const handleProductSelect = (product: Product) => {
+    setSelectedProduct(product);
+  };
+
+  const handleBackToProductOptions = () => {
+    setProductReviewType(null);
+    setSelectedProduct(null);
   };
 
   return (
@@ -111,8 +130,17 @@ const AddReview = () => {
               </Button>
             </div>
           </div>
+        ) : reviewType === "product" && productReviewType === "existing" && !selectedProduct ? (
+          <ProductSearch
+            onProductSelect={handleProductSelect}
+            onBack={handleBackToProductOptions}
+          />
         ) : reviewType === "product" ? (
-          <ProductReviewForm onCancel={handleReset} reviewType={productReviewType!} />
+          <ProductReviewForm 
+            onCancel={handleReset} 
+            reviewType={productReviewType!} 
+            selectedProduct={selectedProduct}
+          />
         ) : reviewType === "sitter" && !sitterReviewType ? (
           <div className="space-y-6">
             <div className="text-center">
