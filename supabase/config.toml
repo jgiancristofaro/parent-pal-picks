@@ -50,3 +50,6 @@ verify_jwt = true
 
 [functions.get_pending_follow_requests]
 verify_jwt = true
+
+[functions.search_sitters]
+verify_jwt = false
