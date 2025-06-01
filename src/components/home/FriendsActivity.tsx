@@ -79,6 +79,7 @@ export const FriendsActivity = ({ currentUserId }: FriendsActivityProps) => {
                   itemCategory={activity.item_category}
                   reviewRating={activity.review_rating}
                   reviewTitle={activity.review_title}
+                  displayMode="preview"
                 />
               </div>
             ))}

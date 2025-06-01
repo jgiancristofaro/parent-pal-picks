@@ -17,6 +17,7 @@ interface GenericActivityFeedItemProps {
   itemCategory: string | null;
   reviewRating: number;
   reviewTitle: string;
+  displayMode?: 'preview' | 'full';
 }
 
 export const GenericActivityFeedItem = ({
@@ -31,10 +32,63 @@ export const GenericActivityFeedItem = ({
   itemImageUrl,
   itemCategory,
   reviewRating,
-  reviewTitle
+  reviewTitle,
+  displayMode = 'full'
 }: GenericActivityFeedItemProps) => {
   const timeAgo = formatDistanceToNowStrict(new Date(activityTimestamp), { addSuffix: false });
   const itemDetailPath = activityType === 'product_review' ? `/product/${itemId}` : `/sitter/${itemId}`;
+
+  if (displayMode === 'preview') {
+    return (
+      <Link to={itemDetailPath} className="block p-4 hover:bg-gray-50 transition-colors">
+        <div className="flex items-start space-x-3">
+          {/* Actor Avatar */}
+          <Link to={`/profile/${actorId}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+            <Avatar className="w-10 h-10">
+              <AvatarImage 
+                src={actorAvatarUrl || undefined} 
+                alt={actorFullName}
+                className="object-cover"
+              />
+              <AvatarFallback className="bg-purple-100 text-purple-600">
+                {actorFullName.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
+          
+          <div className="flex-grow min-w-0">
+            <div className="flex justify-between items-start mb-1">
+              <Link to={`/profile/${actorId}`} onClick={(e) => e.stopPropagation()}>
+                <p className="font-semibold text-gray-800 hover:text-purple-600 transition-colors text-sm">
+                  {actorFullName}
+                </p>
+              </Link>
+              <p className="text-xs text-gray-500 flex-shrink-0 ml-2">{timeAgo}</p>
+            </div>
+            
+            {/* Simplified activity description with rating */}
+            <div className="flex items-center space-x-2">
+              <p className="text-sm text-gray-600 truncate">
+                gave {reviewRating} stars to {itemName}
+              </p>
+              <div className="flex items-center space-x-1 flex-shrink-0">
+                <StarIcon filled={true} className="w-4 h-4 text-yellow-400" />
+                <span className="text-sm font-medium text-gray-700">
+                  {reviewRating}
+                </span>
+              </div>
+            </div>
+            
+            {reviewTitle && (
+              <p className="text-sm text-gray-500 mt-1 truncate">
+                "{reviewTitle}"
+              </p>
+            )}
+          </div>
+        </div>
+      </Link>
+    );
+  }
 
   return (
     <div className="flex items-start py-3 px-4">
