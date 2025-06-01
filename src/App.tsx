@@ -15,6 +15,7 @@ import FindParents from "./pages/FindParents";
 import Profile from "./pages/Profile";
 import SitterProfile from "./pages/SitterProfile";
 import ProductSearchPage from "./pages/ProductSearchPage";
+import ProductPage from "./pages/ProductPage";
 import Settings from "./pages/Settings";
 import PaymentMethods from "./pages/PaymentMethods";
 import Notifications from "./pages/Notifications";
@@ -53,6 +54,7 @@ const App = () => (
           <Route path="/profile/:userId" element={<Profile />} />
           <Route path="/sitter/:id" element={<SitterProfile />} />
           <Route path="/shop" element={<ProductSearchPage />} />
+          <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/add-review" element={<AddReview />} />
           <Route path="/activity-feed" element={<ActivityFeedPage />} />
           <Route path="/newly-recommended-sitters" element={<NewlyRecommendedSittersPage />} />
