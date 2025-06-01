@@ -26,10 +26,10 @@ export const RecommendedSitterFeedItem = ({
 }: RecommendedSitterFeedItemProps) => {
   return (
     <Link to={`/sitter/${sitterId}`} className="block group">
-      <div className="flex items-center space-x-3 p-4 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all">
+      <div className="flex items-center space-x-5 p-4 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all">
         {/* Sitter Profile Image */}
         <div className="flex-shrink-0">
-          <Avatar className="w-12 h-12">
+          <Avatar className="w-24 h-24">
             <AvatarImage 
               src={sitterProfileImageUrl || undefined} 
               alt={sitterName}
@@ -42,7 +42,7 @@ export const RecommendedSitterFeedItem = ({
         </div>
         
         {/* Sitter Details */}
-        <div className="flex-grow">
+        <div className="flex-grow min-h-[6rem] flex flex-col justify-center">
           <div className="flex items-center justify-between">
             <h4 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
               {sitterName}
