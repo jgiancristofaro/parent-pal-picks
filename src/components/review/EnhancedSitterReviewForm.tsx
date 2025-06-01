@@ -94,46 +94,47 @@ export const EnhancedSitterReviewForm = ({
 
     setIsSubmitting(true);
 
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
+    try {
+      // Call the create_review function with all required parameters
+      const { data, error } = await supabase.rpc('create_review', {
+        p_sitter_id: selectedSitter.id,
+        p_service_location_id: selectedLocationId,
+        p_rating: rating,
+        p_title: title.trim(),
+        p_content: content.trim(),
+        p_certification_checkbox_value: certified
+      });
+
+      if (error) {
+        console.error("Error calling create_review function:", error);
+        toast({
+          title: "Error",
+          description: "Failed to submit review",
+          variant: "destructive",
+        });
+      } else if (data && data.error) {
+        // Handle business logic errors returned by the function
+        toast({
+          title: "Error",
+          description: data.error,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Your review has been submitted!",
+        });
+        onCancel();
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
       toast({
         title: "Error",
-        description: "You must be logged in to submit a review",
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
+    } finally {
       setIsSubmitting(false);
-      return;
-    }
-
-    const reviewData = {
-      user_id: user.id,
-      sitter_id: selectedSitter.id,
-      service_location_id: selectedLocationId,
-      rating,
-      title: title.trim(),
-      content: content.trim(),
-    };
-
-    const { error } = await supabase
-      .from("reviews")
-      .insert(reviewData);
-
-    setIsSubmitting(false);
-
-    if (error) {
-      console.error("Error submitting review:", error);
-      toast({
-        title: "Error",
-        description: "Failed to submit review",
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Success",
-        description: "Your review has been submitted!",
-      });
-      onCancel();
     }
   };
 

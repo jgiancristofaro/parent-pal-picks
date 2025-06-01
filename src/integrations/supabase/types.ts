@@ -208,6 +208,7 @@ export type Database = {
           title: string
           updated_at: string
           user_id: string
+          worked_with_sitter_certification: boolean
         }
         Insert: {
           content: string
@@ -220,6 +221,7 @@ export type Database = {
           title: string
           updated_at?: string
           user_id: string
+          worked_with_sitter_certification?: boolean
         }
         Update: {
           content?: string
@@ -232,6 +234,7 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string
+          worked_with_sitter_certification?: boolean
         }
         Relationships: [
           {
@@ -389,6 +392,18 @@ export type Database = {
       cleanup_rate_limits: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      create_review: {
+        Args: {
+          p_sitter_id: string
+          p_service_location_id: string
+          p_rating: number
+          p_title: string
+          p_content: string
+          p_certification_checkbox_value: boolean
+          p_product_id?: string
+        }
+        Returns: Json
       }
       get_follow_status: {
         Args: { target_user_id: string }
