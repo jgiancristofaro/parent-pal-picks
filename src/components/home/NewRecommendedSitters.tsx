@@ -10,7 +10,10 @@ interface NewRecommendedSittersProps {
 }
 
 export const NewRecommendedSitters = ({ currentUserId }: NewRecommendedSittersProps) => {
-  const { data: newlyRecommendedSitters = [], isLoading, error } = useNewlyRecommendedSitters(currentUserId);
+  const { data: newlyRecommendedSitters = [], isLoading, error } = useNewlyRecommendedSitters(
+    currentUserId,
+    5 // Limit to 5 recommendations for the preview
+  );
 
   if (isLoading) {
     return (
