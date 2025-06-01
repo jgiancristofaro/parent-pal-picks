@@ -55,7 +55,7 @@ export const useNewlyRecommendedProducts = (
             image_url,
             category
           ),
-          profiles!inner(
+          profiles!reviews_user_id_fkey(
             full_name,
             avatar_url
           )
