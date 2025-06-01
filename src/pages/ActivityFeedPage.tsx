@@ -1,12 +1,11 @@
-
 import { Header } from "@/components/Header";
 import { useFriendsActivityFeed } from "@/hooks/useFriendsActivityFeed";
 import { GenericActivityFeedItem } from "@/components/GenericActivityFeedItem";
 
 const ActivityFeedPage = () => {
-  // Mock current user data - in a real app this would come from auth context
+  // Mock current user data with valid UUID - in a real app this would come from auth context
   const mockCurrentUser = {
-    id: "user-2",
+    id: "550e8400-e29b-41d4-a716-446655440000",
   };
 
   const { 
