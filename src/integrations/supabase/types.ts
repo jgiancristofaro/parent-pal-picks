@@ -265,6 +265,7 @@ export type Database = {
           bio: string | null
           certifications: string[] | null
           created_at: string
+          created_by_user_id: string | null
           experience: string | null
           hourly_rate: number | null
           id: string
@@ -280,6 +281,7 @@ export type Database = {
           bio?: string | null
           certifications?: string[] | null
           created_at?: string
+          created_by_user_id?: string | null
           experience?: string | null
           hourly_rate?: number | null
           id?: string
@@ -295,6 +297,7 @@ export type Database = {
           bio?: string | null
           certifications?: string[] | null
           created_at?: string
+          created_by_user_id?: string | null
           experience?: string | null
           hourly_rate?: number | null
           id?: string
@@ -436,6 +439,7 @@ export type Database = {
           bio: string | null
           certifications: string[] | null
           created_at: string
+          created_by_user_id: string | null
           experience: string | null
           hourly_rate: number | null
           id: string

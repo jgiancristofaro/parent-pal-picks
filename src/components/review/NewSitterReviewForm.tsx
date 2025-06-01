@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -110,58 +109,49 @@ export const NewSitterReviewForm = ({
     setIsSubmitting(true);
 
     try {
-      // First, create the new sitter
-      const sitterData = {
-        name: `${firstName.trim()} ${lastName.trim()}`,
-        phone_number: phoneNumber.trim() || null,
-        phone_number_searchable: false // Default to private
-      };
-
-      const { data: newSitter, error: sitterError } = await supabase
-        .from("sitters")
-        .insert([sitterData])
-        .select()
-        .single();
-
-      if (sitterError) {
-        console.error("Error creating sitter:", sitterError);
-        if (sitterError.code === '23505') { // Unique constraint violation
-          setErrorMessage("A sitter with this information already exists in our system");
-        } else {
-          setErrorMessage("Failed to create sitter profile");
-        }
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        setErrorMessage("You must be logged in to submit a review");
         return;
       }
 
-      // Then create the review using the new sitter's ID
-      const { data, error } = await supabase.rpc('create_review', {
-        p_sitter_id: newSitter.id,
-        p_service_location_id: selectedLocationId,
-        p_rating: rating,
-        p_title: title.trim(),
-        p_content: content.trim(),
-        p_certification_checkbox_value: certified
+      // Call the edge function to create sitter and review
+      const { data, error } = await supabase.functions.invoke('create_sitter_and_review', {
+        body: {
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          email: email.trim() || undefined,
+          phone_number: phoneNumber.trim() || undefined,
+          user_id: user.id,
+          service_location_id: selectedLocationId,
+          rating: rating,
+          title: title.trim(),
+          content: content.trim(),
+          certification_checkbox_value: certified
+        }
       });
 
       if (error) {
-        console.error("Error calling create_review function:", error);
-        toast({
-          title: "Error",
-          description: "Failed to submit review",
-          variant: "destructive",
-        });
-      } else if (data && typeof data === 'object' && data !== null && 'error' in data) {
-        toast({
-          title: "Error",
-          description: String(data.error),
-          variant: "destructive",
-        });
-      } else {
+        console.error("Error calling create_sitter_and_review function:", error);
+        setErrorMessage("An unexpected error occurred");
+        return;
+      }
+
+      if (data?.error) {
+        setErrorMessage(data.error);
+        return;
+      }
+
+      if (data?.success) {
         toast({
           title: "Success",
-          description: "Sitter profile created and review submitted!",
+          description: data.message || "Sitter profile created and review submitted!",
         });
         onCancel();
+      } else {
+        setErrorMessage("An unexpected error occurred");
       }
     } catch (err) {
       console.error("Unexpected error:", err);
