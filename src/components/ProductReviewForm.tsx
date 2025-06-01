@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -83,6 +82,7 @@ export const ProductReviewForm = ({ onCancel }: ProductReviewFormProps) => {
         rating,
         title: title.trim(),
         content: content.trim(),
+        has_verified_experience: true, // Added required field
       });
 
     setIsSubmitting(false);

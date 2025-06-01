@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -76,7 +75,7 @@ const ProductSearchPage = () => {
           average_rating,
           review_count
         `)
-        .order('average_rating', { ascending: false, nullsLast: true });
+        .order('average_rating', { ascending: false });
 
       if (error) {
         console.error('Error fetching products:', error);
