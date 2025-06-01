@@ -1,6 +1,7 @@
 
 import { Header } from "@/components/Header";
 import { useNewlyRecommendedSitters } from "@/hooks/useNewlyRecommendedSitters";
+import { RecommendedSitterFeedItem } from "@/components/RecommendedSitterFeedItem";
 
 const NewlyRecommendedSittersPage = () => {
   // Mock current user data - in a real app this would come from auth context
@@ -60,11 +61,17 @@ const NewlyRecommendedSittersPage = () => {
           // Recommendations feed
           <div className="space-y-4">
             {newlyRecommendedSitters.map((recommendation) => (
-              <div key={`${recommendation.sitter_id}-${recommendation.recommender_user_id}`} className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow p-4">
-                <div>Sitter Recommendation Item Placeholder</div>
-                <div className="text-sm text-gray-500 mt-2">
-                  {recommendation.sitter_name} recommended by {recommendation.recommender_full_name}
-                </div>
+              <div key={`${recommendation.sitter_id}-${recommendation.recommender_user_id}`} className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <RecommendedSitterFeedItem
+                  sitterId={recommendation.sitter_id}
+                  sitterName={recommendation.sitter_name}
+                  sitterProfileImageUrl={recommendation.sitter_profile_image_url}
+                  sitterRating={recommendation.sitter_rating ? Number(recommendation.sitter_rating) : null}
+                  recommenderUserId={recommendation.recommender_user_id}
+                  recommenderFullName={recommendation.recommender_full_name}
+                  recommenderAvatarUrl={recommendation.recommender_avatar_url}
+                  recommendationTimestamp={recommendation.recommendation_timestamp}
+                />
               </div>
             ))}
           </div>
