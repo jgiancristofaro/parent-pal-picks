@@ -17,9 +17,10 @@ interface Sitter {
 
 interface SitterReviewFormProps {
   onCancel: () => void;
+  reviewType: "existing" | "new";
 }
 
-export const SitterReviewForm = ({ onCancel }: SitterReviewFormProps) => {
+export const SitterReviewForm = ({ onCancel, reviewType }: SitterReviewFormProps) => {
   const [sitters, setSitters] = useState<Sitter[]>([]);
   const [selectedSitter, setSelectedSitter] = useState<Sitter | null>(null);
   const [rating, setRating] = useState(0);
@@ -33,8 +34,10 @@ export const SitterReviewForm = ({ onCancel }: SitterReviewFormProps) => {
   const { data: userLocations = [] } = useUserLocations();
 
   useEffect(() => {
-    fetchSitters();
-  }, []);
+    if (reviewType === "existing") {
+      fetchSitters();
+    }
+  }, [reviewType]);
 
   const fetchSitters = async () => {
     const { data, error } = await supabase
@@ -115,6 +118,29 @@ export const SitterReviewForm = ({ onCancel }: SitterReviewFormProps) => {
       onCancel();
     }
   };
+
+  if (reviewType === "new") {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Create New Sitter Profile
+          </h2>
+          <p className="text-gray-600">
+            This feature is coming soon! For now, please use "Find an Existing Sitter to Review".
+          </p>
+        </div>
+        <div className="flex justify-center">
+          <button
+            onClick={onCancel}
+            className="px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+          >
+            Back
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
