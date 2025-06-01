@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "./pages/Login";
 import ExistingUserLoginPage from "./pages/ExistingUserLoginPage";
+import OnboardingPage from "./pages/OnboardingPage";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
 import SearchMock from "./pages/SearchMock";
@@ -38,6 +39,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/login-existing" element={<ExistingUserLoginPage />} />
           <Route path="/" element={<Home />} />
