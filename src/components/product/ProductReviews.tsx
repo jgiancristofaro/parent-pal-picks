@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -58,7 +57,8 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
           content,
           has_verified_experience,
           created_at,
-          profiles!reviews_user_id_fkey(id, full_name, avatar_url)
+          user_id,
+          profiles!inner(id, full_name, avatar_url)
         `)
         .eq("product_id", productId)
         .order("created_at", { ascending: false });
