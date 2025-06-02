@@ -1,31 +1,12 @@
 
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { ChevronRight, CreditCard, Bell, Globe, Shield, Lock, HelpCircle, Info, LogOut, Home } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { SettingsSection } from "@/components/settings/SettingsSection";
+import { SettingsItem } from "@/components/settings/SettingsItem";
+import { LogoutSection } from "@/components/settings/LogoutSection";
+import { CreditCard, Bell, Globe, Shield, Lock, HelpCircle, Info, Home } from "lucide-react";
 
 const Settings = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const handleLogout = () => {
-    // Clear any stored user data (localStorage, sessionStorage, etc.)
-    localStorage.clear();
-    sessionStorage.clear();
-    
-    // Show success message
-    toast({
-      title: "Logged out successfully",
-      description: "You have been logged out of your account.",
-    });
-    
-    // Navigate to login page
-    navigate("/login");
-  };
-
   const settingsItems = [
     {
       section: "Account",
@@ -119,69 +100,28 @@ const Settings = () => {
       
       <div className="px-4 py-6">
         {settingsItems.map((section, sectionIndex) => (
-          <div key={section.section} className={sectionIndex > 0 ? "mt-8" : ""}>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">{section.section}</h2>
-            
-            <div className="bg-white rounded-lg shadow-sm">
-              {section.items.map((item, itemIndex) => (
-                <Link 
-                  key={item.id}
-                  to={item.href}
-                  className={`flex items-center p-4 hover:bg-gray-50 transition-colors ${
-                    itemIndex !== section.items.length - 1 ? "border-b border-gray-100" : ""
-                  } ${itemIndex === 0 ? "rounded-t-lg" : ""} ${
-                    itemIndex === section.items.length - 1 ? "rounded-b-lg" : ""
-                  }`}
-                >
-                  <div className="flex-shrink-0 mr-4">
-                    {item.avatar ? (
-                      <Avatar className="w-12 h-12">
-                        <AvatarImage 
-                          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                          alt="Profile" 
-                        />
-                        <AvatarFallback>SC</AvatarFallback>
-                      </Avatar>
-                    ) : (
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                        {item.icon && <item.icon className="w-6 h-6 text-gray-600" />}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex-grow">
-                    <h3 className="text-base font-medium text-gray-900">{item.title}</h3>
-                    <p className="text-sm text-gray-500 mt-1">{item.description}</p>
-                  </div>
-                  
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
-                </Link>
-              ))}
-            </div>
-          </div>
+          <SettingsSection 
+            key={section.section} 
+            title={section.section}
+            className={sectionIndex > 0 ? "mt-8" : ""}
+          >
+            {section.items.map((item, itemIndex) => (
+              <SettingsItem
+                key={item.id}
+                id={item.id}
+                title={item.title}
+                description={item.description}
+                icon={item.icon}
+                avatar={item.avatar}
+                href={item.href}
+                isFirst={itemIndex === 0}
+                isLast={itemIndex === section.items.length - 1}
+              />
+            ))}
+          </SettingsSection>
         ))}
         
-        {/* Logout Section */}
-        <div className="mt-8">
-          <div className="bg-white rounded-lg shadow-sm">
-            <Button
-              onClick={handleLogout}
-              variant="ghost"
-              className="w-full flex items-center justify-start p-4 h-auto text-left hover:bg-red-50 text-red-600 hover:text-red-700 rounded-lg"
-            >
-              <div className="flex-shrink-0 mr-4">
-                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                  <LogOut className="w-6 h-6 text-red-600" />
-                </div>
-              </div>
-              
-              <div className="flex-grow">
-                <h3 className="text-base font-medium">Log Out</h3>
-                <p className="text-sm text-red-500 mt-1">Sign out of your account</p>
-              </div>
-            </Button>
-          </div>
-        </div>
+        <LogoutSection />
       </div>
       
       <BottomNavigation />
