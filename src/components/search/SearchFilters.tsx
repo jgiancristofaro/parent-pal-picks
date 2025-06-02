@@ -1,22 +1,84 @@
 
-import { Input } from "@/components/ui/input";
-import { Search as SearchIcon } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { SearchInput } from "@/components/search/SearchInput";
+import { HomeSelector } from "@/components/search/HomeSelector";
+import { LocalScopeFilter } from "@/components/search/LocalScopeFilter";
 
-interface SearchFiltersProps {
-  location: string;
-  onLocationChange: (location: string) => void;
+interface UserLocation {
+  id: string;
+  location_nickname: string;
 }
 
-export const SearchFilters = ({ location, onLocationChange }: SearchFiltersProps) => {
+interface UserLocationDetails {
+  location_nickname: string;
+  building_identifier: string | null;
+  zip_code: string;
+}
+
+interface SearchFiltersProps {
+  searchTerm: string;
+  onSearchTermChange: (term: string) => void;
+  friendRecommendedOnly: boolean;
+  onFriendRecommendedOnlyChange: (value: boolean) => void;
+  userLocations: UserLocation[];
+  selectedUserHomeId: string | null;
+  onSelectedUserHomeIdChange: (id: string | null) => void;
+  selectedUserHomeDetails: UserLocationDetails | undefined;
+  localSearchScope: string;
+  onLocalSearchScopeChange: (scope: string) => void;
+}
+
+export const SearchFilters = ({
+  searchTerm,
+  onSearchTermChange,
+  friendRecommendedOnly,
+  onFriendRecommendedOnlyChange,
+  userLocations,
+  selectedUserHomeId,
+  onSelectedUserHomeIdChange,
+  selectedUserHomeDetails,
+  localSearchScope,
+  onLocalSearchScopeChange,
+}: SearchFiltersProps) => {
   return (
-    <div className="relative mb-6">
-      <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-      <Input 
-        className="pl-10 py-6 bg-white rounded-lg border-gray-200" 
-        placeholder="Search by location"
-        value={location}
-        onChange={(e) => onLocationChange(e.target.value)}
+    <>
+      {/* Search Bar */}
+      <SearchInput 
+        searchTerm={searchTerm}
+        onSearchTermChange={onSearchTermChange}
       />
-    </div>
+
+      {/* Home Selection */}
+      <HomeSelector 
+        userLocations={userLocations}
+        selectedUserHomeId={selectedUserHomeId}
+        onSelectedUserHomeIdChange={onSelectedUserHomeIdChange}
+      />
+
+      {/* Dynamic Local Options Filter */}
+      <LocalScopeFilter 
+        selectedUserHomeDetails={selectedUserHomeDetails}
+        localSearchScope={localSearchScope}
+        onLocalSearchScopeChange={onLocalSearchScopeChange}
+      />
+
+      {/* Friend Recommended Filter */}
+      <div className="mb-4 p-4 bg-white rounded-lg border border-gray-200">
+        <div className="flex items-center space-x-3">
+          <Switch
+            id="friend-recommended"
+            checked={friendRecommendedOnly}
+            onCheckedChange={onFriendRecommendedOnlyChange}
+          />
+          <Label htmlFor="friend-recommended" className="text-sm font-medium">
+            Friend-Recommended Only
+          </Label>
+        </div>
+        <p className="text-xs text-gray-500 mt-2">
+          Show only sitters recommended by people you follow.
+        </p>
+      </div>
+    </>
   );
 };

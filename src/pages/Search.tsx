@@ -1,15 +1,9 @@
 
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { Eye } from "lucide-react";
 import { HyperLocalSitters } from "@/components/search/HyperLocalSitters";
-import { SearchInput } from "@/components/search/SearchInput";
-import { HomeSelector } from "@/components/search/HomeSelector";
-import { LocalScopeFilter } from "@/components/search/LocalScopeFilter";
+import { SearchFilters } from "@/components/search/SearchFilters";
+import { DemoLinkSection } from "@/components/search/DemoLinkSection";
 import { SearchResultsGrid } from "@/components/search/SearchResultsGrid";
 import { useSearchFilters } from "@/hooks/useSearchFilters";
 import { useSitterData } from "@/hooks/useSitterData";
@@ -50,59 +44,21 @@ const Search = () => {
       
       <div className="p-4">
         {/* Demo Link */}
-        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-semibold text-yellow-900">Want to see hyper-local features?</h3>
-              <p className="text-sm text-yellow-700">
-                View the mock search page to see how the interface changes with configured homes.
-              </p>
-            </div>
-            <Link to="/search-mock">
-              <Button variant="outline" size="sm">
-                <Eye className="w-4 h-4 mr-2" />
-                View Mock Demo
-              </Button>
-            </Link>
-          </div>
-        </div>
+        <DemoLinkSection />
 
-        {/* Search Bar */}
-        <SearchInput 
+        {/* Search Filters */}
+        <SearchFilters
           searchTerm={searchTerm}
           onSearchTermChange={setSearchTerm}
-        />
-
-        {/* Home Selection */}
-        <HomeSelector 
+          friendRecommendedOnly={friendRecommendedOnly}
+          onFriendRecommendedOnlyChange={setFriendRecommendedOnly}
           userLocations={userLocations}
           selectedUserHomeId={selectedUserHomeId}
           onSelectedUserHomeIdChange={setSelectedUserHomeId}
-        />
-
-        {/* Dynamic Local Options Filter */}
-        <LocalScopeFilter 
           selectedUserHomeDetails={selectedUserHomeDetails}
           localSearchScope={localSearchScope}
           onLocalSearchScopeChange={setLocalSearchScope}
         />
-
-        {/* Friend Recommended Filter */}
-        <div className="mb-4 p-4 bg-white rounded-lg border border-gray-200">
-          <div className="flex items-center space-x-3">
-            <Switch
-              id="friend-recommended"
-              checked={friendRecommendedOnly}
-              onCheckedChange={setFriendRecommendedOnly}
-            />
-            <Label htmlFor="friend-recommended" className="text-sm font-medium">
-              Friend-Recommended Only
-            </Label>
-          </div>
-          <p className="text-xs text-gray-500 mt-2">
-            Show only sitters recommended by people you follow.
-          </p>
-        </div>
 
         {/* Original Hyper-Local Component - Only show when no filters are active */}
         {!searchTerm && !friendRecommendedOnly && localSearchScope === "ANY" && userLocations.length > 0 && (
