@@ -8,10 +8,13 @@ import { LocalScopeFilter } from "@/components/search/LocalScopeFilter";
 interface UserLocation {
   id: string;
   location_nickname: string;
+  dwelling_type: string;
 }
 
 interface UserLocationDetails {
+  id: string;
   location_nickname: string;
+  dwelling_type: string;
   building_identifier: string | null;
   zip_code: string;
 }
