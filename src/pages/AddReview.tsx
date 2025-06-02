@@ -2,7 +2,7 @@
 import React from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
-import { AddReviewContent } from "@/components/review/AddReviewContent";
+import { AddReviewFlow } from "@/components/review/AddReviewFlow";
 
 const AddReview = () => {
   return (
@@ -10,7 +10,7 @@ const AddReview = () => {
       <Header title="Add Review" showBack={true} backTo="/" />
       
       <div className="px-4 py-6 pb-20">
-        <AddReviewContent />
+        <AddReviewFlow />
       </div>
 
       <BottomNavigation />
