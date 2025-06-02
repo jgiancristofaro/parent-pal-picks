@@ -1,22 +1,17 @@
 
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useLoginForm } from "@/hooks/useLoginForm";
+import { LoginForm } from "@/components/auth/LoginForm";
+import WelcomeBackSection from "@/components/auth/WelcomeBackSection";
+import LoginFooterLinks from "@/components/auth/LoginFooterLinks";
 
 const ExistingUserLoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Mock functionality - log credentials and navigate to home
-    console.log("Email:", email);
-    console.log("Password:", password);
-    // Simulate successful login
-    navigate("/");
-  };
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    handleSubmit,
+  } = useLoginForm();
 
   return (
     <div className="min-h-screen flex flex-col bg-purple-50">
@@ -25,64 +20,17 @@ const ExistingUserLoginPage = () => {
       </div>
       
       <div className="flex-grow flex flex-col items-center justify-center px-6 pb-16">
-        <div className="w-full max-w-md text-center mb-10">
-          <h1 className="text-4xl font-bold mb-4">Welcome Back!</h1>
-          <p className="text-lg text-gray-600 mb-8">
-            Log in to your ParentPal account to continue finding trusted care.
-          </p>
-        </div>
+        <WelcomeBackSection />
 
-        <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
-          <div>
-            <Input
-              type="email"
-              placeholder="Email address"
-              className="input-field"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          
-          <div>
-            <Input
-              type="password"
-              placeholder="Password"
-              className="input-field"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          
-          <Button 
-            type="submit" 
-            className="w-full py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-lg"
-          >
-            Log In
-          </Button>
-        </form>
+        <LoginForm
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          onSubmit={handleSubmit}
+        />
 
-        <div className="mt-6 text-center">
-          <Link 
-            to="/forgot-password" 
-            className="text-purple-500 hover:text-purple-600 underline"
-          >
-            Forgot Password?
-          </Link>
-        </div>
-
-        <div className="mt-8 text-center">
-          <p className="text-gray-600">
-            Don't have an account?{" "}
-            <Link 
-              to="/login" 
-              className="text-purple-500 font-semibold hover:text-purple-600 underline"
-            >
-              Sign Up
-            </Link>
-          </p>
-        </div>
+        <LoginFooterLinks />
       </div>
     </div>
   );
