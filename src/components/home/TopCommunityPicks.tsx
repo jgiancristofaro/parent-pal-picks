@@ -79,7 +79,7 @@ export const TopCommunityPicks = () => {
           <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">Demo Data</span>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-4 px-4 max-h-96 overflow-y-auto">
+      <div className="grid grid-cols-2 gap-4 px-4">
         {topPicks.map(pick => (
           <ProductCard
             key={pick.product_id}
