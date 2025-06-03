@@ -2,9 +2,18 @@
 import { ProductCard } from "@/components/ProductCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTopCommunityPicks } from "@/hooks/useTopCommunityPicks";
+import { useTopCommunityPicksMock } from "@/hooks/useTopCommunityPicksMock";
 
 export const TopCommunityPicks = () => {
-  const { data: topPicks, isLoading, error } = useTopCommunityPicks();
+  // Try real data first, fallback to mock data
+  const { data: realPicks, isLoading: realLoading, error: realError } = useTopCommunityPicks();
+  const { data: mockPicks, isLoading: mockLoading } = useTopCommunityPicksMock();
+  
+  // Use real data if available and not empty, otherwise use mock data
+  const shouldUseMock = !realPicks || realPicks.length === 0;
+  const topPicks = shouldUseMock ? mockPicks : realPicks;
+  const isLoading = shouldUseMock ? mockLoading : realLoading;
+  const error = shouldUseMock ? null : realError;
 
   if (error) {
     return (
@@ -66,6 +75,9 @@ export const TopCommunityPicks = () => {
     <div className="mb-4">
       <div className="flex justify-between items-center px-4 mb-2">
         <h2 className="text-xl font-bold">Top Community Picks</h2>
+        {shouldUseMock && (
+          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">Demo Data</span>
+        )}
       </div>
       <div className="grid grid-cols-2 gap-4 px-4 max-h-96 overflow-y-auto">
         {topPicks.map(pick => (
