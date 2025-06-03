@@ -1,5 +1,5 @@
 
-import { Home, Search, Plus, MessageSquare, User } from "lucide-react";
+import { Home, Search, Plus, Users, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 
@@ -22,6 +22,10 @@ export const BottomNavigation = () => {
         <Home className={`w-6 h-6 ${isActive("/")}`} />
         <span className={`text-xs mt-1 ${isActive("/")}`}>Home</span>
       </Link>
+      <Link to="/activity-feed" className="flex flex-col items-center">
+        <Users className={`w-6 h-6 ${isActive("/activity-feed")}`} />
+        <span className={`text-xs mt-1 ${isActive("/activity-feed")}`}>Friends</span>
+      </Link>
       <Link to="/search" className="flex flex-col items-center">
         <Search className={`w-6 h-6 ${isActive("/search")}`} />
         <span className={`text-xs mt-1 ${isActive("/search")}`}>Search</span>
@@ -29,10 +33,6 @@ export const BottomNavigation = () => {
       <Link to="/add-review" className="flex flex-col items-center">
         <Plus className={`w-6 h-6 ${isActive("/add-review")}`} />
         <span className={`text-xs mt-1 ${isActive("/add-review")}`}>Review</span>
-      </Link>
-      <Link to="/inbox" className="flex flex-col items-center">
-        <MessageSquare className={`w-6 h-6 ${isActive("/inbox")}`} />
-        <span className={`text-xs mt-1 ${isActive("/inbox")}`}>Inbox</span>
       </Link>
       <Link to="/profile" className="flex flex-col items-center">
         <User className={`w-6 h-6 ${isActive("/profile")}`} />
