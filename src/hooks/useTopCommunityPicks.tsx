@@ -15,6 +15,7 @@ export const useTopCommunityPicks = () => {
   return useQuery({
     queryKey: ['top-community-picks'],
     queryFn: async () => {
+      console.log('Fetching top community picks...');
       const { data, error } = await supabase.rpc('get_top_community_picks', {
         time_window_days: 14,
         min_recommendation_rating: 4.0,
@@ -26,6 +27,7 @@ export const useTopCommunityPicks = () => {
         throw error;
       }
 
+      console.log('Top community picks data:', data);
       return data as TopCommunityPick[];
     },
   });
