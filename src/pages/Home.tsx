@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -8,7 +9,7 @@ import { ActionButtons } from "@/components/home/ActionButtons";
 import { FriendsActivity } from "@/components/home/FriendsActivity";
 import { NewRecommendedSitters } from "@/components/home/NewRecommendedSitters";
 import { NewRecommendedProducts } from "@/components/home/NewRecommendedProducts";
-import { FeaturedRecommendations } from "@/components/home/FeaturedRecommendations";
+import { TopCommunityPicks } from "@/components/home/TopCommunityPicks";
 
 const Home = () => {
   // Mock current user data with valid UUID
@@ -28,29 +29,6 @@ const Home = () => {
   
   // Local state for notification banner visibility
   const [showNotification, setShowNotification] = useState(false);
-  
-  // Mock data for demonstration
-  const featuredProducts = [{
-    id: "1",
-    name: "Top-rated Baby Monitors",
-    image: "/assets/babymonitor.jpg",
-    category: "Baby Safety"
-  }, {
-    id: "2",
-    name: "Essential Baby Carriers",
-    image: "/assets/babycarrier.jpg",
-    category: "Carrying"
-  }, {
-    id: "3",
-    name: "Organic Baby Food",
-    image: "/assets/organicbabyfood.jpg",
-    category: "Nutrition"
-  }, {
-    id: "4",
-    name: "Soft Baby Blankets",
-    image: "/assets/softbabyblankets.jpg",
-    category: "Comfort"
-  }];
 
   // Show notification banner when there's new activity
   useEffect(() => {
@@ -95,7 +73,7 @@ const Home = () => {
       <FriendsActivity currentUserId={mockCurrentUser.id} />
       <NewRecommendedSitters currentUserId={mockCurrentUser.id} />
       <NewRecommendedProducts currentUserId={mockCurrentUser.id} />
-      <FeaturedRecommendations featuredProducts={featuredProducts} />
+      <TopCommunityPicks />
 
       <BottomNavigation />
     </div>

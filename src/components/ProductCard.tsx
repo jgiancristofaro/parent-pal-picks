@@ -10,6 +10,7 @@ interface ProductCardProps {
   recommendedBy?: string;
   rating?: number;
   friendRecommendationCount?: number;
+  uniqueRecommenderCount?: number;
 }
 
 export const ProductCard = ({ 
@@ -19,7 +20,8 @@ export const ProductCard = ({
   category, 
   recommendedBy, 
   rating,
-  friendRecommendationCount 
+  friendRecommendationCount,
+  uniqueRecommenderCount
 }: ProductCardProps) => {
   const renderStars = (rating: number) => {
     const stars = [];
@@ -47,6 +49,11 @@ export const ProductCard = ({
     return `Recommended by ${count} friend${count === 1 ? '' : 's'}`;
   };
 
+  const formatUniqueRecommenderText = (count: number) => {
+    if (count === 0) return null;
+    return `${count} parent${count === 1 ? '' : 's'} recommend${count === 1 ? 's' : ''}`;
+  };
+
   return (
     <Link to={`/product/${id}`}>
       <div className="rounded-lg overflow-hidden bg-white shadow-md hover:shadow-lg transition-shadow duration-200">
@@ -68,6 +75,12 @@ export const ProductCard = ({
               </div>
               <span className="text-xs text-gray-600">({rating})</span>
             </div>
+          )}
+          
+          {uniqueRecommenderCount !== undefined && uniqueRecommenderCount > 0 && (
+            <p className="text-xs text-purple-600 mt-1">
+              {formatUniqueRecommenderText(uniqueRecommenderCount)}
+            </p>
           )}
           
           {recommendedBy && (

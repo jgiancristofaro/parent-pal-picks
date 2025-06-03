@@ -547,6 +547,21 @@ export type Database = {
           most_recent_activity: string
         }[]
       }
+      get_top_community_picks: {
+        Args: {
+          time_window_days?: number
+          min_recommendation_rating?: number
+          limit_results?: number
+        }
+        Returns: {
+          product_id: string
+          product_name: string
+          product_image_url: string
+          product_category: string
+          average_rating: number
+          unique_recommender_count: number
+        }[]
+      }
       gtrgm_compress: {
         Args: { "": unknown }
         Returns: unknown
