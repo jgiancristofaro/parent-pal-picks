@@ -1,7 +1,7 @@
-
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -39,11 +39,17 @@ export const NewSitterReviewForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage("");
     
+    if (!user) {
+      setErrorMessage("You must be logged in to submit a review");
+      return;
+    }
+
     // Validate sitter information
     if (!firstName.trim()) {
       setErrorMessage("Please enter the sitter's first name");
@@ -109,15 +115,6 @@ export const NewSitterReviewForm = ({
     setIsSubmitting(true);
 
     try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        setErrorMessage("You must be logged in to submit a review");
-        return;
-      }
-
-      // Call the edge function to create sitter and review
       const { data, error } = await supabase.functions.invoke('create_sitter_and_review', {
         body: {
           first_name: firstName.trim(),

@@ -1,7 +1,7 @@
-
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -43,10 +43,20 @@ export const EnhancedSitterReviewForm = ({
   const [certified, setCertified] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to submit a review",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!selectedLocationId) {
       toast({
         title: "Error",
@@ -95,14 +105,16 @@ export const EnhancedSitterReviewForm = ({
     setIsSubmitting(true);
 
     try {
-      // Call the create_review function with all required parameters
-      const { data, error } = await supabase.rpc('create_review', {
-        p_sitter_id: selectedSitter.id,
-        p_service_location_id: selectedLocationId,
-        p_rating: rating,
-        p_title: title.trim(),
-        p_content: content.trim(),
-        p_certification_checkbox_value: certified
+      const { data, error } = await supabase.functions.invoke('create_review', {
+        body: {
+          user_id: user.id,
+          sitter_id: selectedSitter.id,
+          service_location_id: selectedLocationId,
+          rating: rating,
+          title: title.trim(),
+          content: content.trim(),
+          certification_checkbox_value: certified
+        }
       });
 
       if (error) {
@@ -112,19 +124,30 @@ export const EnhancedSitterReviewForm = ({
           description: "Failed to submit review",
           variant: "destructive",
         });
-      } else if (data && typeof data === 'object' && data !== null && 'error' in data) {
-        // Handle business logic errors returned by the function
+        return;
+      }
+
+      if (data?.error) {
         toast({
           title: "Error",
-          description: String(data.error),
+          description: data.error,
           variant: "destructive",
         });
-      } else {
+        return;
+      }
+
+      if (data?.success) {
         toast({
           title: "Success",
           description: "Your review has been submitted!",
         });
         onCancel();
+      } else {
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred",
+          variant: "destructive",
+        });
       }
     } catch (err) {
       console.error("Unexpected error:", err);
