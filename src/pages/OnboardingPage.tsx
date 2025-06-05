@@ -24,9 +24,14 @@ const OnboardingPage = () => {
     });
   }, [api]);
 
-  const handleGetStarted = () => {
+  const handleSignUp = () => {
     localStorage.setItem('hasSeenParentPalOnboarding', 'true');
     navigate('/login');
+  };
+
+  const handleLogin = () => {
+    localStorage.setItem('hasSeenParentPalOnboarding', 'true');
+    navigate('/login-existing');
   };
 
   const slides = [
@@ -62,13 +67,13 @@ const OnboardingPage = () => {
                   {index === 2 && (
                     <div className="space-y-3">
                       <Button 
-                        onClick={handleGetStarted}
+                        onClick={handleSignUp}
                         className="w-full py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-xl text-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200"
                       >
                         Sign Up
                       </Button>
                       <Button 
-                        onClick={handleGetStarted}
+                        onClick={handleLogin}
                         variant="outline"
                         className="w-full py-6 border-2 border-purple-500 text-purple-500 hover:bg-purple-50 rounded-xl text-lg font-semibold transition-all duration-200"
                       >
