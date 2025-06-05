@@ -4,46 +4,85 @@ import { BottomNavigation } from "@/components/BottomNavigation";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileStats } from "@/components/profile/ProfileStats";
 import { RecommendationsTabs } from "@/components/profile/RecommendationsTabs";
+import { useProfile } from "@/hooks/useProfile";
+import { useProfileFollowers } from "@/hooks/useProfileFollowers";
+import { useProfileFollowing } from "@/hooks/useProfileFollowing";
+import { useUserRecommendations } from "@/hooks/useUserRecommendations";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Profile = () => {
-  // Mock data for demonstration
-  const profileData = {
-    name: "Sophia Carter",
-    role: "Mom",
-    joinedYear: 2021,
-    profileImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    followers: 12,
-    following: 34
-  };
+  const { profile, isLoading: profileLoading } = useProfile();
+  const { data: followers = [], isLoading: followersLoading } = useProfileFollowers(profile?.id);
+  const { data: following = [], isLoading: followingLoading } = useProfileFollowing(profile?.id);
+  const { data: sitterRecommendations = [] } = useUserRecommendations(profile?.id, 'sitter');
+  const { data: productRecommendations = [] } = useUserRecommendations(profile?.id, 'product');
 
-  const recommendedSitters = [
-    {
-      id: "101",
-      name: "Emily Bennett",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=2461&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      rating: 4.9,
-      experience: "5 years experience",
-      recommendedBy: "3 friends",
-      friendRecommendationCount: 3
-    },
-    {
-      id: "102",
-      name: "Olivia Harper",
-      image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=2671&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      rating: 4.7,
-      experience: "4 years experience",
-      recommendedBy: "2 friends",
-      friendRecommendationCount: 2
-    }
-  ];
+  if (profileLoading || followersLoading || followingLoading) {
+    return (
+      <div className="min-h-screen pb-20 bg-gray-50">
+        <Header title="Profile" showBack={true} />
+        
+        <div className="bg-white pb-6">
+          <div className="flex flex-col items-center pt-6 pb-4">
+            <Skeleton className="w-28 h-28 rounded-full mb-4" />
+            <Skeleton className="h-6 w-32 mb-2" />
+            <Skeleton className="h-4 w-24 mb-1" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+        </div>
+        
+        <div className="flex justify-center pb-4">
+          <div className="w-[45%] px-4 py-3 text-center border-r border-gray-200">
+            <Skeleton className="h-6 w-8 mx-auto mb-1" />
+            <Skeleton className="h-4 w-16 mx-auto" />
+          </div>
+          <div className="w-[45%] px-4 py-3 text-center">
+            <Skeleton className="h-6 w-8 mx-auto mb-1" />
+            <Skeleton className="h-4 w-16 mx-auto" />
+          </div>
+        </div>
+        
+        <BottomNavigation />
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen pb-20 bg-gray-50">
+        <Header title="Profile" showBack={true} />
+        <div className="flex items-center justify-center h-64">
+          <p className="text-gray-500">Profile not found</p>
+        </div>
+        <BottomNavigation />
+      </div>
+    );
+  }
+
+  const profileData = {
+    name: profile.full_name || "User",
+    role: profile.identity_tag || "Parent",
+    joinedYear: new Date(profile.created_at).getFullYear(),
+    profileImage: profile.avatar_url || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    bio: profile.bio,
+    username: profile.username
+  };
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
       <Header title="Profile" showBack={true} />
       
       <ProfileHeader profileData={profileData} />
-      <ProfileStats followers={profileData.followers} following={profileData.following} />
-      <RecommendationsTabs recommendedSitters={recommendedSitters} />
+      <ProfileStats 
+        followers={followers.length} 
+        following={following.length}
+        followersData={followers}
+        followingData={following}
+      />
+      <RecommendationsTabs 
+        sitterRecommendations={sitterRecommendations}
+        productRecommendations={productRecommendations}
+      />
       
       <BottomNavigation />
     </div>

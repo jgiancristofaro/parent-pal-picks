@@ -177,9 +177,11 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           created_at: string
           full_name: string
           id: string
+          identity_tag: string | null
           last_activity_feed_view_at: string | null
           last_login_at: string | null
           phone_number: string | null
@@ -190,9 +192,11 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           full_name: string
           id: string
+          identity_tag?: string | null
           last_activity_feed_view_at?: string | null
           last_login_at?: string | null
           phone_number?: string | null
@@ -203,9 +207,11 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           full_name?: string
           id?: string
+          identity_tag?: string | null
           last_activity_feed_view_at?: string | null
           last_login_at?: string | null
           phone_number?: string | null
@@ -539,6 +545,22 @@ export type Database = {
           recommendation_timestamp: string
         }[]
       }
+      get_profile_followers: {
+        Args: { target_user_id: string }
+        Returns: {
+          id: string
+          full_name: string
+          avatar_url: string
+        }[]
+      }
+      get_profile_following: {
+        Args: { target_user_id: string }
+        Returns: {
+          id: string
+          full_name: string
+          avatar_url: string
+        }[]
+      }
       get_recent_activity_summary: {
         Args: { user_id: string }
         Returns: {
@@ -561,6 +583,10 @@ export type Database = {
           average_rating: number
           unique_recommender_count: number
         }[]
+      }
+      get_user_recommendations_with_review_snippets: {
+        Args: { profile_owner_user_id: string; item_type: string }
+        Returns: Json
       }
       gtrgm_compress: {
         Args: { "": unknown }
