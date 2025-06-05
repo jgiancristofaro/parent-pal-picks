@@ -21,16 +21,39 @@ export const useEditProfile = () => {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: UpdateProfileData) => {
-      const { data: result, error } = await supabase.rpc('update_user_profile', {
-        p_full_name: data.full_name,
-        p_identity_tag: data.identity_tag,
-        p_bio: data.bio,
-        p_username: data.username,
-        p_avatar_url: data.avatar_url,
-      });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Check if username is already taken by another user
+      if (data.username && data.username.trim() !== '') {
+        const { data: existingUser } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('username', data.username)
+          .neq('id', user.id)
+          .single();
+
+        if (existingUser) {
+          throw new Error('Username is already taken');
+        }
+      }
+
+      // Update the profile
+      const { data: result, error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: data.full_name,
+          identity_tag: data.identity_tag,
+          bio: data.bio,
+          username: data.username.trim() === '' ? null : data.username,
+          avatar_url: data.avatar_url,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id)
+        .select()
+        .single();
 
       if (error) throw error;
-      if (result?.error) throw new Error(result.error);
       return result;
     },
     onSuccess: () => {

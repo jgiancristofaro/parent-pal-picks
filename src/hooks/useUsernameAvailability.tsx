@@ -17,12 +17,20 @@ export const useUsernameAvailability = (username: string) => {
 
       setIsChecking(true);
       try {
-        const { data, error } = await supabase.rpc('check_username_availability', {
-          p_username: debouncedUsername
-        });
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setIsAvailable(null);
+          return;
+        }
 
-        if (error) throw error;
-        setIsAvailable(data?.available ?? false);
+        const { data: existingUser } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('username', debouncedUsername)
+          .neq('id', user.id)
+          .single();
+
+        setIsAvailable(!existingUser);
       } catch (error) {
         console.error('Error checking username availability:', error);
         setIsAvailable(null);
