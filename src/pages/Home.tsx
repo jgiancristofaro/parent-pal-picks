@@ -50,7 +50,7 @@ const Home = () => {
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
       <Header 
-        showUserProfileImage={true}
+        showUserProfileImage={false}
         userProfileImageUrl={mockCurrentUser.profileImageUrl}
         userFullName={mockCurrentUser.firstName}
         showBack={false}
