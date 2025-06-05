@@ -40,7 +40,7 @@ export const GenericActivityFeedItem = ({
   if (displayMode === 'preview') {
     return (
       <div className="p-4 hover:bg-gray-50 transition-colors">
-        <div className="flex items-start space-x-3">
+        <div className="flex items-center space-x-3">
           {/* Actor Avatar */}
           <Link to={`/profile/${actorId}`} className="flex-shrink-0">
             <Avatar className="w-10 h-10">
@@ -90,7 +90,7 @@ export const GenericActivityFeedItem = ({
   }
 
   return (
-    <div className="flex items-start py-3 px-4">
+    <div className="flex items-center py-3 px-4">
       {/* Left Section - Actor/Reviewer Info */}
       <Link to={`/profile/${actorId}`} className="flex-shrink-0">
         <Avatar className="w-12 h-12">
