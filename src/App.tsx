@@ -1,8 +1,10 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 import Login from "./pages/Login";
 import ExistingUserLoginPage from "./pages/ExistingUserLoginPage";
@@ -46,30 +48,30 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/login-existing" element={<ExistingUserLoginPage />} />
           <Route path="/" element={<Home />} />
-          <Route path="/search" element={<SearchSelection />} />
-          <Route path="/search-mock" element={<SearchMock />} />
-          <Route path="/find-sitter" element={<Search />} />
-          <Route path="/find-parents" element={<FindParents />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/profile/:userId" element={<Profile />} />
-          <Route path="/profile/edit" element={<EditProfile />} />
-          <Route path="/sitter/:id" element={<SitterProfile />} />
-          <Route path="/shop" element={<ProductSearchPage />} />
-          <Route path="/product/:id" element={<ProductPage />} />
-          <Route path="/add-review" element={<AddReview />} />
-          <Route path="/activity-feed" element={<ActivityFeedPage />} />
-          <Route path="/newly-recommended-sitters" element={<NewlyRecommendedSittersPage />} />
-          <Route path="/newly-recommended-products" element={<NewlyRecommendedProductsPage />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/settings/my-homes" element={<ManageLocations />} />
-          <Route path="/payment-methods" element={<PaymentMethods />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/language" element={<Language />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/privacy-settings" element={<PrivacySettings />} />
-          <Route path="/security" element={<Security />} />
-          <Route path="/help" element={<Help />} />
-          <Route path="/about" element={<About />} />
+          <Route path="/search" element={<ProtectedRoute><SearchSelection /></ProtectedRoute>} />
+          <Route path="/search-mock" element={<ProtectedRoute><SearchMock /></ProtectedRoute>} />
+          <Route path="/find-sitter" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+          <Route path="/find-parents" element={<ProtectedRoute><FindParents /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
+          <Route path="/sitter/:id" element={<ProtectedRoute><SitterProfile /></ProtectedRoute>} />
+          <Route path="/shop" element={<ProtectedRoute><ProductSearchPage /></ProtectedRoute>} />
+          <Route path="/product/:id" element={<ProtectedRoute><ProductPage /></ProtectedRoute>} />
+          <Route path="/add-review" element={<ProtectedRoute><AddReview /></ProtectedRoute>} />
+          <Route path="/activity-feed" element={<ProtectedRoute><ActivityFeedPage /></ProtectedRoute>} />
+          <Route path="/newly-recommended-sitters" element={<ProtectedRoute><NewlyRecommendedSittersPage /></ProtectedRoute>} />
+          <Route path="/newly-recommended-products" element={<ProtectedRoute><NewlyRecommendedProductsPage /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/settings/my-homes" element={<ProtectedRoute><ManageLocations /></ProtectedRoute>} />
+          <Route path="/payment-methods" element={<ProtectedRoute><PaymentMethods /></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+          <Route path="/language" element={<ProtectedRoute><Language /></ProtectedRoute>} />
+          <Route path="/privacy" element={<ProtectedRoute><Privacy /></ProtectedRoute>} />
+          <Route path="/privacy-settings" element={<ProtectedRoute><PrivacySettings /></ProtectedRoute>} />
+          <Route path="/security" element={<ProtectedRoute><Security /></ProtectedRoute>} />
+          <Route path="/help" element={<ProtectedRoute><Help /></ProtectedRoute>} />
+          <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
