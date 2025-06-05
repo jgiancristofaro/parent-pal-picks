@@ -11,6 +11,7 @@ const ExistingUserLoginPage = () => {
     password,
     setPassword,
     handleSubmit,
+    isLoading,
   } = useLoginForm();
 
   return (
@@ -28,6 +29,7 @@ const ExistingUserLoginPage = () => {
           password={password}
           setPassword={setPassword}
           onSubmit={handleSubmit}
+          isLoading={isLoading}
         />
 
         <LoginFooterLinks />
