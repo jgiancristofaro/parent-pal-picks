@@ -5,8 +5,8 @@ interface HeroSectionProps {
 
 export const HeroSection = ({ userName }: HeroSectionProps) => {
   return (
-    <div className="mb-4">
-      <div className="relative h-40 overflow-hidden" style={{
+    <div className="mb-4 mx-4">
+      <div className="relative h-40 overflow-hidden rounded-xl" style={{
         backgroundImage: "url('/assets/hero-current.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
