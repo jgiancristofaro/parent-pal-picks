@@ -3,7 +3,6 @@ import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { HyperLocalSitters } from "@/components/search/HyperLocalSitters";
 import { SearchFilters } from "@/components/search/SearchFilters";
-import { DemoLinkSection } from "@/components/search/DemoLinkSection";
 import { SearchResultsGrid } from "@/components/search/SearchResultsGrid";
 import { useSearchFilters } from "@/hooks/useSearchFilters";
 import { useSitterData } from "@/hooks/useSitterData";
@@ -32,7 +31,7 @@ const Search = () => {
     shouldFetchLocalSitters,
     displayedSitters
   } = useSitterData({
-    mockCurrentUserId: currentUserId,
+    currentUserId,
     selectedUserHomeId,
     localSearchScope,
     searchTerm,
@@ -44,9 +43,6 @@ const Search = () => {
       <Header title="Find a sitter" showBack={true} showSettings={false} />
       
       <div className="p-4">
-        {/* Demo Link */}
-        <DemoLinkSection />
-
         {/* Search Filters */}
         <SearchFilters
           searchTerm={searchTerm}

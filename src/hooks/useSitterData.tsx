@@ -14,7 +14,7 @@ interface Sitter {
 }
 
 interface UseSitterDataProps {
-  mockCurrentUserId: string;
+  currentUserId: string;
   selectedUserHomeId: string | null;
   localSearchScope: string;
   searchTerm: string;
@@ -22,7 +22,7 @@ interface UseSitterDataProps {
 }
 
 export const useSitterData = ({
-  mockCurrentUserId,
+  currentUserId,
   selectedUserHomeId,
   localSearchScope,
   searchTerm,
@@ -37,7 +37,7 @@ export const useSitterData = ({
   // Fetch local sitters when local scope is active
   const shouldFetchLocalSitters = localSearchScope !== "ANY" && selectedUserHomeId !== null;
   const { data: localSittersRaw = [], isLoading: localSittersLoading } = useLocalSitters(
-    mockCurrentUserId,
+    currentUserId,
     selectedUserHomeId || undefined,
     localSearchScope as 'BUILDING' | 'AREA_ZIP',
     shouldFetchLocalSitters
@@ -45,7 +45,7 @@ export const useSitterData = ({
 
   // Fetch friend recommended sitters
   const { data: friendRecommendedSittersRaw = [] } = useFriendRecommendedSitters(
-    mockCurrentUserId,
+    currentUserId,
     true
   );
 
