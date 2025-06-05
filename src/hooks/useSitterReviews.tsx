@@ -19,7 +19,7 @@ export const useSitterReviews = (sitterId: string | undefined) => {
           title,
           content,
           created_at,
-          profiles!inner(
+          profiles:user_id(
             full_name,
             avatar_url
           )
