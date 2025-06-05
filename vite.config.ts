@@ -26,8 +26,8 @@ export default defineConfig(({ mode }) => ({
         description: 'Trusted recommendations for parents.',
         start_url: '/',
         display: 'standalone',
-        background_color: '#F5F3FA',
-        theme_color: '#8257E5',
+        background_color: '#FFFFFF',
+        theme_color: '#F8F9FA',
         orientation: 'portrait',
         icons: [
           {
