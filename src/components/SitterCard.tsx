@@ -15,6 +15,8 @@ interface SitterCardProps {
   workedInUserLocationNickname?: string;
   localRecommendationType?: 'BUILDING' | 'AREA_ZIP' | null;
   locationContextName?: string | null;
+  userSpecificRating?: number;
+  reviewSnippet?: string;
 }
 
 export const SitterCard = ({ 
@@ -27,7 +29,9 @@ export const SitterCard = ({
   friendRecommendationCount,
   workedInUserLocationNickname,
   localRecommendationType,
-  locationContextName
+  locationContextName,
+  userSpecificRating,
+  reviewSnippet
 }: SitterCardProps) => {
   const formatFriendRecommendation = (count: number) => {
     if (count === 0) return "New sitter";
@@ -77,7 +81,9 @@ export const SitterCard = ({
           <h3 className="font-semibold text-gray-800 text-sm mb-1">{name}</h3>
           <div className="flex items-center mb-1">
             <StarIcon filled={true} className="w-3 h-3 text-yellow-500" />
-            <span className="text-xs text-gray-600 ml-1">{rating}</span>
+            <span className="text-xs text-gray-600 ml-1">
+              {userSpecificRating !== undefined ? userSpecificRating : rating}
+            </span>
           </div>
           {experience && <p className="text-xs text-gray-500 mb-1">{experience}</p>}
           
@@ -94,7 +100,10 @@ export const SitterCard = ({
             </div>
           )}
           
-          {recommendedBy ? (
+          {/* Show review snippet if provided, otherwise show friend recommendations */}
+          {reviewSnippet ? (
+            <p className="text-xs text-purple-600 italic">"{reviewSnippet}..."</p>
+          ) : recommendedBy ? (
             <p className="text-xs text-purple-600">{formatFriendRecommendation(friendRecommendationCount)}</p>
           ) : (
             <p className="text-xs text-purple-600">{formatFriendRecommendation(friendRecommendationCount)}</p>

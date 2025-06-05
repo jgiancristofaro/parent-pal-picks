@@ -11,6 +11,8 @@ interface ProductCardProps {
   rating?: number;
   friendRecommendationCount?: number;
   uniqueRecommenderCount?: number;
+  userSpecificRating?: number;
+  reviewSnippet?: string;
 }
 
 export const ProductCard = ({ 
@@ -21,7 +23,9 @@ export const ProductCard = ({
   recommendedBy, 
   rating,
   friendRecommendationCount,
-  uniqueRecommenderCount
+  uniqueRecommenderCount,
+  userSpecificRating,
+  reviewSnippet
 }: ProductCardProps) => {
   const renderStars = (rating: number) => {
     const stars = [];
@@ -54,6 +58,8 @@ export const ProductCard = ({
     return `${count} parent${count === 1 ? '' : 's'} recommend${count === 1 ? 's' : ''}`;
   };
 
+  const displayRating = userSpecificRating !== undefined ? userSpecificRating : rating;
+
   return (
     <Link to={`/product/${id}`}>
       <div className="rounded-lg overflow-hidden bg-white shadow-md hover:shadow-lg transition-shadow duration-200">
@@ -68,29 +74,36 @@ export const ProductCard = ({
           <h3 className="font-semibold text-gray-800 truncate">{name}</h3>
           {category && <p className="text-sm text-gray-500">{category}</p>}
           
-          {rating && (
+          {displayRating && (
             <div className="flex items-center mt-1">
               <div className="flex mr-1">
-                {renderStars(rating)}
+                {renderStars(displayRating)}
               </div>
-              <span className="text-xs text-gray-600">({rating})</span>
+              <span className="text-xs text-gray-600">({displayRating})</span>
             </div>
           )}
           
-          {uniqueRecommenderCount !== undefined && uniqueRecommenderCount > 0 && (
-            <p className="text-xs text-purple-600 mt-1">
-              {formatUniqueRecommenderText(uniqueRecommenderCount)}
-            </p>
-          )}
-          
-          {recommendedBy && (
-            <p className="text-xs text-purple-600 mt-1">Recommended by {recommendedBy}</p>
-          )}
-          
-          {friendRecommendationCount !== undefined && friendRecommendationCount > 0 && (
-            <p className="text-xs text-purple-600 mt-1">
-              {formatRecommendationText(friendRecommendationCount)}
-            </p>
+          {/* Show review snippet if provided, otherwise show recommendation counts */}
+          {reviewSnippet ? (
+            <p className="text-xs text-purple-600 mt-1 italic">"{reviewSnippet}..."</p>
+          ) : (
+            <>
+              {uniqueRecommenderCount !== undefined && uniqueRecommenderCount > 0 && (
+                <p className="text-xs text-purple-600 mt-1">
+                  {formatUniqueRecommenderText(uniqueRecommenderCount)}
+                </p>
+              )}
+              
+              {recommendedBy && (
+                <p className="text-xs text-purple-600 mt-1">Recommended by {recommendedBy}</p>
+              )}
+              
+              {friendRecommendationCount !== undefined && friendRecommendationCount > 0 && (
+                <p className="text-xs text-purple-600 mt-1">
+                  {formatRecommendationText(friendRecommendationCount)}
+                </p>
+              )}
+            </>
           )}
         </div>
       </div>

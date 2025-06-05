@@ -10,6 +10,8 @@ export interface Profile {
   profile_privacy_setting: ProfilePrivacySetting;
   phone_number: string | null;
   phone_number_searchable: boolean;
+  bio: string | null;
+  identity_tag: string | null;
   created_at: string;
   updated_at: string;
 }
