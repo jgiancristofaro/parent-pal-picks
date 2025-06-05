@@ -68,15 +68,15 @@ export const SitterCard = ({
 
   return (
     <Link to={`/sitter/${id}`}>
-      <div className="flex flex-col p-3 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
-        <div className="w-full aspect-square rounded-lg overflow-hidden mb-3">
+      <div className="flex flex-col bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+        <div className="w-full aspect-square overflow-hidden">
           <img 
             src={image} 
             alt={name} 
             className="w-full h-full object-cover"
           />
         </div>
-        <div className="flex-grow">
+        <div className="flex-grow p-3">
           <h3 className="font-semibold text-gray-800 text-sm mb-1">{name}</h3>
           <div className="flex items-center mb-1">
             <StarIcon filled={true} className="w-3 h-3 text-yellow-500" />
