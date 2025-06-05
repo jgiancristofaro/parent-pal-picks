@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -80,17 +79,11 @@ const SitterProfile = () => {
       <Header title="Babysitter Profile" showBack={true} />
       
       <ProfileHeader sitter={{
-        id: sitter.id,
         name: sitter.name,
         role: "Babysitter",
         rating: sitter.rating ? Number(sitter.rating) : 0,
         reviewCount: sitter.review_count || 0,
-        profileImage: sitter.profile_image_url || "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        about: sitter.bio || "No bio provided",
-        experience: sitter.experience || "Experience not specified",
-        certifications: sitter.certifications || [],
-        rate: sitter.hourly_rate ? `$${sitter.hourly_rate}/hour` : "Rate not specified",
-        availability: "Available"
+        profileImage: sitter.profile_image_url || "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
       }} renderStars={renderStars} />
 
       <div className="p-4">

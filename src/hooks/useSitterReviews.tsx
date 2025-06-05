@@ -14,7 +14,7 @@ export const useSitterReviews = (sitterId: string | undefined) => {
         .from('reviews')
         .select(`
           *,
-          profiles!reviews_user_id_fkey (
+          profiles (
             full_name,
             avatar_url
           )
