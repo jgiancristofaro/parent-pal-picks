@@ -38,7 +38,7 @@ export const useUserRecommendations = (userId: string | undefined, itemType: 'si
       }
 
       console.log('User recommendations data:', data);
-      return (data as UserRecommendation[]) || [];
+      return (data as unknown as UserRecommendation[]) || [];
     },
     enabled: !!userId,
   });
