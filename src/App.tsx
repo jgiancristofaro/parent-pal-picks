@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -32,6 +31,7 @@ import ManageLocations from "./pages/ManageLocations";
 import OnboardingPage from "./pages/OnboardingPage";
 import NewlyRecommendedSittersPage from "./pages/NewlyRecommendedSittersPage";
 import NewlyRecommendedProductsPage from "./pages/NewlyRecommendedProductsPage";
+import EditProfile from "./pages/EditProfile";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +52,7 @@ const App = () => (
           <Route path="/find-parents" element={<FindParents />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/:userId" element={<Profile />} />
+          <Route path="/profile/edit" element={<EditProfile />} />
           <Route path="/sitter/:id" element={<SitterProfile />} />
           <Route path="/shop" element={<ProductSearchPage />} />
           <Route path="/product/:id" element={<ProductPage />} />

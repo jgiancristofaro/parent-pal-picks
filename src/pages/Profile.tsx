@@ -8,23 +8,53 @@ import { useProfile } from "@/hooks/useProfile";
 import { useProfileFollowers } from "@/hooks/useProfileFollowers";
 import { useProfileFollowing } from "@/hooks/useProfileFollowing";
 import { useUserRecommendations } from "@/hooks/useUserRecommendations";
+import { useMockProfile, useMockProfileFollowers, useMockProfileFollowing, useMockUserRecommendations } from "@/hooks/useMockProfile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 const Profile = () => {
   const { userId } = useParams();
+  const isMockProfile = userId === 'mock-user-1';
+  
+  // Use mock data for the mock profile, real data otherwise
   const { profile: currentUserProfile, isLoading: currentUserLoading } = useProfile();
+  const { data: mockProfile, isLoading: mockProfileLoading } = useMockProfile();
+  
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   
-  // For now, we'll use current user's profile since we don't have user lookup by ID yet
-  const profile = currentUserProfile;
-  const isLoading = currentUserLoading;
+  const profile = isMockProfile ? mockProfile : currentUserProfile;
+  const isLoading = isMockProfile ? mockProfileLoading : currentUserLoading;
   
-  const { data: followers = [], isLoading: followersLoading } = useProfileFollowers(profile?.id);
-  const { data: following = [], isLoading: followingLoading } = useProfileFollowing(profile?.id);
-  const { data: sitterRecommendations = [] } = useUserRecommendations(profile?.id, 'sitter');
-  const { data: productRecommendations = [] } = useUserRecommendations(profile?.id, 'product');
+  // Use appropriate hooks based on profile type
+  const { data: realFollowers = [], isLoading: realFollowersLoading } = useProfileFollowers(
+    !isMockProfile ? profile?.id : undefined
+  );
+  const { data: realFollowing = [], isLoading: realFollowingLoading } = useProfileFollowing(
+    !isMockProfile ? profile?.id : undefined
+  );
+  const { data: realSitterRecommendations = [] } = useUserRecommendations(
+    !isMockProfile ? profile?.id : undefined, 
+    'sitter'
+  );
+  const { data: realProductRecommendations = [] } = useUserRecommendations(
+    !isMockProfile ? profile?.id : undefined, 
+    'product'
+  );
+  
+  // Mock data hooks
+  const { data: mockFollowers = [] } = useMockProfileFollowers();
+  const { data: mockFollowing = [] } = useMockProfileFollowing();
+  const { data: mockSitterRecommendations = [] } = useMockUserRecommendations('sitter');
+  const { data: mockProductRecommendations = [] } = useMockUserRecommendations('product');
+  
+  // Select the appropriate data based on profile type
+  const followers = isMockProfile ? mockFollowers : realFollowers;
+  const following = isMockProfile ? mockFollowing : realFollowing;
+  const sitterRecommendations = isMockProfile ? mockSitterRecommendations : realSitterRecommendations;
+  const productRecommendations = isMockProfile ? mockProductRecommendations : realProductRecommendations;
+  const followersLoading = isMockProfile ? false : realFollowersLoading;
+  const followingLoading = isMockProfile ? false : realFollowingLoading;
 
   useEffect(() => {
     // Check if this is the user's own profile
@@ -90,7 +120,7 @@ const Profile = () => {
     <div className="min-h-screen pb-20 bg-gray-50">
       <Header title="Profile" showBack={true} />
       
-      <ProfileHeader profileData={profileData} isOwnProfile={isOwnProfile} />
+      <ProfileHeader profileData={profileData} isOwnProfile={isOwnProfile && !isMockProfile} />
       <ProfileStats 
         followers={followers.length} 
         following={following.length}
