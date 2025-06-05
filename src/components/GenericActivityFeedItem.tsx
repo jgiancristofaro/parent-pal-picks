@@ -41,7 +41,7 @@ export const GenericActivityFeedItem = ({
   if (displayMode === 'preview') {
     return (
       <Link to={itemDetailPath} className="block p-4 hover:bg-gray-50 transition-colors">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-start space-x-3">
           {/* Actor Avatar */}
           <Link to={`/profile/${actorId}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
             <Avatar className="w-10 h-10">
@@ -66,21 +66,24 @@ export const GenericActivityFeedItem = ({
               <p className="text-xs text-gray-500 flex-shrink-0 ml-2">{timeAgo}</p>
             </div>
             
-            {/* Simplified activity description */}
-            <p className="text-sm text-gray-500">
-              {actorFullName} recommended
-            </p>
-            <Link to={itemDetailPath} onClick={(e) => e.stopPropagation()} className="text-sm font-medium text-gray-800 hover:underline">
-              {itemName}
-            </Link>
-            
-            {/* Rating display */}
-            <div className="flex items-center space-x-1 mt-1">
-              <StarIcon filled={true} className="w-4 h-4 text-yellow-400" />
-              <span className="text-sm font-medium text-gray-700">
-                {reviewRating}
-              </span>
+            {/* Simplified activity description with rating */}
+            <div className="flex items-center space-x-2">
+              <p className="text-sm text-gray-600 truncate">
+                gave {reviewRating} stars to {itemName}
+              </p>
+              <div className="flex items-center space-x-1 flex-shrink-0">
+                <StarIcon filled={true} className="w-4 h-4 text-yellow-400" />
+                <span className="text-sm font-medium text-gray-700">
+                  {reviewRating}
+                </span>
+              </div>
             </div>
+            
+            {reviewTitle && (
+              <p className="text-sm text-gray-500 mt-1 truncate">
+                "{reviewTitle}"
+              </p>
+            )}
           </div>
         </div>
       </Link>
@@ -88,7 +91,7 @@ export const GenericActivityFeedItem = ({
   }
 
   return (
-    <div className="flex items-center py-3 px-4">
+    <div className="flex items-start py-3 px-4">
       {/* Left Section - Actor/Reviewer Info */}
       <Link to={`/profile/${actorId}`} className="flex-shrink-0">
         <Avatar className="w-12 h-12">
@@ -113,13 +116,11 @@ export const GenericActivityFeedItem = ({
           <p className="text-sm text-gray-500">{timeAgo}</p>
         </div>
         
-        {/* Simplified Activity Description */}
-        <p className="text-sm text-gray-500 mt-1">
-          {actorFullName} recommended
+        {/* Activity Description */}
+        <p className="text-sm text-gray-600 mt-1">
+          {actorFullName} gave {reviewRating} stars to {itemName}
+          {reviewTitle && ` - "${reviewTitle}"`}
         </p>
-        <Link to={itemDetailPath} className="text-sm font-medium text-gray-800 hover:underline">
-          {itemName}
-        </Link>
         
         {/* Right Section / Main Content - Reviewed Item Info */}
         <Link to={itemDetailPath} className="block mt-2 group">
