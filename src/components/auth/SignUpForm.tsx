@@ -10,6 +10,7 @@ interface SignUpFormProps {
   setPassword: (value: string) => void;
   phoneNumber: string;
   setPhoneNumber: (value: string) => void;
+  isLoading?: boolean;
 }
 
 const SignUpForm = ({
@@ -20,7 +21,8 @@ const SignUpForm = ({
   password,
   setPassword,
   phoneNumber,
-  setPhoneNumber
+  setPhoneNumber,
+  isLoading = false
 }: SignUpFormProps) => {
   return (
     <div className="space-y-6">
@@ -31,6 +33,7 @@ const SignUpForm = ({
           className="input-field"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
+          disabled={isLoading}
           required
         />
       </div>
@@ -42,6 +45,7 @@ const SignUpForm = ({
           className="input-field"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={isLoading}
           required
         />
       </div>
@@ -53,6 +57,7 @@ const SignUpForm = ({
           className="input-field"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          disabled={isLoading}
           required
         />
       </div>
@@ -64,6 +69,7 @@ const SignUpForm = ({
           className="input-field"
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
+          disabled={isLoading}
         />
       </div>
     </div>
