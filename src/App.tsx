@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
+import Index from "./pages/Index";
 import Login from "./pages/Login";
 import ExistingUserLoginPage from "./pages/ExistingUserLoginPage";
 import Home from "./pages/Home";
@@ -43,10 +44,11 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<Index />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/login-existing" element={<ExistingUserLoginPage />} />
-          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
           <Route path="/search" element={<ProtectedRoute><SearchSelection /></ProtectedRoute>} />
           <Route path="/find-sitter" element={<ProtectedRoute><Search /></ProtectedRoute>} />
           <Route path="/find-parents" element={<ProtectedRoute><FindParents /></ProtectedRoute>} />

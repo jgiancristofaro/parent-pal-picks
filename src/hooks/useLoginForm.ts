@@ -35,7 +35,7 @@ export const useLoginForm = () => {
           title: "Welcome back!",
           description: "You have successfully signed in.",
         });
-        navigate("/");
+        navigate("/home");
       }
     } catch (error) {
       console.error('Login error:', error);

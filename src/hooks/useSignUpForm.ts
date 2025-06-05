@@ -47,7 +47,7 @@ export const useSignUpForm = () => {
           title: "Account created successfully!",
           description: "Please check your email to verify your account.",
         });
-        navigate("/");
+        navigate("/home");
       }
     } catch (error) {
       console.error('Sign up error:', error);

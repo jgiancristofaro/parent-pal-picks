@@ -1,12 +1,22 @@
 
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { session, isLoading } = useAuth();
 
   useEffect(() => {
-    // Check if user has seen onboarding
+    if (isLoading) return; // Wait for auth to load
+
+    if (session) {
+      // User is authenticated, redirect to home
+      navigate("/home");
+      return;
+    }
+
+    // User is not authenticated, check onboarding status
     const hasSeenOnboarding = localStorage.getItem('hasSeenParentPalOnboarding');
     
     if (!hasSeenOnboarding || hasSeenOnboarding !== 'true') {
@@ -16,7 +26,7 @@ const Index = () => {
       // Returning user, proceed to login
       navigate("/login");
     }
-  }, [navigate]);
+  }, [navigate, session, isLoading]);
 
   return null;
 };
