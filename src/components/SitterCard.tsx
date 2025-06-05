@@ -102,11 +102,11 @@ export const SitterCard = ({
           
           {/* Show review snippet if provided, otherwise show friend recommendations */}
           {reviewSnippet ? (
-            <p className="text-xs text-purple-600 italic">"{reviewSnippet}..."</p>
+            <p className="text-xs text-gray-600 italic">"{reviewSnippet}..."</p>
           ) : recommendedBy ? (
-            <p className="text-xs text-purple-600">{formatFriendRecommendation(friendRecommendationCount)}</p>
+            <p className="text-xs text-gray-600">{formatFriendRecommendation(friendRecommendationCount)}</p>
           ) : (
-            <p className="text-xs text-purple-600">{formatFriendRecommendation(friendRecommendationCount)}</p>
+            <p className="text-xs text-gray-600">{formatFriendRecommendation(friendRecommendationCount)}</p>
           )}
         </div>
       </div>
