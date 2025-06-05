@@ -25,42 +25,43 @@ export const RecommendedSitterFeedItem = ({
   recommendationTimestamp
 }: RecommendedSitterFeedItemProps) => {
   return (
-    <Link to={`/sitter/${sitterId}`} className="block group">
-      <div className="flex items-center space-x-5 p-4 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all">
-        {/* Sitter Profile Image */}
-        <div className="flex-shrink-0">
-          <Avatar className="w-24 h-24">
-            <AvatarImage 
-              src={sitterProfileImageUrl || undefined} 
-              alt={sitterName}
-              className="object-cover"
-            />
-            <AvatarFallback className="bg-gray-100 text-gray-600">
-              {sitterName.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-        </div>
-        
-        {/* Sitter Details */}
-        <div className="flex-grow min-h-[6rem] flex flex-col justify-center">
-          <div className="flex items-center justify-between">
-            <h4 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
-              {sitterName}
-            </h4>
-            {sitterRating && (
-              <div className="flex items-center space-x-1">
-                <StarIcon filled={true} className="w-4 h-4 text-yellow-400" />
-                <span className="text-sm font-medium text-gray-700">
-                  {sitterRating.toFixed(1)}
-                </span>
-              </div>
-            )}
-          </div>
-          <p className="text-sm text-gray-600 mt-1">
-            Recommended by {recommenderFullName}
-          </p>
-        </div>
+    <div className="flex items-center space-x-5 p-4 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all">
+      {/* Sitter Profile Image */}
+      <div className="flex-shrink-0">
+        <Avatar className="w-24 h-24">
+          <AvatarImage 
+            src={sitterProfileImageUrl || undefined} 
+            alt={sitterName}
+            className="object-cover"
+          />
+          <AvatarFallback className="bg-gray-100 text-gray-600">
+            {sitterName.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
       </div>
-    </Link>
+      
+      {/* Sitter Details */}
+      <div className="flex-grow min-h-[6rem] flex flex-col justify-center">
+        <div className="flex items-center justify-between">
+          <h4 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
+            {sitterName}
+          </h4>
+          {sitterRating && (
+            <div className="flex items-center space-x-1">
+              <StarIcon filled={true} className="w-4 h-4 text-yellow-400" />
+              <span className="text-sm font-medium text-gray-700">
+                {sitterRating.toFixed(1)}
+              </span>
+            </div>
+          )}
+        </div>
+        <p className="text-sm text-gray-500 mt-1">
+          {recommenderFullName} recommended
+        </p>
+        <Link to={`/sitter/${sitterId}`} className="text-sm font-medium text-gray-800 hover:underline">
+          {sitterName}
+        </Link>
+      </div>
+    </div>
   );
 };
