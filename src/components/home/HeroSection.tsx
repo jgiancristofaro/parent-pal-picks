@@ -5,21 +5,12 @@ interface HeroSectionProps {
 
 export const HeroSection = ({ userName }: HeroSectionProps) => {
   return (
-    <div className="mb-4">
-      <div className="relative h-40 overflow-hidden" style={{
-        backgroundImage: "url('/assets/hero-current.jpg')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}>
-        <div className="relative h-full flex flex-col justify-center px-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            Welcome back,
-            <br />
-            {userName}!
-          </h1>
-        </div>
-      </div>
+    <div className="px-4 pt-4 pb-6">
+      <h1 className="text-3xl font-bold text-gray-900">
+        Welcome back,
+        <br />
+        {userName}!
+      </h1>
     </div>
   );
 };
