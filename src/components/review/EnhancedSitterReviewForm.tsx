@@ -1,7 +1,9 @@
+
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserLocations } from "@/hooks/useUserLocations";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -18,21 +20,14 @@ interface Sitter {
   hourly_rate: number | null;
 }
 
-interface UserLocation {
-  id: string;
-  location_nickname: string;
-}
-
 interface EnhancedSitterReviewFormProps {
   selectedSitter: Sitter;
-  userLocations: UserLocation[];
   onCancel: () => void;
   onBackToSearch: () => void;
 }
 
 export const EnhancedSitterReviewForm = ({
   selectedSitter,
-  userLocations,
   onCancel,
   onBackToSearch
 }: EnhancedSitterReviewFormProps) => {
@@ -44,6 +39,7 @@ export const EnhancedSitterReviewForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { data: userLocations = [], isLoading: locationsLoading } = useUserLocations();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,6 +156,17 @@ export const EnhancedSitterReviewForm = ({
       setIsSubmitting(false);
     }
   };
+
+  if (locationsLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Review Sitter</h2>
+          <p className="text-gray-600">Loading your locations...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -8,53 +8,25 @@ import { useProfile } from "@/hooks/useProfile";
 import { useProfileFollowers } from "@/hooks/useProfileFollowers";
 import { useProfileFollowing } from "@/hooks/useProfileFollowing";
 import { useUserRecommendations } from "@/hooks/useUserRecommendations";
-import { useMockProfile, useMockProfileFollowers, useMockProfileFollowing, useMockUserRecommendations } from "@/hooks/useMockProfile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Profile = () => {
   const { userId } = useParams();
-  const isMockProfile = userId === 'mock-user-1';
+  const { user } = useAuth();
   
-  // Use mock data for the mock profile, real data otherwise
-  const { profile: currentUserProfile, isLoading: currentUserLoading } = useProfile();
-  const { data: mockProfile, isLoading: mockProfileLoading } = useMockProfile();
+  // Use the current user's profile if no userId is provided
+  const profileUserId = userId || user?.id;
+  
+  const { data: profile, isLoading: profileLoading } = useProfile();
+  const { data: followers = [], isLoading: followersLoading } = useProfileFollowers(profileUserId);
+  const { data: following = [], isLoading: followingLoading } = useProfileFollowing(profileUserId);
+  const { data: sitterRecommendations = [] } = useUserRecommendations(profileUserId, 'sitter');
+  const { data: productRecommendations = [] } = useUserRecommendations(profileUserId, 'product');
   
   const [isOwnProfile, setIsOwnProfile] = useState(false);
-  
-  const profile = isMockProfile ? mockProfile : currentUserProfile;
-  const isLoading = isMockProfile ? mockProfileLoading : currentUserLoading;
-  
-  // Use appropriate hooks based on profile type
-  const { data: realFollowers = [], isLoading: realFollowersLoading } = useProfileFollowers(
-    !isMockProfile ? profile?.id : undefined
-  );
-  const { data: realFollowing = [], isLoading: realFollowingLoading } = useProfileFollowing(
-    !isMockProfile ? profile?.id : undefined
-  );
-  const { data: realSitterRecommendations = [] } = useUserRecommendations(
-    !isMockProfile ? profile?.id : undefined, 
-    'sitter'
-  );
-  const { data: realProductRecommendations = [] } = useUserRecommendations(
-    !isMockProfile ? profile?.id : undefined, 
-    'product'
-  );
-  
-  // Mock data hooks
-  const { data: mockFollowers = [] } = useMockProfileFollowers();
-  const { data: mockFollowing = [] } = useMockProfileFollowing();
-  const { data: mockSitterRecommendations = [] } = useMockUserRecommendations('sitter');
-  const { data: mockProductRecommendations = [] } = useMockUserRecommendations('product');
-  
-  // Select the appropriate data based on profile type
-  const followers = isMockProfile ? mockFollowers : realFollowers;
-  const following = isMockProfile ? mockFollowing : realFollowing;
-  const sitterRecommendations = isMockProfile ? mockSitterRecommendations : realSitterRecommendations;
-  const productRecommendations = isMockProfile ? mockProductRecommendations : realProductRecommendations;
-  const followersLoading = isMockProfile ? false : realFollowersLoading;
-  const followingLoading = isMockProfile ? false : realFollowingLoading;
 
   useEffect(() => {
     // Check if this is the user's own profile
@@ -65,7 +37,7 @@ const Profile = () => {
     }
   }, [profile, userId]);
 
-  if (isLoading || followersLoading || followingLoading) {
+  if (profileLoading || followersLoading || followingLoading) {
     return (
       <div className="min-h-screen pb-20 bg-gray-50">
         <Header title="Profile" showBack={true} />
@@ -120,7 +92,7 @@ const Profile = () => {
     <div className="min-h-screen pb-20 bg-gray-50">
       <Header title="Profile" showBack={true} />
       
-      <ProfileHeader profileData={profileData} isOwnProfile={isOwnProfile && !isMockProfile} />
+      <ProfileHeader profileData={profileData} isOwnProfile={isOwnProfile} />
       <ProfileStats 
         followers={followers.length} 
         following={following.length}

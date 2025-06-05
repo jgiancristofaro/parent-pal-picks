@@ -2,18 +2,16 @@
 import { Header } from "@/components/Header";
 import { useNewlyRecommendedSitters } from "@/hooks/useNewlyRecommendedSitters";
 import { RecommendedSitterFeedItem } from "@/components/RecommendedSitterFeedItem";
+import { useAuth } from "@/contexts/AuthContext";
 
 const NewlyRecommendedSittersPage = () => {
-  // Mock current user data - in a real app this would come from auth context
-  const mockCurrentUser = {
-    id: "user-2",
-  };
+  const { user } = useAuth();
 
   const { 
     data: newlyRecommendedSitters = [], 
     isLoading, 
     error 
-  } = useNewlyRecommendedSitters(mockCurrentUser.id);
+  } = useNewlyRecommendedSitters(user?.id);
 
   return (
     <div className="min-h-screen bg-gray-50">

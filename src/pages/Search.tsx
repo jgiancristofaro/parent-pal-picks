@@ -7,10 +7,11 @@ import { DemoLinkSection } from "@/components/search/DemoLinkSection";
 import { SearchResultsGrid } from "@/components/search/SearchResultsGrid";
 import { useSearchFilters } from "@/hooks/useSearchFilters";
 import { useSitterData } from "@/hooks/useSitterData";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Search = () => {
-  // Mock current user ID for demonstration - in a real app this would come from auth
-  const mockCurrentUserId = "user-2";
+  const { user } = useAuth();
+  const currentUserId = user?.id || "";
 
   // Custom hooks for managing state and data
   const {
@@ -31,7 +32,7 @@ const Search = () => {
     shouldFetchLocalSitters,
     displayedSitters
   } = useSitterData({
-    mockCurrentUserId,
+    mockCurrentUserId: currentUserId,
     selectedUserHomeId,
     localSearchScope,
     searchTerm,
@@ -63,7 +64,7 @@ const Search = () => {
         {/* Original Hyper-Local Component - Only show when no filters are active */}
         {!searchTerm && !friendRecommendedOnly && localSearchScope === "ANY" && userLocations.length > 0 && (
           <HyperLocalSitters 
-            currentUserId={mockCurrentUserId}
+            currentUserId={currentUserId}
             selectedLocationId={userLocations[0]?.id}
             locationNickname={userLocations[0]?.location_nickname}
             searchScope="BUILDING"

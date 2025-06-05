@@ -10,22 +10,17 @@ import { FriendsActivity } from "@/components/home/FriendsActivity";
 import { NewRecommendedSitters } from "@/components/home/NewRecommendedSitters";
 import { NewRecommendedProducts } from "@/components/home/NewRecommendedProducts";
 import { TopCommunityPicks } from "@/components/home/TopCommunityPicks";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Home = () => {
-  // Mock current user data with valid UUID
-  const mockCurrentUser = {
-    id: "550e8400-e29b-41d4-a716-446655440000",
-    firstName: "Sophia",
-    fullName: "Sophia Carter",
-    profileImageUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-  };
+  const { user, profile } = useAuth();
   
   // Real notification system
   const { 
     notificationMessage, 
     hasNewActivity, 
     markActivityFeedAsViewed 
-  } = useActivityNotifications(mockCurrentUser.id);
+  } = useActivityNotifications(user?.id);
   
   // Local state for notification banner visibility
   const [showNotification, setShowNotification] = useState(false);
@@ -47,12 +42,14 @@ const Home = () => {
     setShowNotification(false);
   };
 
+  const userName = profile?.full_name?.split(' ')[0] || 'User';
+
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
       <Header 
         showUserProfileImage={false}
-        userProfileImageUrl={mockCurrentUser.profileImageUrl}
-        userFullName={mockCurrentUser.firstName}
+        userProfileImageUrl={profile?.avatar_url}
+        userFullName={userName}
         showBack={false}
         showSettings={true}
         showLogo={true}
@@ -68,11 +65,11 @@ const Home = () => {
         />
       )}
       
-      <HeroSection userName={mockCurrentUser.firstName} />
+      <HeroSection userName={userName} />
       <ActionButtons />
-      <FriendsActivity currentUserId={mockCurrentUser.id} />
-      <NewRecommendedSitters currentUserId={mockCurrentUser.id} />
-      <NewRecommendedProducts currentUserId={mockCurrentUser.id} />
+      <FriendsActivity currentUserId={user?.id} />
+      <NewRecommendedSitters currentUserId={user?.id} />
+      <NewRecommendedProducts currentUserId={user?.id} />
       <TopCommunityPicks />
 
       <BottomNavigation />

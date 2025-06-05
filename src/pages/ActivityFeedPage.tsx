@@ -1,18 +1,17 @@
+
 import { Header } from "@/components/Header";
 import { useFriendsActivityFeed } from "@/hooks/useFriendsActivityFeed";
 import { GenericActivityFeedItem } from "@/components/GenericActivityFeedItem";
+import { useAuth } from "@/contexts/AuthContext";
 
 const ActivityFeedPage = () => {
-  // Mock current user data with valid UUID - in a real app this would come from auth context
-  const mockCurrentUser = {
-    id: "550e8400-e29b-41d4-a716-446655440000",
-  };
+  const { user } = useAuth();
 
   const { 
     data: friendsActivity = [], 
     isLoading, 
     error 
-  } = useFriendsActivityFeed(mockCurrentUser.id);
+  } = useFriendsActivityFeed(user?.id);
 
   return (
     <div className="min-h-screen bg-gray-50">

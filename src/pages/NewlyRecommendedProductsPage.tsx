@@ -2,18 +2,16 @@
 import { Header } from "@/components/Header";
 import { useNewlyRecommendedProducts } from "@/hooks/useNewlyRecommendedProducts";
 import { RecommendedProductFeedItem } from "@/components/RecommendedProductFeedItem";
+import { useAuth } from "@/contexts/AuthContext";
 
 const NewlyRecommendedProductsPage = () => {
-  // Mock current user data - in a real app this would come from auth context
-  const mockCurrentUser = {
-    id: "user-2",
-  };
+  const { user } = useAuth();
 
   const { 
     data: newlyRecommendedProducts = [], 
     isLoading, 
     error 
-  } = useNewlyRecommendedProducts(mockCurrentUser.id);
+  } = useNewlyRecommendedProducts(user?.id);
 
   return (
     <div className="min-h-screen bg-gray-50">
