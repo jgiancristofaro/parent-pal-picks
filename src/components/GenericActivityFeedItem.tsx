@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { StarIcon } from "@/components/StarIcon";
@@ -40,10 +39,10 @@ export const GenericActivityFeedItem = ({
 
   if (displayMode === 'preview') {
     return (
-      <Link to={itemDetailPath} className="block p-4 hover:bg-gray-50 transition-colors">
+      <div className="p-4 hover:bg-gray-50 transition-colors">
         <div className="flex items-start space-x-3">
           {/* Actor Avatar */}
-          <Link to={`/profile/${actorId}`} className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+          <Link to={`/profile/${actorId}`} className="flex-shrink-0">
             <Avatar className="w-10 h-10">
               <AvatarImage 
                 src={actorAvatarUrl || undefined} 
@@ -58,7 +57,7 @@ export const GenericActivityFeedItem = ({
           
           <div className="flex-grow min-w-0">
             <div className="flex justify-between items-start mb-1">
-              <Link to={`/profile/${actorId}`} onClick={(e) => e.stopPropagation()}>
+              <Link to={`/profile/${actorId}`}>
                 <p className="font-semibold text-gray-800 hover:text-purple-600 transition-colors text-sm">
                   {actorFullName}
                 </p>
@@ -66,12 +65,12 @@ export const GenericActivityFeedItem = ({
               <p className="text-xs text-gray-500 flex-shrink-0 ml-2">{timeAgo}</p>
             </div>
             
-            {/* Simplified activity description with rating */}
-            <div className="flex items-center space-x-2">
-              <p className="text-sm text-gray-600 truncate">
-                gave {reviewRating} stars to {itemName}
-              </p>
-              <div className="flex items-center space-x-1 flex-shrink-0">
+            {/* Simplified activity with clickable item name */}
+            <div className="flex items-center justify-between">
+              <Link to={itemDetailPath} className="text-sm text-gray-600 hover:text-purple-600 transition-colors truncate">
+                {itemName}
+              </Link>
+              <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
                 <StarIcon filled={true} className="w-4 h-4 text-yellow-400" />
                 <span className="text-sm font-medium text-gray-700">
                   {reviewRating}
@@ -86,7 +85,7 @@ export const GenericActivityFeedItem = ({
             )}
           </div>
         </div>
-      </Link>
+      </div>
     );
   }
 
