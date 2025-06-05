@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { UserPlus, UserMinus, Clock } from "lucide-react";
 
 interface Profile {
@@ -25,10 +26,10 @@ interface ParentSearchResultCardProps {
 export const ParentSearchResultCard = ({ profile, onFollowStatusChange }: ParentSearchResultCardProps) => {
   const [currentFollowStatus, setCurrentFollowStatus] = useState(profile.follow_status);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const followMutation = useMutation({
     mutationFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
       const { data, error } = await supabase.functions.invoke('request_follow', {
@@ -68,7 +69,6 @@ export const ParentSearchResultCard = ({ profile, onFollowStatusChange }: Parent
 
   const unfollowMutation = useMutation({
     mutationFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
       const { data, error } = await supabase.functions.invoke('unfollow_user', {
