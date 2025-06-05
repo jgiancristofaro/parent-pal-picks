@@ -8,9 +8,10 @@ interface ProfileHeaderProps {
     bio?: string;
     username?: string;
   };
+  isOwnProfile?: boolean;
 }
 
-export const ProfileHeader = ({ profileData }: ProfileHeaderProps) => {
+export const ProfileHeader = ({ profileData, isOwnProfile = false }: ProfileHeaderProps) => {
   return (
     <div className="bg-white pb-6">
       <div className="flex flex-col items-center pt-6 pb-4">
@@ -29,6 +30,15 @@ export const ProfileHeader = ({ profileData }: ProfileHeaderProps) => {
         <p className="text-gray-500 text-sm">Joined {profileData.joinedYear}</p>
         {profileData.bio && (
           <p className="text-gray-600 text-center mt-3 px-6 max-w-md">{profileData.bio}</p>
+        )}
+        
+        {isOwnProfile && (
+          <a 
+            href="/profile/edit"
+            className="mt-4 px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+          >
+            Edit Profile
+          </a>
         )}
       </div>
     </div>

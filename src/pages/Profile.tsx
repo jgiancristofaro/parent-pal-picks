@@ -9,15 +9,33 @@ import { useProfileFollowers } from "@/hooks/useProfileFollowers";
 import { useProfileFollowing } from "@/hooks/useProfileFollowing";
 import { useUserRecommendations } from "@/hooks/useUserRecommendations";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 const Profile = () => {
-  const { profile, isLoading: profileLoading } = useProfile();
+  const { userId } = useParams();
+  const { profile: currentUserProfile, isLoading: currentUserLoading } = useProfile();
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
+  
+  // For now, we'll use current user's profile since we don't have user lookup by ID yet
+  const profile = currentUserProfile;
+  const isLoading = currentUserLoading;
+  
   const { data: followers = [], isLoading: followersLoading } = useProfileFollowers(profile?.id);
   const { data: following = [], isLoading: followingLoading } = useProfileFollowing(profile?.id);
   const { data: sitterRecommendations = [] } = useUserRecommendations(profile?.id, 'sitter');
   const { data: productRecommendations = [] } = useUserRecommendations(profile?.id, 'product');
 
-  if (profileLoading || followersLoading || followingLoading) {
+  useEffect(() => {
+    // Check if this is the user's own profile
+    if (profile && (!userId || userId === profile.id)) {
+      setIsOwnProfile(true);
+    } else {
+      setIsOwnProfile(false);
+    }
+  }, [profile, userId]);
+
+  if (isLoading || followersLoading || followingLoading) {
     return (
       <div className="min-h-screen pb-20 bg-gray-50">
         <Header title="Profile" showBack={true} />
@@ -72,7 +90,7 @@ const Profile = () => {
     <div className="min-h-screen pb-20 bg-gray-50">
       <Header title="Profile" showBack={true} />
       
-      <ProfileHeader profileData={profileData} />
+      <ProfileHeader profileData={profileData} isOwnProfile={isOwnProfile} />
       <ProfileStats 
         followers={followers.length} 
         following={following.length}
