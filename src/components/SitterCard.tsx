@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { StarIcon } from "./StarIcon";
 import { Badge } from "@/components/ui/badge";
@@ -104,7 +103,7 @@ export const SitterCard = ({
           {reviewSnippet ? (
             <p className="text-xs text-gray-600 italic">"{reviewSnippet}..."</p>
           ) : recommendedBy ? (
-            <p className="text-xs text-gray-600">{formatFriendRecommendation(friendRecommendationCount)}</p>
+            <p className="text-xs text-gray-600">Recommended by {recommendedBy}</p>
           ) : (
             <p className="text-xs text-gray-600">{formatFriendRecommendation(friendRecommendationCount)}</p>
           )}
