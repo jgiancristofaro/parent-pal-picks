@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useUserLocations } from "@/hooks/useUserLocations";
 import { SitterSelector } from "@/components/review/SitterSelector";
 import { LocationSelector } from "@/components/review/LocationSelector";
 import { ReviewForm } from "@/components/review/ReviewForm";
@@ -28,9 +27,6 @@ export const SitterReviewForm = ({ onCancel, reviewType }: SitterReviewFormProps
   const [selectedSitter, setSelectedSitter] = useState<Sitter | null>(null);
   const [showSearch, setShowSearch] = useState(true);
   const { toast } = useToast();
-
-  // Fetch user's saved locations
-  const { data: userLocations = [] } = useUserLocations();
 
   useEffect(() => {
     if (reviewType === "existing") {
@@ -74,7 +70,6 @@ export const SitterReviewForm = ({ onCancel, reviewType }: SitterReviewFormProps
   if (reviewType === "new") {
     return (
       <NewSitterReviewForm
-        userLocations={userLocations}
         onCancel={onCancel}
       />
     );
@@ -94,7 +89,6 @@ export const SitterReviewForm = ({ onCancel, reviewType }: SitterReviewFormProps
     return (
       <EnhancedSitterReviewForm
         selectedSitter={selectedSitter}
-        userLocations={userLocations}
         onCancel={onCancel}
         onBackToSearch={handleBackToSearch}
       />

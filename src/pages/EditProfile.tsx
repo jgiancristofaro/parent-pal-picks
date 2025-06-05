@@ -23,7 +23,7 @@ interface FormData {
 }
 
 const EditProfile = () => {
-  const { profile, isLoading } = useProfile();
+  const { data: profile, isLoading } = useProfile();
   const { updateProfile, isUpdating, uploadAvatar, isUploading } = useEditProfile();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');

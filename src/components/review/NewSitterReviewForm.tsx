@@ -1,7 +1,9 @@
+
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserLocations } from "@/hooks/useUserLocations";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -9,18 +11,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { StarIcon } from "@/components/StarIcon";
 
-interface UserLocation {
-  id: string;
-  location_nickname: string;
-}
-
 interface NewSitterReviewFormProps {
-  userLocations: UserLocation[];
   onCancel: () => void;
 }
 
 export const NewSitterReviewForm = ({
-  userLocations,
   onCancel
 }: NewSitterReviewFormProps) => {
   // Sitter information state
@@ -40,6 +35,7 @@ export const NewSitterReviewForm = ({
   const [errorMessage, setErrorMessage] = useState("");
   const { toast } = useToast();
   const { user } = useAuth();
+  const { data: userLocations = [], isLoading: locationsLoading } = useUserLocations();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,6 +153,17 @@ export const NewSitterReviewForm = ({
       setIsSubmitting(false);
     }
   };
+
+  if (locationsLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Create New Sitter Profile & Review</h2>
+          <p className="text-gray-600">Loading your locations...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

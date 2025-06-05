@@ -10,7 +10,6 @@ import Login from "./pages/Login";
 import ExistingUserLoginPage from "./pages/ExistingUserLoginPage";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
-import SearchMock from "./pages/SearchMock";
 import SearchSelection from "./pages/SearchSelection";
 import FindParents from "./pages/FindParents";
 import Profile from "./pages/Profile";
@@ -49,7 +48,6 @@ const App = () => (
           <Route path="/login-existing" element={<ExistingUserLoginPage />} />
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<ProtectedRoute><SearchSelection /></ProtectedRoute>} />
-          <Route path="/search-mock" element={<ProtectedRoute><SearchMock /></ProtectedRoute>} />
           <Route path="/find-sitter" element={<ProtectedRoute><Search /></ProtectedRoute>} />
           <Route path="/find-parents" element={<ProtectedRoute><FindParents /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
