@@ -13,8 +13,13 @@ export const useSitterReviews = (sitterId: string | undefined) => {
       const { data, error } = await supabase
         .from('reviews')
         .select(`
-          *,
-          profiles (
+          id,
+          user_id,
+          rating,
+          title,
+          content,
+          created_at,
+          profiles!inner(
             full_name,
             avatar_url
           )
