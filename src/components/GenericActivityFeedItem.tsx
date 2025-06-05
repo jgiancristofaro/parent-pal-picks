@@ -56,9 +56,9 @@ export const GenericActivityFeedItem = ({
           </Link>
           
           <div className="flex-grow min-w-0">
-            <div className="flex justify-between items-start mb-1">
+            <div className="flex justify-between items-start mb-0.5">
               <Link to={`/profile/${actorId}`}>
-                <p className="font-semibold text-gray-800 hover:text-purple-600 transition-colors text-sm">
+                <p className="font-semibold text-gray-800 hover:text-purple-600 transition-colors text-sm leading-tight">
                   {actorFullName}
                 </p>
               </Link>
@@ -67,7 +67,7 @@ export const GenericActivityFeedItem = ({
             
             {/* Simplified activity with clickable item name */}
             <div className="flex items-center justify-between">
-              <Link to={itemDetailPath} className="text-sm text-gray-600 hover:text-purple-600 transition-colors truncate">
+              <Link to={itemDetailPath} className="text-sm text-gray-600 hover:text-purple-600 transition-colors truncate leading-tight">
                 {itemName}
               </Link>
               <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
@@ -79,7 +79,7 @@ export const GenericActivityFeedItem = ({
             </div>
             
             {reviewTitle && (
-              <p className="text-sm text-gray-500 mt-1 truncate">
+              <p className="text-sm text-gray-500 mt-0.5 truncate leading-tight">
                 "{reviewTitle}"
               </p>
             )}
