@@ -15,23 +15,34 @@ serve(async (req) => {
   try {
     const { review_id, new_rating, new_title, new_content } = await req.json()
 
-    // Get Supabase client
+    // Get the authorization header from the request
+    const authHeader = req.headers.get('authorization')
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authorization header is required' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401 
+        }
+      )
+    }
+
+    // Get Supabase client with the user's auth token
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
+        global: {
+          headers: {
+            authorization: authHeader,
+          },
+        },
         auth: {
           autoRefreshToken: false,
           persistSession: false
         }
       }
     )
-
-    // Get the authorization header from the request
-    const authHeader = req.headers.get('authorization')
-    if (authHeader) {
-      supabaseClient.auth.setSession({ access_token: authHeader.replace('Bearer ', ''), refresh_token: '' })
-    }
 
     // Call the update_review database function
     const { data, error } = await supabaseClient.rpc('update_review', {
