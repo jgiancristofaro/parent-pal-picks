@@ -50,7 +50,8 @@ const OnboardingPage = () => {
     {
       headline: "Shop Smarter, Not Harder.",
       text: "Cut through the noise with curated product picks from your trusted circle.",
-      visualPlaceholder: "Illustration: Appealing layout of baby products"
+      visualPlaceholder: "Illustration: Appealing layout of baby products",
+      imageSrc: "/assets/onboarding3.jpg"
     }
   ];
 
