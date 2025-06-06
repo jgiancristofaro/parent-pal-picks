@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -44,7 +43,8 @@ const OnboardingPage = () => {
     {
       headline: "Find Sitters Your Neighbors Trust.",
       text: "Get hyper-local recommendations, even from parents in your own building or neighborhood.",
-      visualPlaceholder: "Illustration: Friendly sitter or diverse neighborhood"
+      visualPlaceholder: "Illustration: Friendly sitter or diverse neighborhood",
+      imageSrc: "/assets/onboarding2.jpg"
     },
     {
       headline: "Shop Smarter, Not Harder.",
