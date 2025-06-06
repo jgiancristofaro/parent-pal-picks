@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
-import OnboardingSlide from '@/components/onboarding/OnboardingSlide';
+import BrandedOnboardingSlide from '@/components/onboarding/BrandedOnboardingSlide';
 
 const OnboardingPage = () => {
   const navigate = useNavigate();
@@ -55,59 +55,62 @@ const OnboardingPage = () => {
     }
   ];
 
-  // Add error handling for images
-  const handleImageError = (slideIndex: number) => {
-    console.log(`Image failed to load for slide ${slideIndex + 1}`);
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-purple-50 flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-md">
         <Carousel setApi={setApi} className="w-full">
           <CarouselContent>
             {slides.map((slide, index) => (
               <CarouselItem key={index}>
-                <OnboardingSlide
+                <BrandedOnboardingSlide
                   headline={slide.headline}
                   text={slide.text}
                   visualPlaceholder={slide.visualPlaceholder}
                   imageSrc={slide.imageSrc}
+                  isFirstSlide={index === 0}
                 >
                   {index === 2 && (
                     <div className="space-y-3">
                       <Button 
                         onClick={handleSignUp}
-                        className="w-full py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-xl text-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+                        className="w-full py-6 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 border-0"
                       >
                         Sign Up
                       </Button>
                       <Button 
                         onClick={handleLogin}
                         variant="outline"
-                        className="w-full py-6 border-2 border-purple-500 text-purple-500 hover:bg-purple-50 rounded-xl text-lg font-semibold transition-all duration-200"
+                        className="w-full py-6 border-2 border-purple-500 text-purple-500 hover:bg-purple-50 rounded-xl text-lg font-semibold transition-all duration-200 bg-white"
                       >
                         Log In
                       </Button>
                     </div>
                   )}
-                </OnboardingSlide>
+                </BrandedOnboardingSlide>
               </CarouselItem>
             ))}
           </CarouselContent>
         </Carousel>
 
-        {/* Progress Indicators */}
-        <div className="flex justify-center space-x-2 mt-8">
+        {/* Enhanced Progress Indicators */}
+        <div className="flex justify-center space-x-3 mt-8">
           {Array.from({ length: count }, (_, index) => (
             <div
               key={index}
-              className={`h-2 w-2 rounded-full transition-all duration-300 ${
+              className={`h-2 rounded-full transition-all duration-300 ${
                 index + 1 === current 
-                  ? 'bg-purple-500 w-6' 
-                  : 'bg-purple-200'
+                  ? 'bg-gradient-to-r from-purple-500 to-purple-600 w-8 shadow-sm' 
+                  : 'bg-purple-200 w-2'
               }`}
             />
           ))}
+        </div>
+
+        {/* Brand Footer */}
+        <div className="text-center mt-8">
+          <p className="text-xs text-purple-400 font-medium">
+            Your trusted parenting community
+          </p>
         </div>
       </div>
     </div>
