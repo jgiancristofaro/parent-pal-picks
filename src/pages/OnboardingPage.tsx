@@ -38,7 +38,8 @@ const OnboardingPage = () => {
     {
       headline: "ParentPal: Trusted picks for your little one, powered by friends you know.",
       text: "Discover babysitters and baby products trusted and recommended by friends you know.",
-      visualPlaceholder: "Illustration: Connected community of parents"
+      visualPlaceholder: "Illustration: Connected community of parents",
+      imageSrc: "/assets/onboarding1.jpg"
     },
     {
       headline: "Find Sitters Your Neighbors Trust.",
@@ -63,6 +64,7 @@ const OnboardingPage = () => {
                   headline={slide.headline}
                   text={slide.text}
                   visualPlaceholder={slide.visualPlaceholder}
+                  imageSrc={slide.imageSrc}
                 >
                   {index === 2 && (
                     <div className="space-y-3">
