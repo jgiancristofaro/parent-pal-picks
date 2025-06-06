@@ -4,6 +4,7 @@ import { ExternalLink, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StarIcon } from "@/components/StarIcon";
+import { EditReviewButton } from "@/components/review/EditReviewButton";
 import { useNavigate } from "react-router-dom";
 
 interface Product {
@@ -20,11 +21,22 @@ interface Product {
   } | null;
 }
 
-interface ProductInfoProps {
-  product: Product;
+interface UserReview {
+  id: string;
+  rating: number;
+  title: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export const ProductInfo = ({ product }: ProductInfoProps) => {
+interface ProductInfoProps {
+  product: Product;
+  userReview?: UserReview | null;
+  userReviewLoading?: boolean;
+}
+
+export const ProductInfo = ({ product, userReview, userReviewLoading }: ProductInfoProps) => {
   const navigate = useNavigate();
 
   const formatPrice = (price: number | null) => {
@@ -63,6 +75,45 @@ export const ProductInfo = ({ product }: ProductInfoProps) => {
         reviewType: 'product'
       }
     });
+  };
+
+  const renderReviewButton = () => {
+    if (userReviewLoading) {
+      return (
+        <Button 
+          variant="outline" 
+          className="w-full border-purple-300 text-purple-700 hover:bg-purple-50 py-3"
+          disabled
+        >
+          <Star className="w-5 h-5 mr-2" />
+          Loading...
+        </Button>
+      );
+    }
+
+    if (userReview) {
+      return (
+        <EditReviewButton
+          reviewId={userReview.id}
+          rating={userReview.rating}
+          title={userReview.title}
+          content={userReview.content}
+          productId={product.id}
+          className="w-full border-purple-300 text-purple-700 hover:bg-purple-50 py-3"
+        />
+      );
+    }
+
+    return (
+      <Button 
+        variant="outline" 
+        className="w-full border-purple-300 text-purple-700 hover:bg-purple-50 py-3"
+        onClick={handleAddReview}
+      >
+        <Star className="w-5 h-5 mr-2" />
+        Add Review for this Product
+      </Button>
+    );
   };
 
   return (
@@ -107,15 +158,8 @@ export const ProductInfo = ({ product }: ProductInfoProps) => {
           </Button>
         )}
 
-        {/* Add Review Button */}
-        <Button 
-          variant="outline" 
-          className="w-full border-purple-300 text-purple-700 hover:bg-purple-50 py-3"
-          onClick={handleAddReview}
-        >
-          <Star className="w-5 h-5 mr-2" />
-          Add Review for this Product
-        </Button>
+        {/* Review Button - conditionally rendered */}
+        {renderReviewButton()}
       </div>
     </div>
   );
