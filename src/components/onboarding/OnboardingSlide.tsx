@@ -16,6 +16,10 @@ const OnboardingSlide: React.FC<OnboardingSlideProps> = ({
   imageSrc,
   children
 }) => {
+  const handleImageError = () => {
+    console.log(`Failed to load image: ${imageSrc}`);
+  };
+
   return (
     <div className="text-center px-4">
       <div className="h-80 bg-purple-100 flex items-center justify-center mb-8 rounded-2xl border border-purple-200 overflow-hidden">
@@ -24,6 +28,7 @@ const OnboardingSlide: React.FC<OnboardingSlideProps> = ({
             src={imageSrc} 
             alt={headline}
             className="w-full h-full object-cover"
+            onError={handleImageError}
           />
         ) : (
           <p className="text-purple-600 font-medium text-sm px-4 text-center">

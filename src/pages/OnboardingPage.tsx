@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,11 @@ const OnboardingPage = () => {
       visualPlaceholder: "Illustration: Appealing layout of baby products"
     }
   ];
+
+  // Add error handling for images
+  const handleImageError = (slideIndex: number) => {
+    console.log(`Image failed to load for slide ${slideIndex + 1}`);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white flex flex-col items-center justify-center p-6">
