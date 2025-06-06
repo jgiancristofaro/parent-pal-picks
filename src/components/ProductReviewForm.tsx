@@ -1,65 +1,94 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEditReview } from "@/hooks/useEditReview";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { StarIcon } from "@/components/StarIcon";
-import { useToast } from "@/hooks/use-toast";
 
 interface Product {
   id: string;
   name: string;
-  category: string | null;
-  image_url: string | null;
   brand_name: string;
+  image_url: string | null;
+  category: string | null;
 }
 
 interface ProductReviewFormProps {
   onCancel: () => void;
   reviewType: "existing" | "new";
-  selectedProduct?: Product | null;
+  selectedProduct: Product | null;
+  editData?: {
+    reviewId: string;
+    rating: number;
+    title: string;
+    content: string;
+    productId: string;
+  };
 }
 
-export const ProductReviewForm = ({ onCancel, reviewType, selectedProduct }: ProductReviewFormProps) => {
-  const [rating, setRating] = useState(0);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+export const ProductReviewForm = ({ 
+  onCancel, 
+  reviewType, 
+  selectedProduct,
+  editData 
+}: ProductReviewFormProps) => {
+  const [rating, setRating] = useState(editData?.rating || 0);
+  const [title, setTitle] = useState(editData?.title || "");
+  const [content, setContent] = useState(editData?.content || "");
   const [hasVerifiedExperience, setHasVerifiedExperience] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // New product fields
-  const [newProductName, setNewProductName] = useState("");
-  const [newProductBrand, setNewProductBrand] = useState("");
-  const [newProductCategory, setNewProductCategory] = useState("");
-  const [newProductPrice, setNewProductPrice] = useState("");
-  const [newProductLink, setNewProductLink] = useState("");
-  
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { updateReview } = useEditReview();
+  const navigate = useNavigate();
+  const isEditMode = !!editData;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (rating === 0 || !title.trim() || !content.trim()) {
+    if (!user) {
       toast({
         title: "Error",
-        description: "Please fill in all fields and select a rating",
+        description: "You must be logged in to submit a review",
         variant: "destructive",
       });
       return;
     }
 
-    if (reviewType === "existing" && !selectedProduct) {
+    if (rating === 0) {
       toast({
         title: "Error",
-        description: "Please select a product to review",
+        description: "Please select a rating",
         variant: "destructive",
       });
       return;
     }
 
-    if (reviewType === "existing" && !hasVerifiedExperience) {
+    if (!title.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a review title",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!content.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter your review content",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isEditMode && !hasVerifiedExperience) {
       toast({
         title: "Error",
         description: "Please certify that you have experience with this product",
@@ -68,121 +97,59 @@ export const ProductReviewForm = ({ onCancel, reviewType, selectedProduct }: Pro
       return;
     }
 
-    if (reviewType === "new" && (!newProductName.trim() || !newProductBrand.trim())) {
-      toast({
-        title: "Error",
-        description: "Please fill in the product name and brand",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsSubmitting(true);
 
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to submit a review",
-        variant: "destructive",
-      });
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
-      let productId = selectedProduct?.id;
-
-      // If creating a new product, create it first
-      if (reviewType === "new") {
-        // First get or create a default category
-        let categoryId;
-        if (newProductCategory.trim()) {
-          const { data: existingCategory } = await supabase
-            .from("categories")
-            .select("id")
-            .eq("name", newProductCategory.trim())
-            .single();
-
-          if (existingCategory) {
-            categoryId = existingCategory.id;
-          } else {
-            const { data: newCategory, error: categoryError } = await supabase
-              .from("categories")
-              .insert({ name: newProductCategory.trim() })
-              .select()
-              .single();
-
-            if (categoryError) throw categoryError;
-            categoryId = newCategory.id;
-          }
-        } else {
-          // Create or get default category
-          const { data: defaultCategory } = await supabase
-            .from("categories")
-            .select("id")
-            .eq("name", "General")
-            .single();
-
-          if (defaultCategory) {
-            categoryId = defaultCategory.id;
-          } else {
-            const { data: newDefaultCategory, error: categoryError } = await supabase
-              .from("categories")
-              .insert({ name: "General" })
-              .select()
-              .single();
-
-            if (categoryError) throw categoryError;
-            categoryId = newDefaultCategory.id;
-          }
-        }
-
-        const { data: newProduct, error: productError } = await supabase
-          .from("products")
-          .insert({
-            name: newProductName.trim(),
-            brand_name: newProductBrand.trim(),
-            category: newProductCategory.trim() || "General",
-            category_id: categoryId,
-            price: newProductPrice ? parseFloat(newProductPrice) : null,
-            external_purchase_link: newProductLink.trim() || null,
-            created_by_user_id: user.id,
-          })
-          .select()
-          .single();
-
-        if (productError) throw productError;
-        productId = newProduct.id;
-      }
-
-      // Create the review
-      const { error } = await supabase
-        .from("reviews")
-        .insert({
-          user_id: user.id,
-          product_id: productId,
+      if (isEditMode) {
+        // Update existing review
+        const success = await updateReview({
+          id: editData.reviewId,
           rating,
           title: title.trim(),
           content: content.trim(),
-          has_verified_experience: reviewType === "existing" ? hasVerifiedExperience : true,
+          product_id: editData.productId,
         });
 
-      if (error) throw error;
+        if (success) {
+          navigate(-1); // Go back to the product page
+        }
+      } else {
+        // Create new review logic (existing code)
+        const productId = selectedProduct?.id;
+        
+        if (!productId) {
+          toast({
+            title: "Error",
+            description: "Product not selected",
+            variant: "destructive",
+          });
+          return;
+        }
 
-      toast({
-        title: "Success",
-        description: reviewType === "new" 
-          ? "Your product and review have been created!" 
-          : "Your review has been submitted!",
-      });
-      onCancel();
+        const { error } = await supabase
+          .from("reviews")
+          .insert({
+            user_id: user.id,
+            product_id: productId,
+            rating,
+            title: title.trim(),
+            content: content.trim(),
+            has_verified_experience: hasVerifiedExperience,
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Your review has been submitted!",
+        });
+        onCancel();
+      }
     } catch (error) {
-      console.error("Error submitting review:", error);
+      console.error("Error with review:", error);
       toast({
         title: "Error",
-        description: "Failed to submit review",
+        description: isEditMode ? "Failed to update review" : "Failed to submit review",
         variant: "destructive",
       });
     } finally {
@@ -190,164 +157,119 @@ export const ProductReviewForm = ({ onCancel, reviewType, selectedProduct }: Pro
     }
   };
 
+  const productToDisplay = isEditMode 
+    ? { id: editData.productId, name: "Product", brand_name: "", image_url: null, category: null }
+    : selectedProduct;
+
   return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          {reviewType === "existing" ? "Review Product" : "Create New Product & Review"}
+          {isEditMode ? "Edit Your Review" : "Review Product"}
         </h2>
         <p className="text-gray-600">
-          Share your experience with baby essentials
+          {isEditMode ? "Update your experience with this product" : "Share your experience with this product"}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {reviewType === "existing" && selectedProduct && (
-          <div className="flex items-center p-3 bg-white rounded-lg border">
-            {selectedProduct.image_url && (
-              <img
-                src={selectedProduct.image_url}
-                alt={selectedProduct.name}
-                className="w-12 h-12 rounded-lg object-cover mr-3"
-              />
+      {productToDisplay && (
+        <div className="flex items-center p-3 bg-white rounded-lg border">
+          {productToDisplay.image_url && (
+            <img
+              src={productToDisplay.image_url}
+              alt={productToDisplay.name}
+              className="w-12 h-12 rounded-lg object-cover mr-3"
+            />
+          )}
+          <div className="flex-grow">
+            <div className="font-semibold">{productToDisplay.name}</div>
+            {productToDisplay.brand_name && (
+              <div className="text-sm text-gray-500">{productToDisplay.brand_name}</div>
             )}
-            <div className="flex-grow">
-              <div className="font-semibold">{selectedProduct.name}</div>
-              <div className="text-sm text-gray-500">{selectedProduct.brand_name}</div>
-              {selectedProduct.category && (
-                <div className="text-xs text-gray-400">{selectedProduct.category}</div>
-              )}
-            </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {reviewType === "new" && (
-          <div className="space-y-4 p-4 bg-white rounded-lg border">
-            <h3 className="text-lg font-semibold">New Product Details</h3>
-            
-            <div>
-              <label className="block text-sm font-medium mb-2">Product Name *</label>
-              <Input
-                value={newProductName}
-                onChange={(e) => setNewProductName(e.target.value)}
-                placeholder="Enter product name"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Brand *</label>
-              <Input
-                value={newProductBrand}
-                onChange={(e) => setNewProductBrand(e.target.value)}
-                placeholder="Enter brand name"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Category</label>
-              <Input
-                value={newProductCategory}
-                onChange={(e) => setNewProductCategory(e.target.value)}
-                placeholder="e.g., Baby Food, Toys, Clothing"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Price (USD)</label>
-              <Input
-                type="number"
-                step="0.01"
-                value={newProductPrice}
-                onChange={(e) => setNewProductPrice(e.target.value)}
-                placeholder="0.00"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Purchase Link</label>
-              <Input
-                type="url"
-                value={newProductLink}
-                onChange={(e) => setNewProductLink(e.target.value)}
-                placeholder="https://example.com/product"
-              />
-            </div>
-          </div>
-        )}
-
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Rating */}
         <div>
-          <label className="block text-sm font-medium mb-2">Rating</label>
+          <label className="block text-sm font-medium mb-2">
+            Rating <span className="text-red-500">*</span>
+          </label>
           <div className="flex space-x-1">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
                 type="button"
                 onClick={() => setRating(star)}
-                className="p-1"
+                className={`p-1 rounded transition-colors ${
+                  star <= rating ? "text-yellow-400" : "text-gray-300 hover:text-yellow-300"
+                }`}
               >
-                <StarIcon
-                  filled={star <= rating}
-                  className="w-8 h-8 text-yellow-500"
-                />
+                <StarIcon filled={star <= rating} className="w-8 h-8" />
               </button>
             ))}
           </div>
         </div>
 
+        {/* Title */}
         <div>
-          <label className="block text-sm font-medium mb-2">Review Title</label>
+          <label className="block text-sm font-medium mb-2">
+            Review Title <span className="text-red-500">*</span>
+          </label>
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Summarize your experience"
-            required
+            className="w-full"
           />
         </div>
 
+        {/* Content */}
         <div>
-          <label className="block text-sm font-medium mb-2">Your Review</label>
+          <label className="block text-sm font-medium mb-2">
+            Review Details <span className="text-red-500">*</span>
+          </label>
           <Textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Tell other parents about your experience with this product..."
-            rows={4}
-            required
+            placeholder="Share the details of your experience with this product..."
+            rows={5}
+            className="w-full"
           />
         </div>
 
-        {reviewType === "existing" && (
-          <div className="flex items-center space-x-2">
+        {/* Certification Checkbox - only show for new reviews */}
+        {!isEditMode && (
+          <div className="flex items-start space-x-2">
             <Checkbox
               id="verified-experience"
               checked={hasVerifiedExperience}
-              onCheckedChange={(checked) => setHasVerifiedExperience(checked as boolean)}
+              onCheckedChange={(checked) => setHasVerifiedExperience(checked === true)}
+              className="mt-1"
             />
-            <label
-              htmlFor="verified-experience"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              I certify that I have experience with this product *
+            <label htmlFor="verified-experience" className="text-sm font-medium leading-5">
+              I certify that I have experience with this product <span className="text-red-500">*</span>
             </label>
           </div>
         )}
 
-        <div className="flex space-x-3">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            className="flex-1"
-          >
-            Cancel
-          </Button>
+        {/* Submit Button */}
+        <div className="flex space-x-4">
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="flex-1 bg-purple-500 hover:bg-purple-600"
+            className="flex-1 bg-purple-500 hover:bg-purple-600 text-white"
           >
-            {isSubmitting ? "Submitting..." : "Submit Review"}
+            {isSubmitting ? (isEditMode ? "Updating..." : "Submitting...") : (isEditMode ? "Update Review" : "Submit Review")}
+          </Button>
+          <Button
+            type="button"
+            onClick={onCancel}
+            variant="outline"
+            className="px-6"
+          >
+            Cancel
           </Button>
         </div>
       </form>

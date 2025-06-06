@@ -8,8 +8,13 @@ import { NewProductReviewFlow } from "./NewProductReviewFlow";
 import { ProductReviewForm } from "../ProductReviewForm";
 import { SitterReviewForm } from "../SitterReviewForm";
 import { useReviewFlow } from "@/hooks/useReviewFlow";
+import { useLocation } from "react-router-dom";
 
 export const AddReviewFlow = () => {
+  const location = useLocation();
+  const editData = location.state as any;
+  const isEditMode = editData?.editMode;
+
   const {
     reviewType,
     setReviewType,
@@ -23,6 +28,30 @@ export const AddReviewFlow = () => {
     handleBackToProductOptions,
     handleSelectExistingProduct,
   } = useReviewFlow();
+
+  // If in edit mode, skip the selection flow and go directly to the appropriate form
+  if (isEditMode) {
+    if (editData.productId) {
+      return (
+        <ProductReviewForm 
+          onCancel={handleReset} 
+          reviewType="existing"
+          selectedProduct={null}
+          editData={editData}
+        />
+      );
+    }
+    
+    if (editData.sitterId) {
+      return (
+        <SitterReviewForm 
+          onCancel={handleReset} 
+          reviewType="existing"
+          editData={editData}
+        />
+      );
+    }
+  }
 
   // Main review type selection
   if (!reviewType) {

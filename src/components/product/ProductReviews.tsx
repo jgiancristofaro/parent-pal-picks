@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,9 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { StarIcon } from "@/components/StarIcon";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserReview } from "@/hooks/useUserReview";
+import { EditReviewButton } from "@/components/review/EditReviewButton";
 
 interface Review {
   id: string;
@@ -24,15 +26,18 @@ interface Review {
 
 interface ProductReviewsProps {
   productId: string;
+  onUserReviewChange?: () => void;
 }
 
-export const ProductReviews = ({ productId }: ProductReviewsProps) => {
+export const ProductReviews = ({ productId, onUserReviewChange }: ProductReviewsProps) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [filteredReviews, setFilteredReviews] = useState<Review[]>([]);
   const [filter, setFilter] = useState<'all' | 'following'>('all');
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { userReview, refreshUserReview } = useUserReview(productId);
 
   useEffect(() => {
     fetchCurrentUser();
@@ -42,6 +47,14 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
   useEffect(() => {
     filterReviews();
   }, [reviews, filter, currentUser]);
+
+  // Refresh when user review changes
+  useEffect(() => {
+    if (onUserReviewChange) {
+      refreshUserReview();
+      fetchReviews();
+    }
+  }, [onUserReviewChange, refreshUserReview]);
 
   const fetchCurrentUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -243,9 +256,20 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
                         </Badge>
                       )}
                     </div>
-                    <span className="text-sm text-gray-500">
-                      {formatDate(review.created_at)}
-                    </span>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-gray-500">
+                        {formatDate(review.created_at)}
+                      </span>
+                      {user && review.user_id === user.id && (
+                        <EditReviewButton
+                          reviewId={review.id}
+                          rating={review.rating}
+                          title={review.title}
+                          content={review.content}
+                          productId={productId}
+                        />
+                      )}
+                    </div>
                   </div>
                   
                   <div className="flex items-center space-x-2">

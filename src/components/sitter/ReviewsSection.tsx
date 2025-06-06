@@ -1,6 +1,8 @@
 
 import React from "react";
 import { ProfileSection } from "./ProfileSection";
+import { useAuth } from "@/contexts/AuthContext";
+import { EditReviewButton } from "@/components/review/EditReviewButton";
 
 interface Review {
   id: string;
@@ -10,14 +12,18 @@ interface Review {
   rating: number;
   date: string;
   content: string;
+  title?: string;
 }
 
 interface ReviewsSectionProps {
   reviews: Review[];
   renderStars: (rating: number) => React.ReactNode;
+  sitterId?: string;
 }
 
-export const ReviewsSection = ({ reviews, renderStars }: ReviewsSectionProps) => {
+export const ReviewsSection = ({ reviews, renderStars, sitterId }: ReviewsSectionProps) => {
+  const { user } = useAuth();
+
   return (
     <ProfileSection title="Reviews">
       <div className="space-y-4">
@@ -29,14 +35,26 @@ export const ReviewsSection = ({ reviews, renderStars }: ReviewsSectionProps) =>
                 alt={review.userName} 
                 className="w-12 h-12 rounded-full mr-3 object-cover"
               />
-              <div>
+              <div className="flex-grow">
                 <p className="font-medium">{review.userName}</p>
                 <p className="text-gray-500 text-sm">{review.date}</p>
               </div>
+              {user && review.userId === user.id && sitterId && (
+                <EditReviewButton
+                  reviewId={review.id}
+                  rating={review.rating}
+                  title={review.title || ""}
+                  content={review.content}
+                  sitterId={sitterId}
+                />
+              )}
             </div>
             <div className="flex mb-2">
               {renderStars(review.rating)}
             </div>
+            {review.title && (
+              <h4 className="font-semibold text-gray-900 mb-2">{review.title}</h4>
+            )}
             <p className="text-gray-700">{review.content}</p>
             <div className="flex items-center mt-3">
               <button className="flex items-center mr-4">

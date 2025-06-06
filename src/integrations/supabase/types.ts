@@ -644,6 +644,15 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      update_review: {
+        Args: {
+          p_review_id: string
+          p_new_rating: number
+          p_new_title: string
+          p_new_content: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       dwelling_type_enum:
