@@ -20,9 +20,16 @@ interface Sitter {
 interface SitterReviewFormProps {
   onCancel: () => void;
   reviewType: "existing" | "new";
+  editData?: {
+    reviewId: string;
+    rating: number;
+    title: string;
+    content: string;
+    sitterId: string;
+  };
 }
 
-export const SitterReviewForm = ({ onCancel, reviewType }: SitterReviewFormProps) => {
+export const SitterReviewForm = ({ onCancel, reviewType, editData }: SitterReviewFormProps) => {
   const [sitters, setSitters] = useState<Sitter[]>([]);
   const [selectedSitter, setSelectedSitter] = useState<Sitter | null>(null);
   const [showSearch, setShowSearch] = useState(true);
@@ -66,6 +73,16 @@ export const SitterReviewForm = ({ onCancel, reviewType }: SitterReviewFormProps
     setSelectedSitter(null);
     setShowSearch(true);
   };
+
+  // If in edit mode, go directly to the enhanced form
+  if (editData) {
+    return (
+      <EnhancedSitterReviewForm
+        onCancel={onCancel}
+        editData={editData}
+      />
+    );
+  }
 
   if (reviewType === "new") {
     return (
