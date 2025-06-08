@@ -11,7 +11,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { FollowRequestsManagement } from "@/components/settings/FollowRequestsManagement";
 
 const PrivacySettings = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -182,9 +181,6 @@ const PrivacySettings = () => {
           </CardContent>
         </Card>
 
-        {/* Follow Requests Management - Only show for private profiles */}
-        {profilePrivacySetting === 'private' && <FollowRequestsManagement />}
-
         {/* Save Button */}
         <Button 
           onClick={handleSave} 
@@ -193,6 +189,17 @@ const PrivacySettings = () => {
         >
           {updateProfileMutation.isPending ? 'Saving...' : 'Save Settings'}
         </Button>
+        
+        {/* Note about follow requests */}
+        {profilePrivacySetting === 'private' && (
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-sm text-gray-600 text-center">
+                Follow requests can be managed in the <strong>Alerts</strong> section.
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
       
       <BottomNavigation />

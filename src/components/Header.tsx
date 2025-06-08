@@ -3,7 +3,7 @@ import { ChevronLeft, Settings, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
-import { useAlerts } from "@/hooks/useAlerts";
+import { useAlertsContext } from "@/contexts/AlertsContext";
 
 interface HeaderProps {
   title?: string;
@@ -29,7 +29,7 @@ export const Header = ({
   logoUrl = ""
 }: HeaderProps) => {
   const { user } = useAuth();
-  const { hasNewAlerts } = useAlerts(user?.id);
+  const { hasNewAlerts } = useAlertsContext();
 
   return (
     <header className="flex items-center justify-between px-4 py-4 bg-white border-b border-gray-100">
