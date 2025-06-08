@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
@@ -78,8 +79,18 @@ const PrivacySettings = () => {
   });
 
   const handleSave = () => {
+    // Validate phone number is not empty
+    if (!phoneNumber || phoneNumber.trim() === '') {
+      toast({
+        title: 'Phone number required',
+        description: 'Please enter a valid phone number to save your settings.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     updateProfileMutation.mutate({
-      phone_number: phoneNumber || null,
+      phone_number: phoneNumber,
       phone_number_searchable: phoneNumberSearchable,
       profile_privacy_setting: profilePrivacySetting,
     });
@@ -112,13 +123,14 @@ const PrivacySettings = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone">Phone Number *</Label>
               <Input
                 id="phone"
                 type="tel"
                 placeholder="Enter your phone number"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
+                required
               />
             </div>
             
