@@ -2,6 +2,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+interface AlertsStatusResponse {
+  has_new_alerts: boolean;
+}
+
 export const useAlerts = (userId?: string) => {
   const queryClient = useQueryClient();
 
@@ -16,7 +20,7 @@ export const useAlerts = (userId?: string) => {
       });
 
       if (error) throw error;
-      return data;
+      return data as AlertsStatusResponse;
     },
     enabled: !!userId,
     refetchInterval: 30000, // Check every 30 seconds
