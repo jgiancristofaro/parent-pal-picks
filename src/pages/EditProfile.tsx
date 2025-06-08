@@ -1,5 +1,5 @@
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -28,24 +28,35 @@ const EditProfile = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<FormData>();
+  const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<FormData>({
+    defaultValues: {
+      full_name: '',
+      identity_tag: 'Parent',
+      bio: '',
+      username: '',
+      avatar_url: '',
+    }
+  });
   
   const watchedUsername = watch('username') || '';
+  const watchedIdentityTag = watch('identity_tag') || 'Parent';
   const { isAvailable, isChecking } = useUsernameAvailability(watchedUsername);
 
-  // Initialize form with profile data
-  useState(() => {
+  // Initialize form with profile data when it loads
+  useEffect(() => {
     if (profile) {
-      reset({
+      const formData = {
         full_name: profile.full_name || '',
         identity_tag: profile.identity_tag || 'Parent',
         bio: profile.bio || '',
         username: profile.username || '',
         avatar_url: profile.avatar_url || '',
-      });
+      };
+      
+      reset(formData);
       setPreviewUrl(profile.avatar_url || '');
     }
-  });
+  }, [profile, reset]);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -150,7 +161,10 @@ const EditProfile = () => {
         {/* Identity Tag Field */}
         <div className="space-y-2">
           <Label htmlFor="identity_tag">Identity Tag</Label>
-          <Select onValueChange={(value) => setValue('identity_tag', value)}>
+          <Select 
+            value={watchedIdentityTag} 
+            onValueChange={(value) => setValue('identity_tag', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Select your identity" />
             </SelectTrigger>
