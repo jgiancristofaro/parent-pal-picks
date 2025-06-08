@@ -461,6 +461,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      create_follow_relationship: {
+        Args: { p_follower_id: string; p_following_id: string }
+        Returns: undefined
+      }
       create_review: {
         Args: {
           p_sitter_id: string

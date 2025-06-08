@@ -97,6 +97,7 @@ Deno.serve(async (req) => {
       .from('follow_requests')
       .select('requester_id, requestee_id, status')
       .eq('id', request_id)
+      .eq('requestee_id', current_user_id)
       .eq('status', 'pending')
       .single();
 
@@ -129,7 +130,7 @@ Deno.serve(async (req) => {
 
     const newStatus = response_action === 'approve' ? 'approved' : 'denied';
 
-    // Update the follow request status (RLS will handle permissions)
+    // Update the follow request status
     const { error: updateError } = await supabaseClient
       .from('follow_requests')
       .update({ status: newStatus })
@@ -150,14 +151,12 @@ Deno.serve(async (req) => {
       );
     }
 
-    // If approved, create the follow relationship
+    // If approved, create the follow relationship using our database function
     if (response_action === 'approve') {
-      const { error: followError } = await supabaseClient
-        .from('user_follows')
-        .insert({
-          follower_id: followRequest.requester_id,
-          following_id: followRequest.requestee_id
-        });
+      const { error: followError } = await supabaseClient.rpc('create_follow_relationship', {
+        p_follower_id: followRequest.requester_id,
+        p_following_id: followRequest.requestee_id
+      });
 
       if (followError) {
         logSecurityEvent('follow_relationship_creation_failed', {
