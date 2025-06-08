@@ -21,7 +21,6 @@ import Settings from "./pages/Settings";
 import PaymentMethods from "./pages/PaymentMethods";
 import Notifications from "./pages/Notifications";
 import Language from "./pages/Language";
-import Privacy from "./pages/Privacy";
 import PrivacySettings from "./pages/PrivacySettings";
 import Security from "./pages/Security";
 import Help from "./pages/Help";
@@ -67,7 +66,6 @@ const App = () => (
           <Route path="/payment-methods" element={<ProtectedRoute><PaymentMethods /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
           <Route path="/language" element={<ProtectedRoute><Language /></ProtectedRoute>} />
-          <Route path="/privacy" element={<ProtectedRoute><Privacy /></ProtectedRoute>} />
           <Route path="/privacy-settings" element={<ProtectedRoute><PrivacySettings /></ProtectedRoute>} />
           <Route path="/security" element={<ProtectedRoute><Security /></ProtectedRoute>} />
           <Route path="/help" element={<ProtectedRoute><Help /></ProtectedRoute>} />

@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { SettingsSection } from "@/components/settings/SettingsSection";
@@ -62,7 +61,7 @@ const Settings = () => {
           title: "Privacy",
           description: "Manage your privacy settings",
           icon: Shield,
-          href: "/privacy"
+          href: "/privacy-settings"
         },
         {
           id: "security",
