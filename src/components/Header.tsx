@@ -1,7 +1,9 @@
 
-import { ChevronLeft, Settings } from "lucide-react";
+import { ChevronLeft, Settings, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
+import { useAlerts } from "@/hooks/useAlerts";
 
 interface HeaderProps {
   title?: string;
@@ -26,6 +28,9 @@ export const Header = ({
   showLogo = false,
   logoUrl = ""
 }: HeaderProps) => {
+  const { user } = useAuth();
+  const { hasNewAlerts } = useAlerts(user?.id);
+
   return (
     <header className="flex items-center justify-between px-4 py-4 bg-white border-b border-gray-100">
       <div className="flex items-center">
@@ -55,11 +60,24 @@ export const Header = ({
           <h1 className="text-xl font-bold">{title}</h1>
         )}
       </div>
-      {showSettings && (
-        <Link to="/settings">
-          <Settings className="w-6 h-6 text-gray-700" />
-        </Link>
-      )}
+      
+      <div className="flex items-center space-x-3">
+        {/* Notification Bell - Only show when user is authenticated */}
+        {user && (
+          <Link to="/alerts" className="relative">
+            <Bell className="w-6 h-6 text-gray-700" />
+            {hasNewAlerts && (
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+            )}
+          </Link>
+        )}
+        
+        {showSettings && (
+          <Link to="/settings">
+            <Settings className="w-6 h-6 text-gray-700" />
+          </Link>
+        )}
+      </div>
     </header>
   );
 };

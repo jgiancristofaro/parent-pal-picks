@@ -183,6 +183,7 @@ export type Database = {
           id: string
           identity_tag: string | null
           last_activity_feed_view_at: string | null
+          last_alerts_viewed_at: string | null
           last_login_at: string | null
           phone_number: string | null
           phone_number_searchable: boolean
@@ -198,6 +199,7 @@ export type Database = {
           id: string
           identity_tag?: string | null
           last_activity_feed_view_at?: string | null
+          last_alerts_viewed_at?: string | null
           last_login_at?: string | null
           phone_number?: string | null
           phone_number_searchable?: boolean
@@ -213,6 +215,7 @@ export type Database = {
           id?: string
           identity_tag?: string | null
           last_activity_feed_view_at?: string | null
+          last_alerts_viewed_at?: string | null
           last_login_at?: string | null
           phone_number?: string | null
           phone_number_searchable?: boolean
@@ -518,6 +521,10 @@ export type Database = {
         Args: { user_id: string }
         Returns: number
       }
+      get_new_alerts_status: {
+        Args: { user_id: string }
+        Returns: Json
+      }
       get_newly_recommended_products_from_followed_users: {
         Args: { p_current_user_id: string; p_limit?: number; p_offset?: number }
         Returns: {
@@ -607,6 +614,10 @@ export type Database = {
       gtrgm_out: {
         Args: { "": unknown }
         Returns: unknown
+      }
+      mark_alerts_as_viewed: {
+        Args: { user_id: string }
+        Returns: undefined
       }
       search_profile_by_phone: {
         Args: { search_phone: string }

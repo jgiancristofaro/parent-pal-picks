@@ -33,6 +33,7 @@ import OnboardingPage from "./pages/OnboardingPage";
 import NewlyRecommendedSittersPage from "./pages/NewlyRecommendedSittersPage";
 import NewlyRecommendedProductsPage from "./pages/NewlyRecommendedProductsPage";
 import EditProfile from "./pages/EditProfile";
+import Alerts from "./pages/Alerts";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,7 @@ const App = () => (
           <Route path="/settings/my-homes" element={<ProtectedRoute><ManageLocations /></ProtectedRoute>} />
           <Route path="/payment-methods" element={<ProtectedRoute><PaymentMethods /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+          <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
           <Route path="/language" element={<ProtectedRoute><Language /></ProtectedRoute>} />
           <Route path="/privacy-settings" element={<ProtectedRoute><PrivacySettings /></ProtectedRoute>} />
           <Route path="/security" element={<ProtectedRoute><Security /></ProtectedRoute>} />
