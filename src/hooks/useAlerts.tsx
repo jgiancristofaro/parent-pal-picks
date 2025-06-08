@@ -1,4 +1,5 @@
 
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -20,7 +21,7 @@ export const useAlerts = (userId?: string) => {
       });
 
       if (error) throw error;
-      return data as AlertsStatusResponse;
+      return data as unknown as AlertsStatusResponse;
     },
     enabled: !!userId,
     refetchInterval: 30000, // Check every 30 seconds
@@ -49,3 +50,4 @@ export const useAlerts = (userId?: string) => {
     isMarkingAsViewed: markAlertsAsViewedMutation.isPending,
   };
 };
+
