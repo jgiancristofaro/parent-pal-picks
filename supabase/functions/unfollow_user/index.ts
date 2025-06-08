@@ -91,6 +91,7 @@ Deno.serve(async (req) => {
     const { error: unfollowError, count } = await supabaseClient
       .from('user_follows')
       .delete({ count: 'exact' })
+      .eq('follower_id', current_user_id)
       .eq('following_id', target_user_id);
 
     if (unfollowError) {
@@ -120,10 +121,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Also delete any pending follow requests (RLS will handle permissions)
+    // Also delete any pending follow requests in both directions to clean up stale state
     const { error: cancelRequestError, count: requestsCount } = await supabaseClient
       .from('follow_requests')
       .delete({ count: 'exact' })
+      .eq('requester_id', current_user_id)
       .eq('requestee_id', target_user_id)
       .eq('status', 'pending');
 

@@ -65,24 +65,31 @@ export const useFollowRequests = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
-        .from('follow_requests')
-        .insert({
-          requester_id: user.id,
-          requestee_id: requesteeId,
-        })
-        .select()
-        .single();
+      const { data, error } = await supabase.functions.invoke('request_follow', {
+        body: {
+          current_user_id: user.id,
+          target_user_id: requesteeId,
+        }
+      });
 
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['follow-requests'] });
-      toast({
-        title: 'Follow request sent',
-        description: 'Your follow request has been sent.',
-      });
+      queryClient.invalidateQueries({ queryKey: ['user-follows'] });
+      
+      if (data.status === 'following') {
+        toast({
+          title: 'Now following',
+          description: 'You are now following this user.',
+        });
+      } else {
+        toast({
+          title: 'Follow request sent',
+          description: 'Your follow request has been sent.',
+        });
+      }
     },
     onError: (error) => {
       toast({
@@ -96,28 +103,18 @@ export const useFollowRequests = () => {
   // Respond to follow request (approve/deny)
   const respondToFollowRequestMutation = useMutation({
     mutationFn: async ({ requestId, status }: { requestId: string; status: 'approved' | 'denied' }) => {
-      const { data, error } = await supabase
-        .from('follow_requests')
-        .update({ status })
-        .eq('id', requestId)
-        .select()
-        .single();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase.functions.invoke('respond_to_follow_request', {
+        body: {
+          request_id: requestId,
+          current_user_id: user.id,
+          response_action: status === 'approved' ? 'approve' : 'deny',
+        }
+      });
 
       if (error) throw error;
-
-      // If approved, create the follow relationship
-      if (status === 'approved') {
-        const request = data as FollowRequest;
-        const { error: followError } = await supabase
-          .from('user_follows')
-          .insert({
-            follower_id: request.requester_id,
-            following_id: request.requestee_id,
-          });
-
-        if (followError) throw followError;
-      }
-
       return data;
     },
     onSuccess: (_, { status }) => {
@@ -141,16 +138,23 @@ export const useFollowRequests = () => {
 
   // Cancel follow request
   const cancelFollowRequestMutation = useMutation({
-    mutationFn: async (requestId: string) => {
-      const { error } = await supabase
-        .from('follow_requests')
-        .delete()
-        .eq('id', requestId);
+    mutationFn: async (requesteeId: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase.functions.invoke('unfollow_user', {
+        body: {
+          current_user_id: user.id,
+          target_user_id: requesteeId,
+        }
+      });
 
       if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['follow-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['user-follows'] });
       toast({
         title: 'Follow request cancelled',
         description: 'Your follow request has been cancelled.',

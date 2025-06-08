@@ -167,6 +167,40 @@ Deno.serve(async (req) => {
       }
     );
 
+    // First check if already following
+    const { data: existingFollow, error: followCheckError } = await anonSupabaseClient
+      .from('user_follows')
+      .select('id')
+      .eq('follower_id', current_user_id)
+      .eq('following_id', target_user_id)
+      .maybeSingle();
+
+    if (followCheckError) {
+      logSecurityEvent('follow_check_failed', {
+        requester_id: current_user_id,
+        target_user_id: target_user_id,
+        error: followCheckError.message
+      });
+      return new Response(
+        JSON.stringify({ error: 'Failed to check follow status' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (existingFollow) {
+      logSecurityEvent('already_following', {
+        requester_id: current_user_id,
+        target_user_id: target_user_id
+      });
+      return new Response(
+        JSON.stringify({
+          status: 'following',
+          message: 'Already following this user'
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Get target user's privacy setting (RLS will handle access control)
     const { data: targetProfile, error: profileError } = await anonSupabaseClient
       .from('profiles')
@@ -187,18 +221,16 @@ Deno.serve(async (req) => {
     }
 
     const response: RequestFollowResponse = {
-      status: 'not_following',
+      status: 'request_pending',
       message: ''
     };
 
     if (targetProfile.profile_privacy_setting === 'public') {
-      // For public profiles, directly create follow relationship
-      const { error: followError } = await anonSupabaseClient
-        .from('user_follows')
-        .insert({
-          follower_id: current_user_id,
-          following_id: target_user_id
-        });
+      // For public profiles, directly create follow relationship using our database function
+      const { error: followError } = await anonSupabaseClient.rpc('create_follow_relationship', {
+        p_follower_id: current_user_id,
+        p_following_id: target_user_id
+      });
 
       if (followError) {
         logSecurityEvent('follow_creation_failed', {
@@ -222,13 +254,12 @@ Deno.serve(async (req) => {
       response.status = 'following';
       response.message = 'Now following user';
     } else {
-      // For private profiles, create follow request
-      // First check if a pending request already exists
+      // For private profiles, check if a pending request already exists
       const { data: existingRequest, error: existingError } = await anonSupabaseClient
         .from('follow_requests')
-        .select('id')
+        .select('id, status')
+        .eq('requester_id', current_user_id)
         .eq('requestee_id', target_user_id)
-        .eq('status', 'pending')
         .maybeSingle();
 
       if (existingError) {
@@ -244,13 +275,42 @@ Deno.serve(async (req) => {
       }
 
       if (existingRequest) {
-        logSecurityEvent('duplicate_follow_request_attempt', {
-          requester_id: current_user_id,
-          target_user_id: target_user_id,
-          existing_request_id: existingRequest.id
-        });
-        response.status = 'request_pending';
-        response.message = 'Follow request already pending';
+        if (existingRequest.status === 'pending') {
+          logSecurityEvent('duplicate_follow_request_attempt', {
+            requester_id: current_user_id,
+            target_user_id: target_user_id,
+            existing_request_id: existingRequest.id
+          });
+          response.status = 'request_pending';
+          response.message = 'Follow request already pending';
+        } else {
+          // Update existing request to pending status
+          const { error: updateError } = await anonSupabaseClient
+            .from('follow_requests')
+            .update({ status: 'pending' })
+            .eq('id', existingRequest.id);
+
+          if (updateError) {
+            logSecurityEvent('follow_request_update_failed', {
+              requester_id: current_user_id,
+              target_user_id: target_user_id,
+              error: updateError.message
+            });
+            return new Response(
+              JSON.stringify({ error: 'Failed to update follow request' }),
+              { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+
+          logSecurityEvent('follow_request_updated', {
+            requester_id: current_user_id,
+            target_user_id: target_user_id,
+            profile_privacy: 'private'
+          });
+
+          response.status = 'request_pending';
+          response.message = 'Follow request sent';
+        }
       } else {
         // Create new follow request
         const { error: requestError } = await anonSupabaseClient
