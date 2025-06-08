@@ -48,19 +48,11 @@ Deno.serve(async (req) => {
       }
     );
 
-    // Fetch pending follow requests with requester profile information
-    // RLS will automatically filter to only requests for the current user
+    // First, fetch pending follow requests for the current user
     const { data: pendingRequests, error: requestsError } = await supabaseClient
       .from('follow_requests')
-      .select(`
-        id,
-        requester_id,
-        created_at,
-        requester:requester_id (
-          full_name,
-          avatar_url
-        )
-      `)
+      .select('id, requester_id, created_at')
+      .eq('requestee_id', current_user_id)
       .eq('status', 'pending')
       .order('created_at', { ascending: false });
 
@@ -72,14 +64,47 @@ Deno.serve(async (req) => {
       );
     }
 
+    if (!pendingRequests || pendingRequests.length === 0) {
+      return new Response(
+        JSON.stringify([]),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Get all requester IDs
+    const requesterIds = pendingRequests.map(req => req.requester_id);
+
+    // Fetch requester profile information
+    const { data: requesterProfiles, error: profilesError } = await supabaseClient
+      .from('profiles')
+      .select('id, full_name, avatar_url')
+      .in('id', requesterIds);
+
+    if (profilesError) {
+      console.error('Requester profiles query error:', profilesError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to fetch requester profiles' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create a map of requester profiles for easy lookup
+    const profilesMap = new Map();
+    (requesterProfiles || []).forEach(profile => {
+      profilesMap.set(profile.id, profile);
+    });
+
     // Transform the data to match the expected response format
-    const formattedRequests: PendingFollowRequest[] = (pendingRequests || []).map(request => ({
-      request_id: request.id,
-      requester_id: request.requester_id,
-      requester_full_name: (request.requester as any)?.full_name || 'Unknown User',
-      requester_avatar_url: (request.requester as any)?.avatar_url || null,
-      created_at: request.created_at
-    }));
+    const formattedRequests: PendingFollowRequest[] = pendingRequests.map(request => {
+      const requesterProfile = profilesMap.get(request.requester_id);
+      return {
+        request_id: request.id,
+        requester_id: request.requester_id,
+        requester_full_name: requesterProfile?.full_name || 'Unknown User',
+        requester_avatar_url: requesterProfile?.avatar_url || null,
+        created_at: request.created_at
+      };
+    });
 
     return new Response(
       JSON.stringify(formattedRequests),
