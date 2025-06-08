@@ -9,7 +9,7 @@ export const useSignUpForm = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [phoneNumberSearchable, setPhoneNumberSearchable] = useState(false);
+  const [phoneNumberSearchable, setPhoneNumberSearchable] = useState(true);
   const [profilePrivacySetting, setProfilePrivacySetting] = useState<'public' | 'private'>('private');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ export const useSignUpForm = () => {
     
     // Check for duplicate phone number error
     if (error.message?.includes('duplicate key value violates unique constraint "profiles_phone_number_key"')) {
-      return "This phone number is already associated with another account. Please use a different phone number or leave the phone number field empty.";
+      return "This phone number is already associated with another account. Please use a different phone number.";
     }
     
     // Check for duplicate email error
@@ -52,11 +52,11 @@ export const useSignUpForm = () => {
     setIsLoading(true);
 
     try {
-      // Validate required fields
-      if (!email || !password || !fullName) {
+      // Validate required fields including phone number
+      if (!email || !password || !fullName || !phoneNumber) {
         toast({
           title: "Missing required information",
-          description: "Please fill in your name, email, and password to continue.",
+          description: "Please fill in your name, email, password, and phone number to continue.",
           variant: "destructive",
         });
         return;

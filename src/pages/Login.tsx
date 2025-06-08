@@ -17,11 +17,10 @@ const Login = () => {
     setFullName,
     phoneNumber,
     setPhoneNumber,
-    phoneNumberSearchable,
-    setPhoneNumberSearchable,
     profilePrivacySetting,
     setProfilePrivacySetting,
-    handleSubmit
+    handleSubmit,
+    isLoading
   } = useSignUpForm();
 
   return (
@@ -39,11 +38,10 @@ const Login = () => {
             setPassword={setPassword}
             phoneNumber={phoneNumber}
             setPhoneNumber={setPhoneNumber}
+            isLoading={isLoading}
           />
 
           <PrivacySettingsCard
-            phoneNumberSearchable={phoneNumberSearchable}
-            setPhoneNumberSearchable={setPhoneNumberSearchable}
             profilePrivacySetting={profilePrivacySetting}
             setProfilePrivacySetting={setProfilePrivacySetting}
           />
@@ -51,8 +49,9 @@ const Login = () => {
           <Button 
             type="submit" 
             className="w-full py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-lg"
+            disabled={isLoading}
           >
-            Sign Up
+            {isLoading ? 'Creating Account...' : 'Sign Up'}
           </Button>
         </form>
         
