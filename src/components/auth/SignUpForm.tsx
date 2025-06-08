@@ -1,5 +1,7 @@
 
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 interface SignUpFormProps {
   fullName: string;
@@ -71,6 +73,14 @@ const SignUpForm = ({
           onChange={(e) => setPhoneNumber(e.target.value)}
           disabled={isLoading}
         />
+        {phoneNumber && (
+          <Alert className="mt-2">
+            <Info className="h-4 w-4" />
+            <AlertDescription className="text-sm">
+              If you're having trouble signing up, try leaving the phone number field empty or use a different number.
+            </AlertDescription>
+          </Alert>
+        )}
       </div>
     </div>
   );
