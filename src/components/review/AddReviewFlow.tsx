@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { ReviewTypeSelector } from "./ReviewTypeSelector";
 import { ProductReviewTypeSelector } from "./ProductReviewTypeSelector";
 import { SitterReviewTypeSelector } from "./SitterReviewTypeSelector";
@@ -27,7 +27,17 @@ export const AddReviewFlow = () => {
     handleProductSelect,
     handleBackToProductOptions,
     handleSelectExistingProduct,
+    setProductReviewType,
   } = useReviewFlow();
+
+  // Check if we have a pre-selected product from navigation state
+  useEffect(() => {
+    if (editData?.selectedProduct && editData?.reviewType === 'product' && !isEditMode) {
+      setReviewType('product');
+      setProductReviewType('existing');
+      handleProductSelect(editData.selectedProduct);
+    }
+  }, [editData, isEditMode, setReviewType, setProductReviewType, handleProductSelect]);
 
   // If in edit mode, skip the selection flow and go directly to the appropriate form
   if (isEditMode) {
@@ -51,6 +61,17 @@ export const AddReviewFlow = () => {
         />
       );
     }
+  }
+
+  // If we have a pre-selected product, go directly to the form
+  if (reviewType === "product" && productReviewType === "existing" && selectedProduct) {
+    return (
+      <ProductReviewForm 
+        onCancel={handleReset} 
+        reviewType={productReviewType} 
+        selectedProduct={selectedProduct}
+      />
+    );
   }
 
   // Main review type selection
