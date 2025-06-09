@@ -1,52 +1,50 @@
 
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
-import { SearchByNameCard } from "@/components/search/SearchByNameCard";
-import { SearchByPhoneCard } from "@/components/search/SearchByPhoneCard";
-import { SearchResultsList } from "@/components/search/SearchResultsList";
-import { useParentSearch } from "@/hooks/useParentSearch";
+import { UnifiedSearchCard } from "@/components/search/UnifiedSearchCard";
+import { UnifiedSearchResults } from "@/components/search/UnifiedSearchResults";
+import { SuggestedProfilesSection } from "@/components/search/SuggestedProfilesSection";
+import { useUnifiedSearch } from "@/hooks/useUnifiedSearch";
 
 const FindParents = () => {
   const {
     searchTerm,
     setSearchTerm,
-    phoneNumber,
-    setPhoneNumber,
     searchResults,
     isSearching,
-    handleNameSearch,
-    handlePhoneSearch,
+    handleSearch,
     handleKeyPress,
     refreshResults
-  } = useParentSearch();
+  } = useUnifiedSearch();
+
+  const handleFollowStatusChange = () => {
+    refreshResults();
+  };
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
       <Header title="Find Parents" showBack={true} showSettings={false} backTo="/search" />
       
       <div className="px-4 py-6">
-        <SearchByNameCard
+        <UnifiedSearchCard
           searchTerm={searchTerm}
           onSearchTermChange={setSearchTerm}
-          onSearch={handleNameSearch}
-          onKeyPress={(e) => handleKeyPress(e, 'name')}
+          onSearch={handleSearch}
+          onKeyPress={handleKeyPress}
           isSearching={isSearching}
         />
 
-        <SearchByPhoneCard
-          phoneNumber={phoneNumber}
-          onPhoneNumberChange={setPhoneNumber}
-          onSearch={handlePhoneSearch}
-          onKeyPress={(e) => handleKeyPress(e, 'phone')}
-          isSearching={isSearching}
-        />
+        {/* Show suggestions when not searching */}
+        {!searchTerm && (
+          <SuggestedProfilesSection onFollowStatusChange={handleFollowStatusChange} />
+        )}
 
-        <SearchResultsList
+        {/* Show search results when searching */}
+        <UnifiedSearchResults
           searchResults={searchResults}
           searchTerm={searchTerm}
-          phoneNumber={phoneNumber}
           isSearching={isSearching}
-          onFollowStatusChange={refreshResults}
+          onFollowStatusChange={handleFollowStatusChange}
         />
       </div>
       

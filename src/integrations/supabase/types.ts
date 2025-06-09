@@ -580,6 +580,18 @@ export type Database = {
           most_recent_activity: string
         }[]
       }
+      get_suggested_profiles: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          full_name: string
+          username: string
+          avatar_url: string
+          profile_privacy_setting: Database["public"]["Enums"]["profile_privacy_enum"]
+          follow_status: string
+          mutual_connections_count: number
+        }[]
+      }
       get_top_community_picks: {
         Args: {
           time_window_days?: number
@@ -622,6 +634,18 @@ export type Database = {
       mark_alerts_as_viewed: {
         Args: { user_id: string }
         Returns: undefined
+      }
+      search_all_profiles: {
+        Args: { search_term: string }
+        Returns: {
+          id: string
+          full_name: string
+          username: string
+          avatar_url: string
+          profile_privacy_setting: Database["public"]["Enums"]["profile_privacy_enum"]
+          follow_status: string
+          similarity_score: number
+        }[]
       }
       search_profile_by_phone: {
         Args: { search_phone: string }
