@@ -12,7 +12,7 @@ export function prepareSitterData(data: CreateSitterProfileRequest): SitterData 
     rating: 0, // Initialize with no rating yet
     review_count: 0, // No reviews yet
     created_by_user_id: data.user_id,
-    profile_image_url: '/lovable-uploads/f42e2470-723a-456b-a809-54e7c0d004b0.png' // Default profile image
+    profile_image_url: '/assets/defaultsitter.jpg' // Updated to use correct default image
   };
 }
 
