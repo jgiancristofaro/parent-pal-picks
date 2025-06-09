@@ -154,7 +154,8 @@ serve(async (req) => {
       phone_number_searchable: false, // Default to private
       rating: 0, // Initialize with no rating yet
       review_count: 0, // No reviews yet
-      created_by_user_id: user_id
+      created_by_user_id: user_id,
+      profile_image_url: '/lovable-uploads/f42e2470-723a-456b-a809-54e7c0d004b0.png' // Default profile image
     }
 
     console.log('Creating sitter with data:', sitterData);
