@@ -17,10 +17,11 @@ const Profile = () => {
   const { userId } = useParams();
   const { user } = useAuth();
   
-  // Use the current user's profile if no userId is provided
+  // Use the userId from URL params, or fall back to current user's ID
   const profileUserId = userId || user?.id;
   
-  const { data: profile, isLoading: profileLoading } = useProfile();
+  // Pass the profileUserId to useProfile hook
+  const { data: profile, isLoading: profileLoading } = useProfile(profileUserId);
   const { data: followers = [], isLoading: followersLoading } = useProfileFollowers(profileUserId);
   const { data: following = [], isLoading: followingLoading } = useProfileFollowing(profileUserId);
   const { data: sitterRecommendations = [] } = useUserRecommendations(profileUserId, 'sitter');
@@ -30,12 +31,12 @@ const Profile = () => {
 
   useEffect(() => {
     // Check if this is the user's own profile
-    if (profile && (!userId || userId === profile.id)) {
+    if (profile && user && (!userId || userId === user.id)) {
       setIsOwnProfile(true);
     } else {
       setIsOwnProfile(false);
     }
-  }, [profile, userId]);
+  }, [profile, userId, user]);
 
   if (profileLoading || followersLoading || followingLoading) {
     return (

@@ -3,20 +3,23 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
-export const useProfile = () => {
+export const useProfile = (userId?: string) => {
   const { user } = useAuth();
   
+  // Use the provided userId or fall back to the current user's ID
+  const targetUserId = userId || user?.id;
+  
   return useQuery({
-    queryKey: ['profile', user?.id],
+    queryKey: ['profile', targetUserId],
     queryFn: async () => {
-      if (!user?.id) return null;
+      if (!targetUserId) return null;
       
-      console.log('Fetching profile for user:', user.id);
+      console.log('Fetching profile for user:', targetUserId);
       
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', targetUserId)
         .single();
 
       if (error) {
@@ -27,6 +30,6 @@ export const useProfile = () => {
       console.log('Profile data:', data);
       return data;
     },
-    enabled: !!user?.id,
+    enabled: !!targetUserId,
   });
 };
