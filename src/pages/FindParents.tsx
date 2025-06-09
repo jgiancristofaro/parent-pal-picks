@@ -1,21 +1,21 @@
 
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
-import { UnifiedSearchCard } from "@/components/search/UnifiedSearchCard";
-import { UnifiedSearchResults } from "@/components/search/UnifiedSearchResults";
-import { SuggestedProfilesSection } from "@/components/search/SuggestedProfilesSection";
-import { useUnifiedSearch } from "@/hooks/useUnifiedSearch";
+import { OmniSearchInput } from "@/components/search/OmniSearchInput";
+import { SuggestedParentsSection } from "@/components/search/SuggestedParentsSection";
+import { SearchResultsSection } from "@/components/search/SearchResultsSection";
+import { useParentSearch } from "@/hooks/useParentSearch";
 
 const FindParents = () => {
   const {
     searchTerm,
     setSearchTerm,
-    searchResults,
-    isSearching,
-    handleSearch,
+    results,
+    isLoading,
     handleKeyPress,
-    refreshResults
-  } = useUnifiedSearch();
+    refreshResults,
+    isSearchActive
+  } = useParentSearch();
 
   const handleFollowStatusChange = () => {
     refreshResults();
@@ -26,26 +26,31 @@ const FindParents = () => {
       <Header title="Find Parents" showBack={true} showSettings={false} backTo="/search" />
       
       <div className="px-4 py-6">
-        <UnifiedSearchCard
+        <OmniSearchInput
           searchTerm={searchTerm}
           onSearchTermChange={setSearchTerm}
-          onSearch={handleSearch}
           onKeyPress={handleKeyPress}
-          isSearching={isSearching}
+          isLoading={isLoading}
         />
 
-        {/* Show suggestions when not searching */}
-        {!searchTerm && (
-          <SuggestedProfilesSection onFollowStatusChange={handleFollowStatusChange} />
+        {/* Show suggestions when not actively searching */}
+        {!isSearchActive && (
+          <SuggestedParentsSection 
+            suggestions={results}
+            isLoading={isLoading}
+            onFollowStatusChange={handleFollowStatusChange} 
+          />
         )}
 
-        {/* Show search results when searching */}
-        <UnifiedSearchResults
-          searchResults={searchResults}
-          searchTerm={searchTerm}
-          isSearching={isSearching}
-          onFollowStatusChange={handleFollowStatusChange}
-        />
+        {/* Show search results when actively searching */}
+        {isSearchActive && (
+          <SearchResultsSection
+            searchResults={results}
+            searchTerm={searchTerm}
+            isLoading={isLoading}
+            onFollowStatusChange={handleFollowStatusChange}
+          />
+        )}
       </div>
       
       <BottomNavigation />

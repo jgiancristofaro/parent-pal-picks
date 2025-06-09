@@ -1,7 +1,8 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useDebouncedSearch } from "./useDebouncedSearch";
 
 interface ProfileWithFollowStatus {
   id: string;
@@ -10,97 +11,102 @@ interface ProfileWithFollowStatus {
   avatar_url: string | null;
   profile_privacy_setting: string;
   follow_status: 'following' | 'request_pending' | 'not_following';
+  similarity_score?: number;
+  mutual_connections_count?: number;
 }
 
 export const useParentSearch = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [searchResults, setSearchResults] = useState<ProfileWithFollowStatus[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const [results, setResults] = useState<ProfileWithFollowStatus[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  
+  // Debounce the search term by 300ms
+  const debouncedSearchTerm = useDebouncedSearch(searchTerm, 300);
 
-  const searchProfiles = async (term?: string, phone?: string) => {
-    if (!term && !phone) return [];
-
-    setIsSearching(true);
+  const fetchData = async (term: string) => {
+    setIsLoading(true);
     
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!term.trim()) {
+        // Fetch suggested profiles when search is empty
+        const { data, error } = await supabase.rpc('get_suggested_profiles');
 
-      const { data, error } = await supabase.functions.invoke('search_profiles_v2', {
-        body: {
-          search_term: term || undefined,
-          search_phone: phone || undefined,
-          current_user_id: user.id
-        }
-      });
-
-      if (error) {
-        // Check if it's a rate limiting error
-        if (error.message?.includes('Rate limit exceeded')) {
+        if (error) {
+          console.error('Suggested profiles error:', error);
           toast({
-            title: 'Search limit reached',
-            description: phone 
-              ? 'You\'ve reached the phone search limit. Please wait before searching again.'
-              : 'You\'ve reached the search limit. Please wait before searching again.',
+            title: 'Error loading suggestions',
+            description: 'There was an error loading suggested profiles.',
             variant: 'destructive',
           });
-          return [];
+          return;
         }
-        throw error;
+
+        // Type assertion for suggested profiles
+        const typedResults: ProfileWithFollowStatus[] = (data || []).map((result: any) => ({
+          ...result,
+          follow_status: result.follow_status as 'following' | 'request_pending' | 'not_following'
+        }));
+
+        setResults(typedResults);
+      } else {
+        // Fetch search results when there's a search term
+        const { data, error } = await supabase.rpc('search_all_profiles', {
+          search_term: term.trim()
+        });
+
+        if (error) {
+          console.error('Search error:', error);
+          toast({
+            title: 'Search error',
+            description: 'There was an error searching for users.',
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        // Type assertion for search results
+        const typedResults: ProfileWithFollowStatus[] = (data || []).map((result: any) => ({
+          ...result,
+          follow_status: result.follow_status as 'following' | 'request_pending' | 'not_following'
+        }));
+
+        setResults(typedResults);
       }
-      return data || [];
     } catch (error) {
-      console.error('Search error:', error);
+      console.error('Data fetch error:', error);
       toast({
-        title: 'Search error',
-        description: 'There was an error searching for users.',
+        title: 'Error',
+        description: 'There was an error loading profiles.',
         variant: 'destructive',
       });
-      return [];
     } finally {
-      setIsSearching(false);
+      setIsLoading(false);
     }
   };
 
-  const handleNameSearch = async () => {
-    if (!searchTerm.trim()) return;
-    const results = await searchProfiles(searchTerm);
-    setSearchResults(results);
-  };
-
-  const handlePhoneSearch = async () => {
-    if (!phoneNumber.trim()) return;
-    const results = await searchProfiles(undefined, phoneNumber);
-    setSearchResults(results);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent, searchType: 'name' | 'phone') => {
-    if (e.key === 'Enter') {
-      if (searchType === 'name') {
-        handleNameSearch();
-      } else {
-        handlePhoneSearch();
-      }
-    }
-  };
+  // Effect to fetch data when debounced search term changes
+  useEffect(() => {
+    fetchData(debouncedSearchTerm);
+  }, [debouncedSearchTerm]);
 
   const refreshResults = () => {
-    if (searchTerm) handleNameSearch();
-    if (phoneNumber) handlePhoneSearch();
+    fetchData(debouncedSearchTerm);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      fetchData(searchTerm);
+    }
   };
 
   return {
     searchTerm,
     setSearchTerm,
-    phoneNumber,
-    setPhoneNumber,
-    searchResults,
-    isSearching,
-    handleNameSearch,
-    handlePhoneSearch,
+    results,
+    isLoading,
     handleKeyPress,
-    refreshResults
+    refreshResults,
+    isSearchActive: !!searchTerm.trim()
   };
 };
