@@ -98,6 +98,36 @@ export const ParentSearchResultCard = ({ profile, onFollowStatusChange }: Parent
     },
   });
 
+  const cancelRequestMutation = useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase.functions.invoke('cancel_follow_request', {
+        body: {
+          target_user_id: profile.id
+        }
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      setCurrentFollowStatus('not_following');
+      toast({
+        title: 'Request cancelled',
+        description: `Follow request to ${profile.full_name} has been cancelled`,
+      });
+      onFollowStatusChange?.();
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: 'Failed to cancel follow request',
+        variant: 'destructive',
+      });
+    },
+  });
+
   const getButtonConfig = () => {
     switch (currentFollowStatus) {
       case 'following':
@@ -112,9 +142,9 @@ export const ParentSearchResultCard = ({ profile, onFollowStatusChange }: Parent
         return {
           text: 'Requested',
           variant: 'outline' as const,
-          onClick: () => {},
+          onClick: () => cancelRequestMutation.mutate(),
           icon: Clock,
-          disabled: true
+          disabled: cancelRequestMutation.isPending
         };
       default:
         return {
