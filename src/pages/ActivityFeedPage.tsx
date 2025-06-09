@@ -1,5 +1,6 @@
 
 import { Header } from "@/components/Header";
+import { BottomNavigation } from "@/components/BottomNavigation";
 import { useFriendsActivityFeed } from "@/hooks/useFriendsActivityFeed";
 import { GenericActivityFeedItem } from "@/components/GenericActivityFeedItem";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,7 +15,7 @@ const ActivityFeedPage = () => {
   } = useFriendsActivityFeed(user?.id);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen pb-20 bg-gray-50">
       <Header 
         title="Friends' Activity"
         showBack={true}
@@ -79,6 +80,8 @@ const ActivityFeedPage = () => {
           </div>
         )}
       </div>
+      
+      <BottomNavigation />
     </div>
   );
 };
