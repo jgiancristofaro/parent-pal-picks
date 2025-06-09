@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import ExistingUserLoginPage from "./pages/ExistingUserLoginPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import UpdatePasswordPage from "./pages/UpdatePasswordPage";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
 import SearchSelection from "./pages/SearchSelection";
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/login-existing" element={<ExistingUserLoginPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/update-password" element={<UpdatePasswordPage />} />
             <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
             <Route path="/search" element={<ProtectedRoute><SearchSelection /></ProtectedRoute>} />
             <Route path="/find-sitter" element={<ProtectedRoute><Search /></ProtectedRoute>} />
