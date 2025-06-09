@@ -20,6 +20,7 @@ interface Sitter {
   experience: string | null;
   profile_image_url: string | null;
   hourly_rate: number | null;
+  phone_number?: string | null;
 }
 
 interface EnhancedSitterReviewFormProps {
@@ -33,13 +34,15 @@ interface EnhancedSitterReviewFormProps {
     content: string;
     sitterId: string;
   };
+  isNewSitterFlow?: boolean;
 }
 
 export const EnhancedSitterReviewForm = ({
   selectedSitter,
   onCancel,
   onBackToSearch,
-  editData
+  editData,
+  isNewSitterFlow = false
 }: EnhancedSitterReviewFormProps) => {
   const [selectedLocationId, setSelectedLocationId] = useState<string>("");
   const [rating, setRating] = useState(editData?.rating || 0);
@@ -128,8 +131,8 @@ export const EnhancedSitterReviewForm = ({
           navigate(-1); // Go back to the sitter profile page
         }
       } else {
-        // Create new review (existing logic)
-        const { data, error } = await supabase.functions.invoke('create_review', {
+        // Create new review using the new create_sitter_review function
+        const { data, error } = await supabase.functions.invoke('create_sitter_review', {
           body: {
             user_id: user.id,
             sitter_id: selectedSitter?.id,
@@ -142,7 +145,7 @@ export const EnhancedSitterReviewForm = ({
         });
 
         if (error) {
-          console.error("Error calling create_review function:", error);
+          console.error("Error calling create_sitter_review function:", error);
           toast({
             title: "Error",
             description: "Failed to submit review",
@@ -163,7 +166,7 @@ export const EnhancedSitterReviewForm = ({
         if (data?.success) {
           toast({
             title: "Success",
-            description: "Your review has been submitted!",
+            description: data.message || "Your review has been submitted!",
           });
           onCancel();
         } else {
@@ -205,7 +208,7 @@ export const EnhancedSitterReviewForm = ({
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          {isEditMode ? "Edit Your Review" : "Review Sitter"}
+          {isEditMode ? "Edit Your Review" : isNewSitterFlow ? "Step 2: Add Your Review" : "Review Sitter"}
         </h2>
         <p className="text-gray-600">
           {isEditMode ? "Update your experience with this babysitter" : "Share your experience with this babysitter"}
@@ -235,9 +238,12 @@ export const EnhancedSitterReviewForm = ({
               {sitterToDisplay.hourly_rate && (
                 <p className="text-sm text-gray-500">${sitterToDisplay.hourly_rate}/hour</p>
               )}
+              {isNewSitterFlow && (
+                <p className="text-sm text-green-600 font-medium">✓ Profile created successfully</p>
+              )}
             </div>
 
-            {!isEditMode && onBackToSearch && (
+            {!isEditMode && onBackToSearch && !isNewSitterFlow && (
               <Button
                 onClick={onBackToSearch}
                 variant="outline"

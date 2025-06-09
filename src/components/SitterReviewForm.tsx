@@ -7,7 +7,7 @@ import { LocationSelector } from "@/components/review/LocationSelector";
 import { ReviewForm } from "@/components/review/ReviewForm";
 import { SitterSearch } from "@/components/review/SitterSearch";
 import { EnhancedSitterReviewForm } from "@/components/review/EnhancedSitterReviewForm";
-import { NewSitterReviewForm } from "@/components/review/NewSitterReviewForm";
+import { NewSitterReviewFlow } from "@/components/review/NewSitterReviewFlow";
 
 interface Sitter {
   id: string;
@@ -86,7 +86,7 @@ export const SitterReviewForm = ({ onCancel, reviewType, editData }: SitterRevie
 
   if (reviewType === "new") {
     return (
-      <NewSitterReviewForm
+      <NewSitterReviewFlow
         onCancel={onCancel}
       />
     );
