@@ -88,6 +88,7 @@ Deno.serve(async (req) => {
     );
 
     // Delete from user_follows (RLS will ensure only own follows can be deleted)
+    // Match both follower_id and following_id for explicit and clear logic
     const { error: unfollowError, count } = await supabaseClient
       .from('user_follows')
       .delete({ count: 'exact' })
