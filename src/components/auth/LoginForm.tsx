@@ -1,6 +1,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 interface LoginFormProps {
   email: string;
@@ -52,6 +53,15 @@ export const LoginForm = ({
       >
         {isLoading ? "Signing in..." : "Log In"}
       </Button>
+
+      <div className="text-center">
+        <Link 
+          to="/forgot-password" 
+          className="text-purple-500 hover:text-purple-600 text-sm font-medium"
+        >
+          Forgot Password?
+        </Link>
+      </div>
     </form>
   );
 };
