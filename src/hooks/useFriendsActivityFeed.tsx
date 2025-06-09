@@ -42,6 +42,17 @@ export const useFriendsActivityFeed = (
       }
 
       console.log('Friends activity feed found:', data?.length || 0);
+      // Debug logging to check actor_id values
+      data?.forEach((activity: FriendsActivityItem, index: number) => {
+        console.log(`Activity ${index}:`, {
+          activity_id: activity.activity_id,
+          actor_id: activity.actor_id,
+          actor_name: activity.actor_full_name,
+          current_user_id: currentUserId,
+          is_same_as_current: activity.actor_id === currentUserId
+        });
+      });
+      
       return (data || []) as FriendsActivityItem[];
     },
     enabled: enabled && !!currentUserId,
