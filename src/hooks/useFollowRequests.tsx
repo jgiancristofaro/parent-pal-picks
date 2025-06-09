@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { FollowRequest, FollowRequestStatus } from '@/types/profile';
@@ -142,30 +141,22 @@ export const useFollowRequests = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Ensure we have a valid session
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError || !session) {
-        console.error('Session error:', sessionError);
-        throw new Error('Authentication session invalid. Please log in again.');
-      }
+      console.log('Attempting to cancel follow request from user:', user.id, 'to target:', requesteeId);
 
-      const { data, error } = await supabase.functions.invoke('cancel_follow_request', {
-        body: {
-          target_user_id: requesteeId,
-        }
-      });
+      // Use direct database query instead of edge function
+      const { data, error } = await supabase
+        .from('follow_requests')
+        .delete()
+        .eq('requester_id', user.id)
+        .eq('requestee_id', requesteeId)
+        .eq('status', 'pending');
 
       if (error) {
-        console.error('Cancel request error:', error);
-        
-        // Handle specific error types
-        if (error.message?.includes('Authentication')) {
-          throw new Error('Authentication failed. Please log in again.');
-        }
-        
-        throw error;
+        console.error('Database error:', error);
+        throw new Error(`Failed to cancel follow request: ${error.message}`);
       }
+
+      console.log('Successfully cancelled follow request, affected rows:', data);
       return data;
     },
     onSuccess: () => {
@@ -177,6 +168,7 @@ export const useFollowRequests = () => {
       });
     },
     onError: (error) => {
+      console.error('Cancel mutation error:', error);
       toast({
         title: 'Error cancelling follow request',
         description: error.message,
