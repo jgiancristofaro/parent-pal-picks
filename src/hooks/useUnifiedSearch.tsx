@@ -43,7 +43,13 @@ export const useUnifiedSearch = () => {
         return;
       }
 
-      setSearchResults(data || []);
+      // Type assertion to ensure follow_status matches our expected union type
+      const typedResults: UnifiedSearchResult[] = (data || []).map((result: any) => ({
+        ...result,
+        follow_status: result.follow_status as 'following' | 'request_pending' | 'not_following'
+      }));
+
+      setSearchResults(typedResults);
     } catch (error) {
       console.error('Search error:', error);
       toast({
