@@ -100,7 +100,19 @@ export const ParentSearchResultCard = ({ profile, onFollowStatusChange }: Parent
 
   const cancelRequestMutation = useMutation({
     mutationFn: async () => {
-      if (!user) throw new Error('Not authenticated');
+      if (!user) {
+        throw new Error('Not authenticated');
+      }
+
+      // Ensure we have a valid session before making the request
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        console.error('Session error:', sessionError);
+        throw new Error('Authentication session invalid. Please log in again.');
+      }
+
+      console.log('Making cancel request with user:', user.id, 'target:', profile.id);
 
       const { data, error } = await supabase.functions.invoke('cancel_follow_request', {
         body: {
@@ -108,7 +120,21 @@ export const ParentSearchResultCard = ({ profile, onFollowStatusChange }: Parent
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Cancel request error:', error);
+        
+        // Handle specific error types
+        if (error.message?.includes('Authentication')) {
+          throw new Error('Authentication failed. Please log in again.');
+        }
+        
+        if (error.message?.includes('404') || error.message?.includes('No pending')) {
+          throw new Error('No pending follow request found to cancel.');
+        }
+        
+        throw error;
+      }
+      
       return data;
     },
     onSuccess: () => {
@@ -120,9 +146,10 @@ export const ParentSearchResultCard = ({ profile, onFollowStatusChange }: Parent
       onFollowStatusChange?.();
     },
     onError: (error) => {
+      console.error('Cancel mutation error:', error);
       toast({
         title: 'Error',
-        description: 'Failed to cancel follow request',
+        description: error.message || 'Failed to cancel follow request',
         variant: 'destructive',
       });
     },

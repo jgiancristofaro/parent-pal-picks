@@ -142,14 +142,30 @@ export const useFollowRequests = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase.functions.invoke('unfollow_user', {
+      // Ensure we have a valid session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        console.error('Session error:', sessionError);
+        throw new Error('Authentication session invalid. Please log in again.');
+      }
+
+      const { data, error } = await supabase.functions.invoke('cancel_follow_request', {
         body: {
-          current_user_id: user.id,
           target_user_id: requesteeId,
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Cancel request error:', error);
+        
+        // Handle specific error types
+        if (error.message?.includes('Authentication')) {
+          throw new Error('Authentication failed. Please log in again.');
+        }
+        
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
