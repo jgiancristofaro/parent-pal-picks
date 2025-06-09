@@ -53,3 +53,9 @@ verify_jwt = true
 
 [functions.search_sitters]
 verify_jwt = false
+
+[functions.create_sitter_profile]
+verify_jwt = true
+
+[functions.create_sitter_review]
+verify_jwt = true
