@@ -30,7 +30,7 @@ export const ReviewsSection = ({ reviews, renderStars, sitterId }: ReviewsSectio
 
   // Get array of followed user IDs
   const followedUserIds = useMemo(() => {
-    return followingData.map(follow => follow.following_id);
+    return followingData.map(follow => follow.id);
   }, [followingData]);
 
   // Filter reviews based on current filter selection
