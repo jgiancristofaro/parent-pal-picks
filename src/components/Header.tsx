@@ -1,6 +1,6 @@
 
 import { ChevronLeft, Settings, Bell } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAlertsContext } from "@/contexts/AlertsContext";
@@ -9,7 +9,6 @@ interface HeaderProps {
   title?: string;
   showBack?: boolean;
   showSettings?: boolean;
-  backTo?: string;
   showUserProfileImage?: boolean;
   userProfileImageUrl?: string | null;
   userFullName?: string | null;
@@ -21,7 +20,6 @@ export const Header = ({
   title = "ParentPal", 
   showBack = false, 
   showSettings = true, 
-  backTo = "/",
   showUserProfileImage = false,
   userProfileImageUrl = null,
   userFullName = null,
@@ -30,14 +28,19 @@ export const Header = ({
 }: HeaderProps) => {
   const { user } = useAuth();
   const { hasNewAlerts } = useAlertsContext();
+  const navigate = useNavigate();
+
+  const handleBackClick = () => {
+    navigate(-1);
+  };
 
   return (
     <header className="flex items-center justify-between px-4 py-4 bg-white border-b border-gray-100">
       <div className="flex items-center">
         {showBack && (
-          <Link to={backTo} className="mr-3">
+          <button onClick={handleBackClick} className="mr-3">
             <ChevronLeft className="w-6 h-6 text-gray-700" />
-          </Link>
+          </button>
         )}
         
         {showUserProfileImage && userProfileImageUrl && (
