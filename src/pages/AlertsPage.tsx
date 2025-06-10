@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAlertsContext } from "@/contexts/AlertsContext";
-import { Check, X } from "lucide-react";
+import { Check, X, UserPlus } from "lucide-react";
 
 interface PendingFollowRequest {
   request_id: string;
@@ -25,6 +25,9 @@ const AlertsPage = () => {
   const { refreshAlerts } = useAlertsContext();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Local state to track which requests should show Follow Back button
+  const [showFollowBack, setShowFollowBack] = useState<Set<string>>(new Set());
 
   // Mark alerts as viewed when user visits the page
   useEffect(() => {
@@ -76,22 +79,66 @@ const AlertsPage = () => {
       });
 
       if (error) throw error;
-      return data;
+      return { data, requestId, action };
     },
-    onSuccess: (_, { action }) => {
-      queryClient.invalidateQueries({ queryKey: ['pending-follow-requests'] });
-      refreshAlerts();
-      toast({
-        title: action === 'approve' ? 'Follow request approved' : 'Follow request denied',
-        description: action === 'approve' 
-          ? 'The user can now follow you and see your activity.' 
-          : 'The follow request has been denied.',
-      });
+    onSuccess: ({ data, requestId, action }) => {
+      if (action === 'approve' && data.follow_back_status === 'not_following') {
+        // Add to Follow Back state, don't invalidate queries yet
+        setShowFollowBack(prev => new Set(prev).add(requestId));
+        toast({
+          title: 'Follow request approved',
+          description: 'The user can now follow you and see your activity.',
+        });
+      } else {
+        // For deny or when already following, invalidate immediately
+        queryClient.invalidateQueries({ queryKey: ['pending-follow-requests'] });
+        refreshAlerts();
+        toast({
+          title: action === 'approve' ? 'Follow request approved' : 'Follow request denied',
+          description: action === 'approve' 
+            ? 'The user can now follow you and see your activity.' 
+            : 'The follow request has been denied.',
+        });
+      }
     },
     onError: (error) => {
       toast({
         title: 'Error',
         description: 'Failed to respond to follow request.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const followBackMutation = useMutation({
+    mutationFn: async (targetUserId: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase.functions.invoke('request_follow', {
+        body: {
+          current_user_id: user.id,
+          target_user_id: targetUserId,
+        }
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      // Now invalidate the pending requests query to remove the item
+      queryClient.invalidateQueries({ queryKey: ['pending-follow-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['user-follows'] });
+      refreshAlerts();
+      toast({
+        title: 'Follow back successful',
+        description: 'You are now following each other!',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error following back',
+        description: 'Failed to follow back. Please try again.',
         variant: 'destructive',
       });
     },
@@ -155,29 +202,45 @@ const AlertsPage = () => {
                     </div>
                     
                     <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => respondToRequestMutation.mutate({ 
-                          requestId: request.request_id, 
-                          action: 'deny' 
-                        })}
-                        disabled={respondToRequestMutation.isPending}
-                      >
-                        <X size={16} />
-                        Deny
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => respondToRequestMutation.mutate({ 
-                          requestId: request.request_id, 
-                          action: 'approve' 
-                        })}
-                        disabled={respondToRequestMutation.isPending}
-                      >
-                        <Check size={16} />
-                        Approve
-                      </Button>
+                      {showFollowBack.has(request.request_id) ? (
+                        // Show Follow Back button
+                        <Button
+                          size="sm"
+                          onClick={() => followBackMutation.mutate(request.requester_id)}
+                          disabled={followBackMutation.isPending}
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          <UserPlus size={16} />
+                          Follow Back
+                        </Button>
+                      ) : (
+                        // Show Approve/Deny buttons
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => respondToRequestMutation.mutate({ 
+                              requestId: request.request_id, 
+                              action: 'deny' 
+                            })}
+                            disabled={respondToRequestMutation.isPending}
+                          >
+                            <X size={16} />
+                            Deny
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => respondToRequestMutation.mutate({ 
+                              requestId: request.request_id, 
+                              action: 'approve' 
+                            })}
+                            disabled={respondToRequestMutation.isPending}
+                          >
+                            <Check size={16} />
+                            Approve
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 ))}
