@@ -1,12 +1,7 @@
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
-import { UserPlus, UserMinus, Clock } from "lucide-react";
+import { FollowButton } from "@/components/FollowButton";
 
 interface Profile {
   id: string;
@@ -23,154 +18,6 @@ interface ParentSearchResultCardProps {
 }
 
 export const ParentSearchResultCard = ({ profile, onFollowStatusChange }: ParentSearchResultCardProps) => {
-  const [currentFollowStatus, setCurrentFollowStatus] = useState(profile.follow_status);
-  const { toast } = useToast();
-  const { user } = useAuth();
-
-  const followMutation = useMutation({
-    mutationFn: async () => {
-      if (!user) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase.functions.invoke('request_follow', {
-        body: {
-          current_user_id: user.id,
-          target_user_id: profile.id
-        }
-      });
-
-      if (error) {
-        // Check if it's a rate limiting error
-        if (error.message?.includes('Rate limit exceeded')) {
-          throw new Error('You\'ve reached the follow request limit. Please wait before sending more requests.');
-        }
-        throw error;
-      }
-      return data;
-    },
-    onSuccess: (data) => {
-      setCurrentFollowStatus(data.status === 'following' ? 'following' : 'request_pending');
-      toast({
-        title: data.status === 'following' ? 'Now following' : 'Follow request sent',
-        description: data.status === 'following' 
-          ? `You are now following ${profile.full_name}` 
-          : `Follow request sent to ${profile.full_name}`,
-      });
-      onFollowStatusChange?.();
-    },
-    onError: (error) => {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to send follow request',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  const unfollowMutation = useMutation({
-    mutationFn: async () => {
-      if (!user) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase.functions.invoke('unfollow_user', {
-        body: {
-          current_user_id: user.id,
-          target_user_id: profile.id
-        }
-      });
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      setCurrentFollowStatus('not_following');
-      toast({
-        title: 'Unfollowed',
-        description: `You are no longer following ${profile.full_name}`,
-      });
-      onFollowStatusChange?.();
-    },
-    onError: (error) => {
-      toast({
-        title: 'Error',
-        description: 'Failed to unfollow user',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  const cancelRequestMutation = useMutation({
-    mutationFn: async () => {
-      if (!user) {
-        throw new Error('Not authenticated');
-      }
-
-      console.log('Attempting to cancel follow request from user:', user.id, 'to target:', profile.id);
-
-      // Use direct database query instead of edge function
-      const { data, error } = await supabase
-        .from('follow_requests')
-        .delete()
-        .eq('requester_id', user.id)
-        .eq('requestee_id', profile.id)
-        .eq('status', 'pending');
-
-      if (error) {
-        console.error('Database error:', error);
-        throw new Error(`Failed to cancel follow request: ${error.message}`);
-      }
-
-      console.log('Successfully cancelled follow request, affected rows:', data);
-      return data;
-    },
-    onSuccess: () => {
-      setCurrentFollowStatus('not_following');
-      toast({
-        title: 'Request cancelled',
-        description: `Follow request to ${profile.full_name} has been cancelled`,
-      });
-      onFollowStatusChange?.();
-    },
-    onError: (error) => {
-      console.error('Cancel mutation error:', error);
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to cancel follow request',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  const getButtonConfig = () => {
-    switch (currentFollowStatus) {
-      case 'following':
-        return {
-          text: 'Unfollow',
-          variant: 'outline' as const,
-          onClick: () => unfollowMutation.mutate(),
-          icon: UserMinus,
-          disabled: unfollowMutation.isPending
-        };
-      case 'request_pending':
-        return {
-          text: 'Requested',
-          variant: 'outline' as const,
-          onClick: () => cancelRequestMutation.mutate(),
-          icon: Clock,
-          disabled: cancelRequestMutation.isPending
-        };
-      default:
-        return {
-          text: profile.profile_privacy_setting === 'public' ? 'Follow' : 'Request Follow',
-          variant: 'default' as const,
-          onClick: () => followMutation.mutate(),
-          icon: UserPlus,
-          disabled: followMutation.isPending
-        };
-    }
-  };
-
-  const buttonConfig = getButtonConfig();
-  const ButtonIcon = buttonConfig.icon;
-
   return (
     <Card className="w-full">
       <CardContent className="p-4">
@@ -193,16 +40,12 @@ export const ParentSearchResultCard = ({ profile, onFollowStatusChange }: Parent
             </div>
           </div>
           
-          <Button
-            variant={buttonConfig.variant}
+          <FollowButton
+            targetProfile={profile}
+            onStatusChange={onFollowStatusChange}
             size="sm"
-            onClick={buttonConfig.onClick}
-            disabled={buttonConfig.disabled}
-            className="flex items-center gap-2"
-          >
-            <ButtonIcon size={16} />
-            {buttonConfig.text}
-          </Button>
+            variant="default"
+          />
         </div>
       </CardContent>
     </Card>

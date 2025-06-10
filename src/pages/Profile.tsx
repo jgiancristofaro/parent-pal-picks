@@ -4,6 +4,7 @@ import { BottomNavigation } from "@/components/BottomNavigation";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileStats } from "@/components/profile/ProfileStats";
 import { RecommendationsTabs } from "@/components/profile/RecommendationsTabs";
+import { FollowButton } from "@/components/FollowButton";
 import { useProfile } from "@/hooks/useProfile";
 import { useProfileFollowers } from "@/hooks/useProfileFollowers";
 import { useProfileFollowing } from "@/hooks/useProfileFollowing";
@@ -94,6 +95,23 @@ const Profile = () => {
       <Header title="Profile" showBack={true} />
       
       <ProfileHeader profileData={profileData} isOwnProfile={isOwnProfile} />
+      
+      {/* Follow Button for other users' profiles */}
+      {!isOwnProfile && profile.follow_status && profile.follow_status !== 'own_profile' && (
+        <div className="flex justify-center pb-4">
+          <FollowButton
+            targetProfile={{
+              id: profile.id,
+              full_name: profile.full_name,
+              profile_privacy_setting: profile.profile_privacy_setting,
+              follow_status: profile.follow_status
+            }}
+            size="default"
+            variant="default"
+          />
+        </div>
+      )}
+      
       <ProfileStats 
         followers={followers.length} 
         following={following.length}

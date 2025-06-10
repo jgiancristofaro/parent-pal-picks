@@ -14,20 +14,19 @@ export const useProfile = (userId?: string) => {
     queryFn: async () => {
       if (!targetUserId) return null;
       
-      console.log('Fetching profile for user:', targetUserId);
+      console.log('Fetching profile with follow status for user:', targetUserId);
       
       const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', targetUserId)
-        .single();
+        .rpc('get_profile_with_follow_status', {
+          target_user_id: targetUserId
+        });
 
       if (error) {
-        console.error('Error fetching profile:', error);
+        console.error('Error fetching profile with follow status:', error);
         throw error;
       }
 
-      console.log('Profile data:', data);
+      console.log('Profile data with follow status:', data);
       return data;
     },
     enabled: !!targetUserId,

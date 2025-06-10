@@ -576,6 +576,10 @@ export type Database = {
           avatar_url: string
         }[]
       }
+      get_profile_with_follow_status: {
+        Args: { target_user_id: string }
+        Returns: Json
+      }
       get_recent_activity_summary: {
         Args: { user_id: string }
         Returns: {
