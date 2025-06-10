@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 interface Sitter {
   id: string;
   name: string;
-  experience: string | null;
-  profile_image_url: string | null;
-  hourly_rate: number | null;
+  image: string;
+  rating: number;
+  experience?: string;
+  friendRecommendationCount: number;
+  workedInUserLocationNickname?: string;
 }
 
 interface SitterSearchResultCardProps {
@@ -20,7 +22,7 @@ export const SitterSearchResultCard = ({ sitter, onSelectSitter }: SitterSearchR
     <div className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg hover:border-purple-200 hover:bg-purple-50 transition-all">
       <Avatar className="w-16 h-16">
         <AvatarImage 
-          src={sitter.profile_image_url || undefined} 
+          src={sitter.image} 
           alt={sitter.name}
           className="object-cover"
         />
@@ -34,8 +36,8 @@ export const SitterSearchResultCard = ({ sitter, onSelectSitter }: SitterSearchR
         {sitter.experience && (
           <p className="text-sm text-gray-600">{sitter.experience}</p>
         )}
-        {sitter.hourly_rate && (
-          <p className="text-sm text-gray-500">${sitter.hourly_rate}/hour</p>
+        {sitter.rating > 0 && (
+          <p className="text-sm text-gray-500">Rating: {sitter.rating}/5</p>
         )}
       </div>
       
