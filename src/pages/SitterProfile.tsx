@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Header } from "@/components/Header";
@@ -11,6 +12,7 @@ import { CertificationsSection } from "@/components/sitter/CertificationsSection
 import { RatesSection } from "@/components/sitter/RatesSection";
 import { ReviewsSection } from "@/components/sitter/ReviewsSection";
 import { ContactSitterModal } from "@/components/modals/ContactSitterModal";
+import { AddOrEditReviewButton } from "@/components/buttons/AddOrEditReviewButton";
 import { useSitterProfile } from "@/hooks/useSitterProfile";
 import { useSitterReviews } from "@/hooks/useSitterReviews";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
@@ -101,13 +103,24 @@ const SitterProfile = () => {
         
         <ReviewsSection reviews={reviews} renderStars={renderStars} />
 
-        <Button 
-          className="w-full py-6 bg-purple-500 hover:bg-purple-600 mb-6"
-          disabled={!hasContactInfo}
-          onClick={() => setIsContactModalOpen(true)}
-        >
-          Contact Now
-        </Button>
+        {/* Action Buttons Section */}
+        <div className="space-y-3">
+          <Button 
+            className="w-full py-6 bg-purple-500 hover:bg-purple-600"
+            disabled={!hasContactInfo}
+            onClick={() => setIsContactModalOpen(true)}
+          >
+            Contact Now
+          </Button>
+
+          {/* Add/Edit Review Button */}
+          <AddOrEditReviewButton
+            itemType="sitter"
+            item={sitter}
+            className="w-full border-purple-300 text-purple-700 hover:bg-purple-50 py-3"
+            variant="outline"
+          />
+        </div>
       </div>
       
       <ContactSitterModal
