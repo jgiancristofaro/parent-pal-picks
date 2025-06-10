@@ -37,9 +37,17 @@ interface SitterReviewFormProps {
     content: string;
     sitterId: string;
   };
+  selectedSitterId?: string;
+  selectedSitterData?: any;
 }
 
-export const SitterReviewForm = ({ onCancel, reviewType, editData }: SitterReviewFormProps) => {
+export const SitterReviewForm = ({ 
+  onCancel, 
+  reviewType, 
+  editData, 
+  selectedSitterId, 
+  selectedSitterData 
+}: SitterReviewFormProps) => {
   const [sitters, setSitters] = useState<DatabaseSitter[]>([]);
   const [selectedSitter, setSelectedSitter] = useState<DatabaseSitter | null>(null);
   const [showSearch, setShowSearch] = useState(true);
@@ -50,6 +58,21 @@ export const SitterReviewForm = ({ onCancel, reviewType, editData }: SitterRevie
       fetchSitters();
     }
   }, [reviewType]);
+
+  // Handle pre-selected sitter from search
+  useEffect(() => {
+    if (selectedSitterId && selectedSitterData) {
+      const databaseSitter: DatabaseSitter = {
+        id: selectedSitterData.id,
+        name: selectedSitterData.name,
+        experience: selectedSitterData.experience || null,
+        profile_image_url: selectedSitterData.image || selectedSitterData.profile_image_url,
+        hourly_rate: selectedSitterData.hourly_rate || null,
+      };
+      setSelectedSitter(databaseSitter);
+      setShowSearch(false);
+    }
+  }, [selectedSitterId, selectedSitterData]);
 
   const fetchSitters = async () => {
     const { data, error } = await supabase
@@ -110,22 +133,23 @@ export const SitterReviewForm = ({ onCancel, reviewType, editData }: SitterRevie
     );
   }
 
-  if (reviewType === "existing" && showSearch && !selectedSitter) {
-    return (
-      <SitterSearch
-        onSitterSelect={handleSitterSelect}
-        onCreateNew={handleCreateNew}
-        onBack={onCancel}
-      />
-    );
-  }
-
+  // If we have a pre-selected sitter, go directly to the form
   if (selectedSitter) {
     return (
       <EnhancedSitterReviewForm
         selectedSitter={selectedSitter}
         onCancel={onCancel}
         onBackToSearch={handleBackToSearch}
+      />
+    );
+  }
+
+  if (reviewType === "existing" && showSearch && !selectedSitter) {
+    return (
+      <SitterSearch
+        onSitterSelect={handleSitterSelect}
+        onCreateNew={handleCreateNew}
+        onBack={onCancel}
       />
     );
   }

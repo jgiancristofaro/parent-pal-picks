@@ -37,6 +37,7 @@ import NewlyRecommendedSittersPage from "./pages/NewlyRecommendedSittersPage";
 import NewlyRecommendedProductsPage from "./pages/NewlyRecommendedProductsPage";
 import EditProfile from "./pages/EditProfile";
 import AlertsPage from "./pages/AlertsPage";
+import EntitySearchPage from "./pages/EntitySearchPage";
 
 const queryClient = new QueryClient();
 
@@ -56,14 +57,16 @@ const App = () => (
             <Route path="/update-password" element={<UpdatePasswordPage />} />
             <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
             <Route path="/search" element={<ProtectedRoute><SearchSelection /></ProtectedRoute>} />
-            <Route path="/find-sitter" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+            <Route path="/find-sitter" element={<ProtectedRoute><EntitySearchPage type="sitter" mode="discovery" /></ProtectedRoute>} />
             <Route path="/find-parents" element={<ProtectedRoute><FindParents /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
             <Route path="/sitter/:id" element={<ProtectedRoute><SitterProfile /></ProtectedRoute>} />
-            <Route path="/shop" element={<ProtectedRoute><ProductSearchPage /></ProtectedRoute>} />
+            <Route path="/shop" element={<ProtectedRoute><EntitySearchPage type="product" mode="discovery" /></ProtectedRoute>} />
             <Route path="/product/:id" element={<ProtectedRoute><ProductPage /></ProtectedRoute>} />
+            <Route path="/search-for-review/sitter" element={<ProtectedRoute><EntitySearchPage type="sitter" mode="review" /></ProtectedRoute>} />
+            <Route path="/search-for-review/product" element={<ProtectedRoute><EntitySearchPage type="product" mode="review" /></ProtectedRoute>} />
             <Route path="/add-review" element={<ProtectedRoute><AddReview /></ProtectedRoute>} />
             <Route path="/activity-feed" element={<ProtectedRoute><ActivityFeedPage /></ProtectedRoute>} />
             <Route path="/newly-recommended-sitters" element={<ProtectedRoute><NewlyRecommendedSittersPage /></ProtectedRoute>} />

@@ -8,10 +8,11 @@ import { NewProductReviewFlow } from "./NewProductReviewFlow";
 import { ProductReviewForm } from "../ProductReviewForm";
 import { SitterReviewForm } from "../SitterReviewForm";
 import { useReviewFlow } from "@/hooks/useReviewFlow";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const AddReviewFlow = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const editData = location.state as any;
   const isEditMode = editData?.editMode;
 
@@ -38,6 +39,24 @@ export const AddReviewFlow = () => {
       handleProductSelect(editData.selectedProduct);
     }
   }, [editData, isEditMode, setReviewType, setProductReviewType, handleProductSelect]);
+
+  // Check if we have a selected ID from the search page
+  useEffect(() => {
+    if (location.state?.selectedId && location.state?.selectedType) {
+      const { selectedId, selectedType, selectedData } = location.state;
+      
+      if (selectedType === 'sitter') {
+        setReviewType('sitter');
+        // We'll pass the selected sitter data to the form
+      } else if (selectedType === 'product') {
+        setReviewType('product');
+        setProductReviewType('existing');
+        if (selectedData) {
+          handleProductSelect(selectedData);
+        }
+      }
+    }
+  }, [location.state, setReviewType, setProductReviewType, handleProductSelect]);
 
   // If in edit mode, skip the selection flow and go directly to the appropriate form
   if (isEditMode) {
@@ -74,6 +93,18 @@ export const AddReviewFlow = () => {
     );
   }
 
+  // If we have a selected sitter from search, go directly to the form
+  if (reviewType === "sitter" && location.state?.selectedId && location.state?.selectedType === 'sitter') {
+    return (
+      <SitterReviewForm 
+        onCancel={handleReset} 
+        reviewType="existing"
+        selectedSitterId={location.state.selectedId}
+        selectedSitterData={location.state.selectedData}
+      />
+    );
+  }
+
   // Main review type selection
   if (!reviewType) {
     return <ReviewTypeSelector onSelectReviewType={setReviewType} />;
@@ -84,17 +115,14 @@ export const AddReviewFlow = () => {
     if (!productReviewType) {
       return (
         <ProductReviewTypeSelector
-          onSelectType={handleProductTypeSelect}
+          onSelectType={(type) => {
+            if (type === "existing") {
+              navigate('/search-for-review/product');
+            } else {
+              handleProductTypeSelect(type);
+            }
+          }}
           onBack={handleReset}
-        />
-      );
-    }
-
-    if (productReviewType === "existing" && !selectedProduct) {
-      return (
-        <ProductSearch
-          onProductSelect={handleProductSelect}
-          onBack={handleBackToProductOptions}
         />
       );
     }
@@ -122,7 +150,13 @@ export const AddReviewFlow = () => {
     if (!sitterReviewType) {
       return (
         <SitterReviewTypeSelector
-          onSelectType={handleSitterTypeSelect}
+          onSelectType={(type) => {
+            if (type === "existing") {
+              navigate('/search-for-review/sitter');
+            } else {
+              handleSitterTypeSelect(type);
+            }
+          }}
           onBack={handleReset}
         />
       );

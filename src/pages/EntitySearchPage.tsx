@@ -15,6 +15,7 @@ import { useSitterData } from "@/hooks/useSitterData";
 import { useProductSearch } from "@/hooks/useProductSearch";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface EntitySearchPageProps {
   type: 'sitter' | 'product';
@@ -32,6 +33,7 @@ const EntitySearchPage = ({
   onCreateNew 
 }: EntitySearchPageProps) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const currentUserId = user?.id || "";
 
   // Sitter search logic
@@ -84,15 +86,40 @@ const EntitySearchPage = ({
     return type === 'sitter' ? 'bg-purple-50' : 'bg-gray-50';
   };
 
+  const handleSelectForReview = (item: any) => {
+    if (mode === 'review') {
+      navigate(-1, { 
+        state: { 
+          selectedId: item.id,
+          selectedType: type,
+          selectedData: item
+        }
+      });
+    }
+  };
+
+  const handleCreateNewForReview = () => {
+    if (mode === 'review') {
+      navigate(-1, { 
+        state: { 
+          createNew: true,
+          selectedType: type
+        }
+      });
+    } else if (onCreateNew) {
+      onCreateNew();
+    }
+  };
+
   const renderNoResultsMessage = () => {
-    if (mode === 'review' && onCreateNew) {
+    if (mode === 'review') {
       return (
         <div className="text-center py-8">
           <p className="text-gray-600 mb-4">
             Can't find what you're looking for?
           </p>
           <Button
-            onClick={onCreateNew}
+            onClick={handleCreateNewForReview}
             className="bg-purple-500 hover:bg-purple-600 text-white"
           >
             Create a new {type} profile
@@ -149,7 +176,7 @@ const EntitySearchPage = ({
                   <ProductSearchResultCard
                     key={product.id}
                     product={product}
-                    onSelect={() => onProductSelect?.(product)}
+                    onSelect={() => handleSelectForReview(product)}
                   />
                 ))}
               </div>
@@ -204,7 +231,7 @@ const EntitySearchPage = ({
                 <SitterSearchResultCard
                   key={sitter.id}
                   sitter={sitter}
-                  onSelectSitter={() => onSitterSelect?.(sitter)}
+                  onSelectSitter={() => handleSelectForReview(sitter)}
                 />
               ))}
             </div>
