@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { HyperLocalSitters } from "@/components/search/HyperLocalSitters";
@@ -88,7 +87,7 @@ const EntitySearchPage = ({
 
   const handleSelectForReview = (item: any) => {
     if (mode === 'review') {
-      navigate(-1, { 
+      navigate('/add-review', { 
         state: { 
           selectedId: item.id,
           selectedType: type,
@@ -100,7 +99,7 @@ const EntitySearchPage = ({
 
   const handleCreateNewForReview = () => {
     if (mode === 'review') {
-      navigate(-1, { 
+      navigate('/add-review', { 
         state: { 
           createNew: true,
           selectedType: type
