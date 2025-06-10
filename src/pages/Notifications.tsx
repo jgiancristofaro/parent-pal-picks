@@ -38,7 +38,7 @@ const Notifications = () => {
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
-      <Header title="Notifications" showBack={true} showSettings={false} backTo="/settings" />
+      <Header title="Notifications" showBack={true} showSettings={false} />
       
       <div className="px-4 py-6">
         <div className="bg-white rounded-lg shadow-sm">

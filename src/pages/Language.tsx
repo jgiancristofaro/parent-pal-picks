@@ -17,7 +17,7 @@ const Language = () => {
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
-      <Header title="Language" showBack={true} showSettings={false} backTo="/settings" />
+      <Header title="Language" showBack={true} showSettings={false} />
       
       <div className="px-4 py-6">
         <div className="bg-white rounded-lg shadow-sm">

@@ -10,7 +10,7 @@ const SearchSelection = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header title="Search" showBack={true} backTo="/" />
+      <Header title="Search" showBack={true} />
       
       <div className="px-4 py-6 pb-20">
         <div className="space-y-6">

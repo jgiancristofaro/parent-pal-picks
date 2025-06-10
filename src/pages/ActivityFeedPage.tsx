@@ -20,7 +20,6 @@ const ActivityFeedPage = () => {
         title="Friends' Activity"
         showBack={true}
         showSettings={false}
-        backTo="/"
       />
       
       <div className="px-4 py-6">

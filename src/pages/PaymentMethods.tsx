@@ -24,7 +24,7 @@ const PaymentMethods = () => {
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
-      <Header title="Payment Methods" showBack={true} showSettings={false} backTo="/settings" />
+      <Header title="Payment Methods" showBack={true} showSettings={false} />
       
       <div className="px-4 py-6">
         <div className="mb-6">

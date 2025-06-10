@@ -101,7 +101,7 @@ const AlertsPage = () => {
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
-      <Header title="Alerts" showBack={true} showSettings={false} backTo="/home" />
+      <Header title="Alerts" showBack={true} showSettings={false} />
       
       <div className="px-4 py-6 space-y-6">
         <Card>

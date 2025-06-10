@@ -23,7 +23,7 @@ const FindParents = () => {
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
-      <Header title="Find Parents" showBack={true} showSettings={false} backTo="/search" />
+      <Header title="Find Parents" showBack={true} showSettings={false} />
       
       <div className="px-4 py-6">
         <OmniSearchInput

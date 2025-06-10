@@ -19,7 +19,6 @@ const NewlyRecommendedSittersPage = () => {
         title="Sitter Recommendations"
         showBack={true}
         showSettings={false}
-        backTo="/"
       />
       
       <div className="px-4 py-6">

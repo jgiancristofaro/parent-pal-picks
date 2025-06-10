@@ -98,7 +98,7 @@ const PrivacySettings = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen pb-20 bg-gray-50">
-        <Header title="Privacy Settings" showBack={true} showSettings={false} backTo="/settings" />
+        <Header title="Privacy Settings" showBack={true} showSettings={false} />
         <div className="px-4 py-6">
           <div className="text-center">Loading...</div>
         </div>
@@ -109,7 +109,7 @@ const PrivacySettings = () => {
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
-      <Header title="Privacy Settings" showBack={true} showSettings={false} backTo="/settings" />
+      <Header title="Privacy Settings" showBack={true} showSettings={false} />
       
       <div className="px-4 py-6 space-y-6">
         {/* Phone Number Settings */}

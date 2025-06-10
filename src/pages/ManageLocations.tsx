@@ -21,7 +21,7 @@ const ManageLocations = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header title="My Homes" showBack={true} backTo="/settings" showSettings={false} />
+        <Header title="My Homes" showBack={true} showSettings={false} />
         <div className="px-4 py-6">
           <div className="text-center py-8">
             <p className="text-gray-500">Loading your home locations...</p>
@@ -39,7 +39,7 @@ const ManageLocations = () => {
     
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header title="My Homes" showBack={true} backTo="/settings" showSettings={false} />
+        <Header title="My Homes" showBack={true} showSettings={false} />
         <div className="px-4 py-6">
           <div className="text-center py-8">
             <div className="max-w-md mx-auto">
@@ -66,7 +66,7 @@ const ManageLocations = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header title="My Homes" showBack={true} backTo="/settings" showSettings={false} />
+      <Header title="My Homes" showBack={true} showSettings={false} />
       
       <div className="px-4 py-6">
         <div className="mb-6">

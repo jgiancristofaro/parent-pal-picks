@@ -80,7 +80,7 @@ const EditProfile = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header title="Edit Profile" showBack={true} backTo="/profile" />
+        <Header title="Edit Profile" showBack={true} />
         <div className="p-6 space-y-6">
           <div className="flex justify-center">
             <Skeleton className="w-24 h-24 rounded-full" />
@@ -95,7 +95,7 @@ const EditProfile = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header title="Edit Profile" showBack={true} backTo="/profile" />
+      <Header title="Edit Profile" showBack={true} />
       
       <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
         {/* Profile Picture Section */}

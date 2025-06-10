@@ -7,7 +7,7 @@ import { AddReviewFlow } from "@/components/review/AddReviewFlow";
 const AddReview = () => {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header title="Add Review" showBack={true} backTo="/" />
+      <Header title="Add Review" showBack={true} />
       
       <div className="px-4 py-6 pb-20">
         <AddReviewFlow />
