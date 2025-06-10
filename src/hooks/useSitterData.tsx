@@ -2,6 +2,7 @@
 import { useUserLocations } from "@/hooks/useUserLocations";
 import { useLocalSitters } from "@/hooks/useLocalSitters";
 import { useFriendRecommendedSitters } from "@/hooks/useFriendRecommendedSitters";
+import { useAllSitters } from "@/hooks/useAllSitters";
 
 interface Sitter {
   id: string;
@@ -49,6 +50,10 @@ export const useSitterData = ({
     true
   );
 
+  // Fetch all sitters as fallback
+  const shouldFetchAllSitters = !shouldFetchLocalSitters && !friendRecommendedOnly;
+  const { data: allSittersRaw = [], isLoading: allSittersLoading } = useAllSitters(shouldFetchAllSitters);
+
   // Transform local sitters to match SitterCard format
   const localSitters = localSittersRaw.map(sitter => ({
     id: sitter.id,
@@ -71,18 +76,31 @@ export const useSitterData = ({
     recommendedBy: sitter.recommendedBy
   }));
 
+  // Transform all sitters
+  const allSitters = allSittersRaw.map(sitter => ({
+    id: sitter.id,
+    name: sitter.name,
+    image: sitter.profile_image_url || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    rating: sitter.rating ? Number(sitter.rating) : 0,
+    experience: sitter.experience,
+    friendRecommendationCount: 0
+  }));
+
   // Determine which sitters to display based on filters
   const getDisplayedSitters = () => {
     let sittersToShow: Sitter[] = [];
 
-    // If local scope is active and we have results, use those
+    // Priority 1: Local sitters when local scope is active
     if (shouldFetchLocalSitters && localSitters.length > 0) {
       sittersToShow = localSitters;
-    } else if (friendRecommendedOnly) {
+    } 
+    // Priority 2: Friend recommended sitters when that filter is on
+    else if (friendRecommendedOnly) {
       sittersToShow = friendRecommendedSitters;
-    } else {
-      // Default to friend recommended sitters when no other filters
-      sittersToShow = friendRecommendedSitters;
+    } 
+    // Priority 3: All sitters as default fallback
+    else {
+      sittersToShow = allSitters;
     }
 
     // Apply search term filter
@@ -97,11 +115,16 @@ export const useSitterData = ({
 
   const displayedSitters = getDisplayedSitters();
 
+  // Determine if we're currently loading
+  const isLoading = locationsLoading || 
+    (shouldFetchLocalSitters && localSittersLoading) || 
+    (shouldFetchAllSitters && allSittersLoading);
+
   return {
     userLocations,
     locationsLoading,
     selectedUserHomeDetails,
-    localSittersLoading,
+    localSittersLoading: isLoading,
     shouldFetchLocalSitters,
     displayedSitters
   };

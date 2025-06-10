@@ -46,7 +46,7 @@ export const SearchResultsGrid = ({
     if (localSearchScope === "AREA_ZIP" && selectedUserHomeDetails) {
       return `Sitters from ${selectedUserHomeDetails.zip_code} area (${displayedSitters.length} found)`;
     }
-    return 'All Sitters';
+    return `All Sitters (${displayedSitters.length} found)`;
   };
 
   const getLocalRecommendationType = () => {
@@ -61,12 +61,12 @@ export const SearchResultsGrid = ({
     return null;
   };
 
-  if (localSittersLoading && shouldFetchLocalSitters) {
+  if (localSittersLoading) {
     return (
       <div className="mt-6">
         <h2 className="text-xl font-semibold mb-4">{getResultsTitle()}</h2>
         <div className="text-center py-8">
-          <p className="text-gray-500">Loading local recommendations...</p>
+          <p className="text-gray-500">Loading sitters...</p>
         </div>
       </div>
     );
@@ -93,6 +93,12 @@ export const SearchResultsGrid = ({
             <>
               <p className="text-gray-500">No local sitters found yet.</p>
               <p className="text-gray-400 text-sm mt-2">Try searching anywhere or check back later.</p>
+            </>
+          )}
+          {!searchTerm && !friendRecommendedOnly && !shouldFetchLocalSitters && (
+            <>
+              <p className="text-gray-500">No sitters found.</p>
+              <p className="text-gray-400 text-sm mt-2">Check back later for new sitter profiles.</p>
             </>
           )}
         </div>
