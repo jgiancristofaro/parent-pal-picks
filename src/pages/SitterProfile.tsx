@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -9,17 +10,19 @@ import { AboutSection } from "@/components/sitter/AboutSection";
 import { ExperienceSection } from "@/components/sitter/ExperienceSection";
 import { CertificationsSection } from "@/components/sitter/CertificationsSection";
 import { RatesSection } from "@/components/sitter/RatesSection";
-import { AvailabilitySection } from "@/components/sitter/AvailabilitySection";
 import { ReviewsSection } from "@/components/sitter/ReviewsSection";
-import { RecommendedBySection } from "@/components/sitter/RecommendedBySection";
+import { ContactSitterModal } from "@/components/modals/ContactSitterModal";
 import { useSitterProfile } from "@/hooks/useSitterProfile";
 import { useSitterReviews } from "@/hooks/useSitterReviews";
+import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const SitterProfile = () => {
   const { id } = useParams<{ id: string }>();
   const { data: sitter, isLoading: sitterLoading, error: sitterError } = useSitterProfile(id);
   const { data: reviewsData = [], isLoading: reviewsLoading } = useSitterReviews(id);
+  const { isSubscribed } = useSubscriptionStatus();
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   const renderStars = (rating: number) => {
     return Array(5).fill(0).map((_, i) => (
@@ -75,6 +78,8 @@ const SitterProfile = () => {
     content: review.content
   }));
 
+  const hasContactInfo = !!(sitter.email || sitter.phone_number);
+
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
       <Header title="Babysitter Profile" showBack={true} />
@@ -88,18 +93,32 @@ const SitterProfile = () => {
       }} renderStars={renderStars} />
 
       <div className="p-4">
-        <AboutSection about={sitter.bio || "No bio provided"} />
-        <ExperienceSection experience={sitter.experience || "Experience not specified"} />
-        <CertificationsSection certifications={sitter.certifications || []} />
-        <RatesSection rate={sitter.hourly_rate ? `$${sitter.hourly_rate}/hour` : "Rate not specified"} />
-        <AvailabilitySection />
+        {sitter.bio && <AboutSection about={sitter.bio} />}
+        {sitter.experience && <ExperienceSection experience={sitter.experience} />}
+        {sitter.certifications && sitter.certifications.length > 0 && (
+          <CertificationsSection certifications={sitter.certifications} />
+        )}
+        {sitter.hourly_rate && <RatesSection rate={`$${sitter.hourly_rate}/hour`} />}
+        
         <ReviewsSection reviews={reviews} renderStars={renderStars} />
-        <RecommendedBySection />
 
-        <Button className="w-full py-6 bg-purple-500 hover:bg-purple-600 mb-6">
-          Book Now
+        <Button 
+          className="w-full py-6 bg-purple-500 hover:bg-purple-600 mb-6"
+          disabled={!hasContactInfo}
+          onClick={() => setIsContactModalOpen(true)}
+        >
+          Contact Now
         </Button>
       </div>
+      
+      <ContactSitterModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        sitterName={sitter.name}
+        sitterEmail={sitter.email}
+        sitterPhone={sitter.phone_number}
+        isSubscribed={isSubscribed}
+      />
       
       <BottomNavigation />
     </div>
