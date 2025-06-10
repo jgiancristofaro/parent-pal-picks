@@ -7,6 +7,7 @@ export function prepareSitterData(data: CreateSitterProfileRequest): SitterData 
   
   return {
     name: sitterName,
+    email: data.email ? data.email.trim() : null,
     phone_number: data.phone_number ? data.phone_number.trim() : null,
     phone_number_searchable: false, // Default to private
     rating: 0, // Initialize with no rating yet

@@ -9,6 +9,7 @@ export interface CreateSitterProfileRequest {
 
 export interface SitterData {
   name: string;
+  email: string | null;
   phone_number: string | null;
   phone_number_searchable: boolean;
   rating: number;

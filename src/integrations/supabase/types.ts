@@ -331,6 +331,7 @@ export type Database = {
           certifications: string[] | null
           created_at: string
           created_by_user_id: string | null
+          email: string | null
           experience: string | null
           hourly_rate: number | null
           id: string
@@ -347,6 +348,7 @@ export type Database = {
           certifications?: string[] | null
           created_at?: string
           created_by_user_id?: string | null
+          email?: string | null
           experience?: string | null
           hourly_rate?: number | null
           id?: string
@@ -363,6 +365,7 @@ export type Database = {
           certifications?: string[] | null
           created_at?: string
           created_by_user_id?: string | null
+          email?: string | null
           experience?: string | null
           hourly_rate?: number | null
           id?: string
@@ -509,6 +512,7 @@ export type Database = {
           certifications: string[] | null
           created_at: string
           created_by_user_id: string | null
+          email: string | null
           experience: string | null
           hourly_rate: number | null
           id: string
