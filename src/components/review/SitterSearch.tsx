@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
 import { SitterSearchResultCard } from "./SitterSearchResultCard";
 
-interface Sitter {
+interface DatabaseSitter {
   id: string;
   name: string;
   experience: string | null;
@@ -16,15 +16,25 @@ interface Sitter {
   hourly_rate: number | null;
 }
 
+interface TransformedSitter {
+  id: string;
+  name: string;
+  image: string;
+  rating: number;
+  experience?: string;
+  friendRecommendationCount: number;
+  workedInUserLocationNickname?: string;
+}
+
 interface SitterSearchProps {
-  onSitterSelect: (sitter: Sitter) => void;
+  onSitterSelect: (sitter: TransformedSitter) => void;
   onCreateNew: () => void;
   onBack: () => void;
 }
 
 export const SitterSearch = ({ onSitterSelect, onCreateNew, onBack }: SitterSearchProps) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState<Sitter[]>([]);
+  const [searchResults, setSearchResults] = useState<DatabaseSitter[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const { toast } = useToast();
   
@@ -70,6 +80,17 @@ export const SitterSearch = ({ onSitterSelect, onCreateNew, onBack }: SitterSear
     }
   };
 
+  const transformSitter = (sitter: DatabaseSitter): TransformedSitter => {
+    return {
+      id: sitter.id,
+      name: sitter.name,
+      image: sitter.profile_image_url || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      rating: 0, // Default rating since we don't have it in the database query
+      experience: sitter.experience || undefined,
+      friendRecommendationCount: 0, // Default value
+    };
+  };
+
   const showNoResults = debouncedSearchTerm.trim() && !isSearching && searchResults.length === 0;
 
   return (
@@ -105,7 +126,7 @@ export const SitterSearch = ({ onSitterSelect, onCreateNew, onBack }: SitterSear
           {searchResults.map((sitter) => (
             <SitterSearchResultCard
               key={sitter.id}
-              sitter={sitter}
+              sitter={transformSitter(sitter)}
               onSelectSitter={onSitterSelect}
             />
           ))}
