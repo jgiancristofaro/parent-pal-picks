@@ -9,12 +9,22 @@ import { SitterSearch } from "@/components/review/SitterSearch";
 import { EnhancedSitterReviewForm } from "@/components/review/EnhancedSitterReviewForm";
 import { NewSitterReviewFlow } from "@/components/review/NewSitterReviewFlow";
 
-interface Sitter {
+interface DatabaseSitter {
   id: string;
   name: string;
   experience: string | null;
   profile_image_url: string | null;
   hourly_rate: number | null;
+}
+
+interface TransformedSitter {
+  id: string;
+  name: string;
+  image: string;
+  rating: number;
+  experience?: string;
+  friendRecommendationCount: number;
+  workedInUserLocationNickname?: string;
 }
 
 interface SitterReviewFormProps {
@@ -30,8 +40,8 @@ interface SitterReviewFormProps {
 }
 
 export const SitterReviewForm = ({ onCancel, reviewType, editData }: SitterReviewFormProps) => {
-  const [sitters, setSitters] = useState<Sitter[]>([]);
-  const [selectedSitter, setSelectedSitter] = useState<Sitter | null>(null);
+  const [sitters, setSitters] = useState<DatabaseSitter[]>([]);
+  const [selectedSitter, setSelectedSitter] = useState<DatabaseSitter | null>(null);
   const [showSearch, setShowSearch] = useState(true);
   const { toast } = useToast();
 
@@ -59,8 +69,16 @@ export const SitterReviewForm = ({ onCancel, reviewType, editData }: SitterRevie
     }
   };
 
-  const handleSitterSelect = (sitter: Sitter) => {
-    setSelectedSitter(sitter);
+  const handleSitterSelect = (transformedSitter: TransformedSitter) => {
+    // Convert TransformedSitter back to DatabaseSitter format for internal use
+    const databaseSitter: DatabaseSitter = {
+      id: transformedSitter.id,
+      name: transformedSitter.name,
+      experience: transformedSitter.experience || null,
+      profile_image_url: transformedSitter.image,
+      hourly_rate: null, // We don't have this in TransformedSitter, so default to null
+    };
+    setSelectedSitter(databaseSitter);
     setShowSearch(false);
   };
 
