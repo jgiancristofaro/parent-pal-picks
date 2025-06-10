@@ -15,6 +15,7 @@ interface RespondToFollowRequestRequest {
 interface RespondToFollowRequestResponse {
   success: boolean;
   message: string;
+  follow_back_status?: 'following' | 'not_following';
 }
 
 // Security logging utility
@@ -151,7 +152,14 @@ Deno.serve(async (req) => {
       );
     }
 
-    // If approved, create the follow relationship using our database function
+    let response: RespondToFollowRequestResponse = {
+      success: true,
+      message: response_action === 'approve' 
+        ? 'Follow request approved' 
+        : 'Follow request denied'
+    };
+
+    // If approved, create the follow relationship and check follow-back status
     if (response_action === 'approve') {
       const { error: followError } = await supabaseClient.rpc('create_follow_relationship', {
         p_follower_id: followRequest.requester_id,
@@ -172,10 +180,32 @@ Deno.serve(async (req) => {
         );
       }
 
+      // Check if the approver is already following the requester (reverse direction)
+      const { data: reverseFollow, error: reverseFollowError } = await supabaseClient
+        .from('user_follows')
+        .select('id')
+        .eq('follower_id', current_user_id)
+        .eq('following_id', followRequest.requester_id)
+        .single();
+
+      if (reverseFollowError && reverseFollowError.code !== 'PGRST116') {
+        logSecurityEvent('follow_back_check_failed', {
+          requestee_id: current_user_id,
+          requester_id: followRequest.requester_id,
+          request_id: request_id,
+          error: reverseFollowError.message,
+          error_code: reverseFollowError.code
+        });
+      }
+
+      // Set follow_back_status based on whether reverse follow exists
+      response.follow_back_status = reverseFollow ? 'following' : 'not_following';
+
       logSecurityEvent('follow_request_approved', {
         requestee_id: current_user_id,
         requester_id: followRequest.requester_id,
-        request_id: request_id
+        request_id: request_id,
+        follow_back_status: response.follow_back_status
       });
     } else {
       logSecurityEvent('follow_request_denied', {
@@ -184,13 +214,6 @@ Deno.serve(async (req) => {
         request_id: request_id
       });
     }
-
-    const response: RespondToFollowRequestResponse = {
-      success: true,
-      message: response_action === 'approve' 
-        ? 'Follow request approved' 
-        : 'Follow request denied'
-    };
 
     return new Response(
       JSON.stringify(response),
