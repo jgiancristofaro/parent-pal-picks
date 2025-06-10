@@ -45,7 +45,7 @@ export const useProfile = (userId?: string) => {
       }
 
       console.log('Profile data with follow status:', data);
-      return data as ProfileWithFollowStatus;
+      return data as unknown as ProfileWithFollowStatus;
     },
     enabled: !!targetUserId,
   });
