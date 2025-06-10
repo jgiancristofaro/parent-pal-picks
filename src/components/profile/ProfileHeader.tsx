@@ -1,17 +1,31 @@
 
+import { useQueryClient } from "@tanstack/react-query";
+import { FollowButton } from "@/components/FollowButton";
+
 interface ProfileHeaderProps {
   profileData: {
+    id?: string;
     name: string;
     role: string;
     joinedYear: number;
     profileImage: string;
     bio?: string;
     username?: string;
+    profile_privacy_setting?: string;
+    follow_status?: 'following' | 'request_pending' | 'not_following' | 'own_profile';
   };
   isOwnProfile?: boolean;
 }
 
 export const ProfileHeader = ({ profileData, isOwnProfile = false }: ProfileHeaderProps) => {
+  const queryClient = useQueryClient();
+
+  const handleFollowStatusChange = () => {
+    if (profileData.id) {
+      queryClient.invalidateQueries({ queryKey: ['profile', profileData.id] });
+    }
+  };
+
   return (
     <div className="bg-white pb-6">
       <div className="flex flex-col items-center pt-6 pb-4">
@@ -32,13 +46,29 @@ export const ProfileHeader = ({ profileData, isOwnProfile = false }: ProfileHead
           <p className="text-gray-600 text-center mt-3 px-6 max-w-md">{profileData.bio}</p>
         )}
         
-        {isOwnProfile && (
+        {isOwnProfile ? (
           <a 
             href="/profile/edit"
             className="mt-4 px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
           >
             Edit Profile
           </a>
+        ) : (
+          profileData.id && profileData.follow_status && profileData.follow_status !== 'own_profile' && (
+            <div className="mt-4">
+              <FollowButton
+                targetProfile={{
+                  id: profileData.id,
+                  full_name: profileData.name,
+                  profile_privacy_setting: profileData.profile_privacy_setting || 'private',
+                  follow_status: profileData.follow_status
+                }}
+                onStatusChange={handleFollowStatusChange}
+                size="default"
+                variant="default"
+              />
+            </div>
+          )
         )}
       </div>
     </div>
