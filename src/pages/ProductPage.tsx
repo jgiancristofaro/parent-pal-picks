@@ -8,7 +8,6 @@ import { ProductInfo } from "@/components/product/ProductInfo";
 import { ProductReviews } from "@/components/product/ProductReviews";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useUserReview } from "@/hooks/useUserReview";
 
 interface Product {
   id: string;
@@ -31,9 +30,6 @@ const ProductPage = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  
-  // Get user's review for this product
-  const { userReview, loading: userReviewLoading } = useUserReview(id);
 
   useEffect(() => {
     if (id) {
@@ -117,11 +113,7 @@ const ProductPage = () => {
             />
             
             {/* Right Column - Product Info */}
-            <ProductInfo 
-              product={product}
-              userReview={userReview}
-              userReviewLoading={userReviewLoading}
-            />
+            <ProductInfo product={product} />
           </div>
         </div>
 
