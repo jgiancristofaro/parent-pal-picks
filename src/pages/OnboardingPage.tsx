@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,10 @@ const OnboardingPage = () => {
     navigate('/login-existing');
   };
 
+  const handleNext = () => {
+    api?.scrollNext();
+  };
+
   const slides = [
     {
       headline: "ParentPal: Trusted picks for your little one, powered by friends you know.",
@@ -55,7 +60,16 @@ const OnboardingPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 flex flex-col items-center justify-center p-6 relative">
+      {/* Skip Button */}
+      <Button 
+        variant="ghost"
+        onClick={handleSignUp}
+        className="absolute top-4 right-4 z-10 text-purple-600 hover:text-purple-700 hover:bg-purple-100"
+      >
+        Skip
+      </Button>
+
       <div className="w-full max-w-md">
         <Carousel setApi={setApi} className="w-full">
           <CarouselContent>
@@ -68,7 +82,15 @@ const OnboardingPage = () => {
                   imageSrc={slide.imageSrc}
                   isFirstSlide={index === 0}
                 >
-                  {index === 2 && (
+                  {/* Conditional buttons based on slide index */}
+                  {index < 2 ? (
+                    <Button 
+                      onClick={handleNext}
+                      className="w-full py-6 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 border-0"
+                    >
+                      Next
+                    </Button>
+                  ) : (
                     <div className="space-y-3">
                       <Button 
                         onClick={handleSignUp}
