@@ -34,16 +34,14 @@ serve(async (req) => {
     console.log('=== GOOGLE API PROXY DEBUG START ===')
     console.log('Request method:', req.method)
     console.log('Request URL:', req.url)
+    console.log('Request headers:', Object.fromEntries(req.headers.entries()))
     console.log('API Key exists:', !!GOOGLE_API_KEY)
-    console.log('API Key length:', GOOGLE_API_KEY?.length || 0)
-    console.log('API Key first 10 chars:', GOOGLE_API_KEY?.substring(0, 10) || 'N/A')
 
     if (!GOOGLE_API_KEY) {
       console.error('Google API key not configured')
       return new Response(
         JSON.stringify({ 
-          error: 'Google API key not configured',
-          debug: 'GOOGLE_API_KEY environment variable is missing'
+          error: 'Google API key not configured'
         }),
         { 
           status: 500, 
@@ -52,49 +50,39 @@ serve(async (req) => {
       )
     }
 
-    // Test API key with a simple request first
-    console.log('Testing API key with simple request...')
-    const testUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=test&key=${GOOGLE_API_KEY}`
-    const testResponse = await fetch(testUrl)
-    const testData = await testResponse.json()
-    console.log('API Key test response status:', testResponse.status)
-    console.log('API Key test response:', testData)
-
-    if (testData.status && testData.status !== 'OK') {
-      console.error('API Key test failed:', testData)
-      return new Response(
-        JSON.stringify({ 
-          error: 'Google API key configuration error',
-          details: testData.error_message || testData.status,
-          debug: 'API key test failed'
-        }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
-    }
-
-    console.log('API Key test passed successfully')
-
     let requestBody: any = {}
 
     // Parse request body for POST requests
     if (req.method === 'POST') {
       try {
-        const bodyText = await req.text()
-        console.log('Raw request body length:', bodyText.length)
-        console.log('Raw request body:', bodyText)
+        const contentType = req.headers.get('content-type') || ''
+        console.log('Content-Type header:', contentType)
         
-        if (bodyText.trim()) {
-          requestBody = JSON.parse(bodyText)
-          console.log('Parsed request body:', JSON.stringify(requestBody, null, 2))
+        if (contentType.includes('application/json')) {
+          const bodyText = await req.text()
+          console.log('Raw request body length:', bodyText.length)
+          console.log('Raw request body:', bodyText)
+          
+          if (bodyText.trim()) {
+            requestBody = JSON.parse(bodyText)
+            console.log('Parsed request body:', JSON.stringify(requestBody, null, 2))
+          } else {
+            console.error('Empty request body received')
+            return new Response(
+              JSON.stringify({ 
+                error: 'Request body is required'
+              }),
+              { 
+                status: 400, 
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+              }
+            )
+          }
         } else {
-          console.error('Empty request body received')
+          console.error('Invalid content type:', contentType)
           return new Response(
             JSON.stringify({ 
-              error: 'Request body is required',
-              debug: 'Empty request body received'
+              error: 'Content-Type must be application/json'
             }),
             { 
               status: 400, 
@@ -107,7 +95,7 @@ serve(async (req) => {
         return new Response(
           JSON.stringify({ 
             error: 'Invalid JSON in request body',
-            debug: parseError.message
+            details: parseError.message
           }),
           { 
             status: 400, 
@@ -119,8 +107,7 @@ serve(async (req) => {
       console.error('Only POST method is supported')
       return new Response(
         JSON.stringify({ 
-          error: 'Only POST method is supported',
-          debug: `Received ${req.method} method`
+          error: 'Only POST method is supported'
         }),
         { 
           status: 405, 
@@ -136,8 +123,7 @@ serve(async (req) => {
       console.error('Endpoint is required but not provided')
       return new Response(
         JSON.stringify({ 
-          error: 'Endpoint is required',
-          debug: 'No endpoint specified in request body'
+          error: 'Endpoint is required'
         }),
         { 
           status: 400, 
@@ -153,8 +139,7 @@ serve(async (req) => {
         if (!requestBody?.address) {
           return new Response(
             JSON.stringify({ 
-              error: 'Address is required for geocoding',
-              debug: 'Missing address parameter'
+              error: 'Address is required for geocoding'
             }),
             { 
               status: 400, 
@@ -169,8 +154,7 @@ serve(async (req) => {
         if (!requestBody?.place_id) {
           return new Response(
             JSON.stringify({ 
-              error: 'Place ID is required for place details',
-              debug: 'Missing place_id parameter'
+              error: 'Place ID is required for place details'
             }),
             { 
               status: 400, 
@@ -185,8 +169,7 @@ serve(async (req) => {
         if (!requestBody?.input) {
           return new Response(
             JSON.stringify({ 
-              error: 'Input is required for place autocomplete',
-              debug: 'Missing input parameter'
+              error: 'Input is required for place autocomplete'
             }),
             { 
               status: 400, 
@@ -201,8 +184,7 @@ serve(async (req) => {
       default:
         return new Response(
           JSON.stringify({ 
-            error: `Invalid endpoint: ${endpoint}. Use geocode, place-details, or place-autocomplete`,
-            debug: `Unsupported endpoint: ${endpoint}`
+            error: `Invalid endpoint: ${endpoint}. Use geocode, place-details, or place-autocomplete`
           }),
           { 
             status: 400, 
@@ -218,7 +200,6 @@ serve(async (req) => {
     const data = await response.json()
 
     console.log('Google API response status:', response.status)
-    console.log('Google API response headers:', Object.fromEntries(response.headers.entries()))
     console.log('Google API response data:', JSON.stringify(data, null, 2))
 
     // Check for Google API errors
@@ -227,12 +208,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: 'Google API error', 
-          details: data.error_message || data.status,
-          debug: {
-            googleStatus: data.status,
-            googleError: data.error_message,
-            responseStatus: response.status
-          }
+          details: data.error_message || data.status
         }),
         { 
           status: 400, 
@@ -241,7 +217,7 @@ serve(async (req) => {
       )
     }
 
-    console.log('=== GOOGLE API PROXY DEBUG END ===')
+    console.log('=== GOOGLE API PROXY SUCCESS ===')
 
     return new Response(
       JSON.stringify(data),
@@ -252,15 +228,10 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in google-api-proxy:', error)
-    console.error('Error stack:', error.stack)
     return new Response(
       JSON.stringify({ 
         error: 'Internal server error', 
-        details: error instanceof Error ? error.message : 'Unknown error',
-        debug: {
-          errorType: error.constructor.name,
-          errorMessage: error instanceof Error ? error.message : 'Unknown error'
-        }
+        details: error instanceof Error ? error.message : 'Unknown error'
       }),
       { 
         status: 500, 

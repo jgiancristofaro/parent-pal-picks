@@ -48,8 +48,7 @@ class GooglePlacesService {
       console.log('GooglePlacesService: Final request body:', requestBody);
 
       const { data: result, error } = await supabase.functions.invoke('google-api-proxy', {
-        body: requestBody,
-        method: 'POST',
+        body: JSON.stringify(requestBody),
         headers: {
           'Content-Type': 'application/json',
         },

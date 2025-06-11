@@ -15,8 +15,7 @@ export const testGooglePlacesService = async () => {
     console.log('📤 Sending test request to google-api-proxy:', testData);
 
     const { data: result, error } = await supabase.functions.invoke('google-api-proxy', {
-      body: testData,
-      method: 'POST',
+      body: JSON.stringify(testData),
       headers: {
         'Content-Type': 'application/json',
       },
