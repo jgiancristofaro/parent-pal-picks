@@ -21,10 +21,14 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
 
   const {
     formData,
+    selectedPlace,
+    searchInput,
     handleSubmit,
     handleInputChange,
     handleDwellingTypeChange,
     handlePlaceSelect,
+    handleSearchInputChange,
+    handleClearAddress,
     saveLocationMutation,
   } = useLocationForm(initialData, onSuccess);
 
@@ -35,7 +39,6 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
     longitude: number;
     addressComponents: any;
   }) => {
-    // Map addressComponents to extractedComponents for the hook
     handlePlaceSelect({
       googlePlaceId: placeData.googlePlaceId,
       standardizedAddress: placeData.standardizedAddress,
@@ -88,32 +91,45 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
     handleSubmit(e, enhancedFormData);
   };
 
+  const handleClearAddressClick = () => {
+    handleClearAddress();
+    setUseManualEntry(false);
+    setManualAddressData({
+      street: "",
+      city: "",
+      state: "",
+      zipCode: ""
+    });
+  };
+
   return (
     <form onSubmit={handleFormSubmit} className="flex flex-col h-full max-h-[70vh]">
-      {/* Scrollable content area */}
-      <div className="flex-1 overflow-y-auto no-scrollbar space-y-6 pr-2">
-        <BasicInfoFields
-          formData={formData}
-          onInputChange={handleInputChange}
-          onDwellingTypeChange={handleDwellingTypeChange}
-        />
+      {/* Scrollable content area with improved padding */}
+      <div className="flex-1 overflow-y-auto no-scrollbar space-y-6 p-6">
+        {/* 1. Location Nickname */}
+        <div className="space-y-2">
+          <BasicInfoFields
+            formData={formData}
+            onInputChange={handleInputChange}
+            onDwellingTypeChange={handleDwellingTypeChange}
+            isManualEntry={useManualEntry}
+            showZipCode={false} // We'll show ZIP separately
+          />
+        </div>
 
-        {/* Address Section */}
+        {/* 2. Dwelling Type is included in BasicInfoFields above */}
+
+        {/* 3. Google Address Autocomplete */}
         <div className="space-y-4">
           {!useManualEntry ? (
-            <>
-              <GooglePlacesAutocomplete
-                onPlaceSelect={handleGooglePlaceSelect}
-                onEscapeHatch={() => setUseManualEntry(true)}
-              />
-              
-              {formData.google_place_id && (
-                <UnitNumberField
-                  value={unitNumber}
-                  onChange={setUnitNumber}
-                />
-              )}
-            </>
+            <GooglePlacesAutocomplete
+              searchValue={searchInput}
+              onSearchChange={handleSearchInputChange}
+              onPlaceSelect={handleGooglePlaceSelect}
+              onEscapeHatch={() => setUseManualEntry(true)}
+              selectedPlace={selectedPlace}
+              onClearAddress={handleClearAddressClick}
+            />
           ) : (
             <ManualAddressForm
               formData={manualAddressData}
@@ -123,25 +139,47 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
           )}
         </div>
 
-        {/* Selected Address Display */}
-        {formData.standardized_address && !useManualEntry && (
+        {/* 4. Unit Number Field - only show if address is selected */}
+        {(selectedPlace || useManualEntry) && (
+          <UnitNumberField
+            value={unitNumber}
+            onChange={setUnitNumber}
+          />
+        )}
+
+        {/* 5. ZIP Code - show auto-filled or manual entry */}
+        {(selectedPlace || useManualEntry) && (
+          <BasicInfoFields
+            formData={formData}
+            onInputChange={handleInputChange}
+            onDwellingTypeChange={handleDwellingTypeChange}
+            isManualEntry={useManualEntry}
+            showZipCode={true}
+          />
+        )}
+
+        {/* Selected Address Confirmation - single green version only */}
+        {selectedPlace && !useManualEntry && (
           <div className="p-4 bg-green-50 border border-green-200 rounded-md">
             <h4 className="font-medium text-sm mb-2 text-green-800">Selected Address:</h4>
-            <p className="text-sm text-green-700">{formData.standardized_address}</p>
+            <p className="text-sm text-green-700">{selectedPlace.standardizedAddress}</p>
             {unitNumber && (
               <p className="text-sm text-green-700 mt-1">Unit: {unitNumber}</p>
             )}
           </div>
         )}
 
-        <PrimaryHomeCheckbox
-          formData={formData}
-          onInputChange={handleInputChange}
-        />
+        {/* 6. Primary Home Checkbox with improved spacing */}
+        <div className="pb-4">
+          <PrimaryHomeCheckbox
+            formData={formData}
+            onInputChange={handleInputChange}
+          />
+        </div>
       </div>
 
       {/* Fixed submit button area */}
-      <div className="flex justify-end space-x-2 pt-4 border-t bg-white">
+      <div className="flex justify-end space-x-2 pt-4 border-t bg-white px-6">
         <Button 
           type="submit" 
           disabled={saveLocationMutation.isPending}

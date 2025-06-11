@@ -21,6 +21,10 @@ export const useLocationForm = (initialData?: any, onSuccess?: () => void) => {
     latitude: initialData?.latitude || undefined,
     longitude: initialData?.longitude || undefined,
   });
+
+  // New state for managing Google Places selection
+  const [selectedPlace, setSelectedPlace] = useState<any>(null);
+  const [searchInput, setSearchInput] = useState("");
   
   const { toast } = useToast();
 
@@ -117,6 +121,7 @@ export const useLocationForm = (initialData?: any, onSuccess?: () => void) => {
     longitude: number;
     extractedComponents: any;
   }) => {
+    // Update form data
     setFormData(prev => ({
       ...prev,
       google_place_id: placeData.googlePlaceId,
@@ -128,14 +133,49 @@ export const useLocationForm = (initialData?: any, onSuccess?: () => void) => {
       // Auto-fill zip code if available from Google
       zip_code: placeData.extractedComponents.zip_code || prev.zip_code,
     }));
+
+    // Update selected place state
+    setSelectedPlace({
+      googlePlaceId: placeData.googlePlaceId,
+      standardizedAddress: placeData.standardizedAddress,
+      latitude: placeData.latitude,
+      longitude: placeData.longitude,
+      extractedComponents: placeData.extractedComponents,
+    });
+
+    // Clear search input and hide dropdown
+    setSearchInput("");
+  };
+
+  const handleSearchInputChange = (value: string) => {
+    setSearchInput(value);
+  };
+
+  const handleClearAddress = () => {
+    setSelectedPlace(null);
+    setSearchInput("");
+    setFormData(prev => ({
+      ...prev,
+      google_place_id: undefined,
+      standardized_address: undefined,
+      latitude: undefined,
+      longitude: undefined,
+      street: "",
+      city: "",
+      zip_code: "",
+    }));
   };
 
   return {
     formData,
+    selectedPlace,
+    searchInput,
     handleSubmit,
     handleInputChange,
     handleDwellingTypeChange,
     handlePlaceSelect,
+    handleSearchInputChange,
+    handleClearAddress,
     saveLocationMutation,
   };
 };

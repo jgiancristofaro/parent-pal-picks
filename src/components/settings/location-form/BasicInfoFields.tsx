@@ -8,12 +8,16 @@ interface BasicInfoFieldsProps {
   formData: LocationFormData;
   onInputChange: (field: keyof LocationFormData, value: string | boolean) => void;
   onDwellingTypeChange: (value: string) => void;
+  isManualEntry?: boolean;
+  showZipCode?: boolean;
 }
 
 export const BasicInfoFields = ({ 
   formData, 
   onInputChange, 
-  onDwellingTypeChange 
+  onDwellingTypeChange,
+  isManualEntry = false,
+  showZipCode = true
 }: BasicInfoFieldsProps) => {
   return (
     <>
@@ -43,17 +47,24 @@ export const BasicInfoFields = ({
         </Select>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="zip_code">ZIP Code *</Label>
-        <Input
-          id="zip_code"
-          type="text"
-          placeholder="e.g., 10001"
-          value={formData.zip_code}
-          onChange={(e) => onInputChange('zip_code', e.target.value)}
-          required
-        />
-      </div>
+      {(isManualEntry || showZipCode) && (
+        <div className="space-y-2">
+          <Label htmlFor="zip_code">ZIP Code *</Label>
+          <Input
+            id="zip_code"
+            type="text"
+            placeholder="e.g., 10001"
+            value={formData.zip_code}
+            onChange={(e) => onInputChange('zip_code', e.target.value)}
+            required
+            readOnly={!isManualEntry && formData.zip_code && formData.google_place_id}
+            className={!isManualEntry && formData.zip_code && formData.google_place_id ? "bg-gray-50" : ""}
+          />
+          {!isManualEntry && formData.zip_code && formData.google_place_id && (
+            <p className="text-xs text-gray-500">Auto-filled from selected address</p>
+          )}
+        </div>
+      )}
     </>
   );
 };
