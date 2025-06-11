@@ -10,6 +10,7 @@ interface BasicInfoFieldsProps {
   onDwellingTypeChange: (value: string) => void;
   isManualEntry?: boolean;
   showZipCode?: boolean;
+  selectedPlace?: any;
 }
 
 export const BasicInfoFields = ({ 
@@ -17,7 +18,8 @@ export const BasicInfoFields = ({
   onInputChange, 
   onDwellingTypeChange,
   isManualEntry = false,
-  showZipCode = true
+  showZipCode = true,
+  selectedPlace
 }: BasicInfoFieldsProps) => {
   return (
     <>
@@ -47,6 +49,7 @@ export const BasicInfoFields = ({
         </Select>
       </div>
 
+      {/* Only show ZIP code field if manual entry or showZipCode is true */}
       {(isManualEntry || showZipCode) && (
         <div className="space-y-2">
           <Label htmlFor="zip_code">ZIP Code *</Label>
@@ -57,10 +60,10 @@ export const BasicInfoFields = ({
             value={formData.zip_code}
             onChange={(e) => onInputChange('zip_code', e.target.value)}
             required
-            readOnly={!isManualEntry && formData.zip_code && formData.google_place_id}
-            className={!isManualEntry && formData.zip_code && formData.google_place_id ? "bg-gray-50" : ""}
+            readOnly={!isManualEntry && formData.zip_code && selectedPlace}
+            className={!isManualEntry && formData.zip_code && selectedPlace ? "bg-gray-50" : ""}
           />
-          {!isManualEntry && formData.zip_code && formData.google_place_id && (
+          {!isManualEntry && formData.zip_code && selectedPlace && (
             <p className="text-xs text-gray-500">Auto-filled from selected address</p>
           )}
         </div>
