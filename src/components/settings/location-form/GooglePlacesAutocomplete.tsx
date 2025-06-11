@@ -174,6 +174,11 @@ export const GooglePlacesAutocomplete = ({
                 <AlertTriangle className="h-4 w-4" />
                 <span className="text-sm">{error}</span>
               </div>
+              {error.includes('API key') && (
+                <div className="mt-2 text-xs text-red-600">
+                  This appears to be a configuration issue. Please contact support if the problem persists.
+                </div>
+              )}
             </div>
           )}
           

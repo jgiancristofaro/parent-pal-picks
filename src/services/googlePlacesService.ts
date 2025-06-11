@@ -55,20 +55,32 @@ class GooglePlacesService {
         },
       });
 
+      console.log('GooglePlacesService: Raw response:', { result, error });
+
       if (error) {
         console.error(`GooglePlacesService: Supabase function error for ${endpoint}:`, error);
         
-        // Check if it's a network error or function error
-        if (error.message?.includes('non-2xx status code')) {
-          throw new Error(`Google API request failed: Server returned an error. Please check your network connection and try again.`);
+        // More specific error handling
+        if (error.message?.includes('FunctionsHttpError')) {
+          throw new Error(`Google API service is currently unavailable. Please try again in a moment.`);
+        } else if (error.message?.includes('FunctionsRelayError')) {
+          throw new Error(`Network connection error. Please check your internet connection and try again.`);
+        } else if (error.message?.includes('non-2xx status code')) {
+          throw new Error(`Google API request failed. This might be due to API key configuration or rate limits.`);
         } else {
-          throw new Error(`Failed to call Google API: ${error.message}`);
+          throw new Error(`Failed to connect to address service: ${error.message}`);
         }
       }
 
       if (!result) {
         console.error(`GooglePlacesService: No result returned for ${endpoint}`);
-        throw new Error('No response received from Google API');
+        throw new Error('No response received from address service');
+      }
+
+      // Check for Google API specific errors in the result
+      if (result.error) {
+        console.error(`GooglePlacesService: Google API error in result:`, result);
+        throw new Error(`Address lookup failed: ${result.error.details || result.error}`);
       }
 
       console.log(`GooglePlacesService: Success response from ${endpoint}:`, result);
@@ -76,11 +88,11 @@ class GooglePlacesService {
     } catch (error) {
       console.error(`GooglePlacesService: Network/parsing error for ${endpoint}:`, error);
       
-      if (error instanceof Error && error.message.includes('Google API request failed')) {
+      if (error instanceof Error && error.message.includes('Google API')) {
         throw error; // Re-throw our custom error
       }
       
-      throw new Error(`Failed to call Google API: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(`Address service error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
