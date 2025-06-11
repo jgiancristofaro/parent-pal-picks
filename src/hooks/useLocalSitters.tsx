@@ -36,7 +36,7 @@ export const useLocalSitters = (
       let data = [];
 
       if (searchScope === 'BUILDING' && locationData.google_place_id) {
-        // Use the new search_sitters function for building-level search
+        // Use the search_sitters function for building-level search with Google Place ID
         const { data: sittersData, error } = await supabase
           .rpc('search_sitters', {
             home_place_id: locationData.google_place_id,

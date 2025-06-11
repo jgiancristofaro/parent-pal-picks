@@ -35,8 +35,12 @@ export const useSitterData = ({
   // Get selected home details
   const selectedUserHomeDetails = userLocations.find(loc => loc.id === selectedUserHomeId);
 
-  // Fetch local sitters when local scope is active
-  const shouldFetchLocalSitters = localSearchScope !== "ANY" && selectedUserHomeId !== null;
+  // Determine if we should fetch local sitters based on having a valid google_place_id
+  const shouldFetchLocalSitters = localSearchScope !== "ANY" && 
+    selectedUserHomeId !== null && 
+    selectedUserHomeDetails?.google_place_id;
+
+  // Fetch local sitters when local scope is active and we have a valid google_place_id
   const { data: localSittersRaw = [], isLoading: localSittersLoading } = useLocalSitters(
     currentUserId,
     selectedUserHomeId || undefined,
@@ -90,7 +94,7 @@ export const useSitterData = ({
   const getDisplayedSitters = () => {
     let sittersToShow: Sitter[] = [];
 
-    // Priority 1: Local sitters when local scope is active
+    // Priority 1: Local sitters when local scope is active and we have valid data
     if (shouldFetchLocalSitters && localSitters.length > 0) {
       sittersToShow = localSitters;
     } 
