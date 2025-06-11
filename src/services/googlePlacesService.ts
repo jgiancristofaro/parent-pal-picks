@@ -55,11 +55,11 @@ class GooglePlacesService {
 
   async geocodeAddress(address: string): Promise<PlaceDetails[]> {
     try {
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/google-api-proxy?endpoint=geocode`, {
+      const response = await fetch(`https://jmyfwrbwpbbbmoournsg.supabase.co/functions/v1/google-api-proxy?endpoint=geocode`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.supabaseKey}`,
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpteWZ3cmJ3cGJiYm1vb3VybnNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMDgyNTQsImV4cCI6MjA2MzY4NDI1NH0.rV3Tvvw1FeKarR5DSVoensPWowEHIr_WRBL__hqZNe0`,
         },
         body: JSON.stringify({ address }),
       });
@@ -79,11 +79,11 @@ class GooglePlacesService {
 
   async getPlaceDetails(placeId: string): Promise<PlaceDetails | null> {
     try {
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/google-api-proxy?endpoint=place-details`, {
+      const response = await fetch(`https://jmyfwrbwpbbbmoournsg.supabase.co/functions/v1/google-api-proxy?endpoint=place-details`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.supabaseKey}`,
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpteWZ3cmJ3cGJiYm1vb3VybnNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMDgyNTQsImV4cCI6MjA2MzY4NDI1NH0.rV3Tvvw1FeKarR5DSVoensPWowEHIr_WRBL__hqZNe0`,
         },
         body: JSON.stringify({ place_id: placeId }),
       });
@@ -103,11 +103,11 @@ class GooglePlacesService {
 
   async getPlaceAutocomplete(input: string, types = 'address'): Promise<AutocompletePrediction[]> {
     try {
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/google-api-proxy?endpoint=place-autocomplete`, {
+      const response = await fetch(`https://jmyfwrbwpbbbmoournsg.supabase.co/functions/v1/google-api-proxy?endpoint=place-autocomplete`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.supabaseKey}`,
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpteWZ3cmJ3cGJiYm1vb3VybnNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMDgyNTQsImV4cCI6MjA2MzY4NDI1NH0.rV3Tvvw1FeKarR5DSVoensPWowEHIr_WRBL__hqZNe0`,
         },
         body: JSON.stringify({ input, types }),
       });

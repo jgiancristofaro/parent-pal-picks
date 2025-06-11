@@ -6,7 +6,7 @@ import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { MapPin, Loader2 } from "lucide-react";
 import { googlePlacesService, AutocompletePrediction, PlaceDetails } from "@/services/googlePlacesService";
-import { useDebouncedValue } from "@/hooks/useDebouncedSearch";
+import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
 
 interface AddressAutocompleteProps {
   value: string;
@@ -26,7 +26,7 @@ export const AddressAutocomplete = ({
   const [isOpen, setIsOpen] = useState(false);
   const [predictions, setPredictions] = useState<AutocompletePrediction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [debouncedValue] = useDebouncedValue(value, 300);
+  const debouncedValue = useDebouncedSearch(value, 300);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
