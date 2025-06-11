@@ -406,11 +406,13 @@ export type Database = {
           building_identifier: string
           created_at: string
           dwelling_type: Database["public"]["Enums"]["dwelling_type_enum"]
+          google_place_id: string | null
           id: string
           is_primary: boolean | null
           latitude: number | null
           location_nickname: string
           longitude: number | null
+          standardized_address: string | null
           updated_at: string
           user_id: string
           zip_code: string
@@ -420,11 +422,13 @@ export type Database = {
           building_identifier: string
           created_at?: string
           dwelling_type?: Database["public"]["Enums"]["dwelling_type_enum"]
+          google_place_id?: string | null
           id?: string
           is_primary?: boolean | null
           latitude?: number | null
           location_nickname: string
           longitude?: number | null
+          standardized_address?: string | null
           updated_at?: string
           user_id: string
           zip_code?: string
@@ -434,11 +438,13 @@ export type Database = {
           building_identifier?: string
           created_at?: string
           dwelling_type?: Database["public"]["Enums"]["dwelling_type_enum"]
+          google_place_id?: string | null
           id?: string
           is_primary?: boolean | null
           latitude?: number | null
           location_nickname?: string
           longitude?: number | null
+          standardized_address?: string | null
           updated_at?: string
           user_id?: string
           zip_code?: string
