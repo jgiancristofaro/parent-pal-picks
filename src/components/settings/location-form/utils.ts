@@ -21,9 +21,7 @@ export const validateFormData = (formData: any) => {
     errors.push("ZIP code is required.");
   }
 
-  if (formData.dwelling_type === 'APARTMENT_BUILDING' && !formData.building_identifier.trim()) {
-    errors.push("Building identifier is required for apartment buildings.");
-  }
+  // Removed the building_identifier requirement - it's now optional
 
   return errors;
 };

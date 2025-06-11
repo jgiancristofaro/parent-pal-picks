@@ -18,17 +18,16 @@ export const BuildingIdentifierField = ({
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="building_identifier">Building Identifier *</Label>
+      <Label htmlFor="building_identifier">Building Identifier</Label>
       <Input
         id="building_identifier"
         type="text"
         placeholder="e.g., The Grand Plaza Main Tower"
         value={formData.building_identifier}
         onChange={(e) => onInputChange('building_identifier', e.target.value)}
-        required
       />
       <p className="text-sm text-gray-500">
-        Use a consistent name that neighbors in your building would recognize and use.
+        Optional: Use a consistent name that neighbors in your building would recognize and use.
       </p>
     </div>
   );
