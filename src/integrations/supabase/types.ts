@@ -681,6 +681,24 @@ export type Database = {
           profile_privacy_setting: Database["public"]["Enums"]["profile_privacy_enum"]
         }[]
       }
+      search_sitters: {
+        Args: { home_place_id: string; current_user_id?: string }
+        Returns: {
+          id: string
+          name: string
+          profile_image_url: string
+          rating: number
+          experience: string
+          bio: string
+          hourly_rate: number
+          certifications: string[]
+          phone_number: string
+          email: string
+          review_count: number
+          created_at: string
+          updated_at: string
+        }[]
+      }
       set_limit: {
         Args: { "": number }
         Returns: number

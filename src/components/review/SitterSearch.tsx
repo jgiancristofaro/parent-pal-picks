@@ -52,11 +52,13 @@ export const SitterSearch = ({ onSitterSelect, onCreateNew, onBack }: SitterSear
     setIsSearching(true);
     
     try {
-      const { data, error } = await supabase
-        .from("sitters")
-        .select("id, name, experience, profile_image_url, hourly_rate")
-        .or(`name.ilike.%${term}%,phone_number.ilike.%${term}%`)
-        .order("name");
+      // Use the new search_sitters edge function instead of direct database query
+      const { data, error } = await supabase.functions.invoke('search_sitters', {
+        body: {
+          search_term: term,
+          current_user_id: (await supabase.auth.getUser()).data.user?.id
+        }
+      });
 
       if (error) {
         console.error("Error searching sitters:", error);
@@ -66,7 +68,15 @@ export const SitterSearch = ({ onSitterSelect, onCreateNew, onBack }: SitterSear
           variant: "destructive",
         });
       } else {
-        setSearchResults(data || []);
+        // Transform the results from the edge function response
+        const transformedResults = (data || []).map((sitter: any) => ({
+          id: sitter.sitter_id,
+          name: sitter.full_name,
+          experience: null,
+          profile_image_url: sitter.avatar_url,
+          hourly_rate: null
+        }));
+        setSearchResults(transformedResults);
       }
     } catch (error) {
       console.error("Search error:", error);
