@@ -9,6 +9,7 @@ interface UserLocation {
   id: string;
   location_nickname: string;
   dwelling_type: string;
+  google_place_id: string | null;
 }
 
 interface UserLocationDetails {
@@ -17,6 +18,7 @@ interface UserLocationDetails {
   dwelling_type: string;
   building_identifier: string | null;
   zip_code: string;
+  google_place_id: string | null;
 }
 
 interface SearchFiltersProps {

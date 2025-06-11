@@ -45,7 +45,7 @@ export const useSitterData = ({
     currentUserId,
     selectedUserHomeId || undefined,
     localSearchScope as 'BUILDING' | 'AREA_ZIP',
-    shouldFetchLocalSitters
+    Boolean(shouldFetchLocalSitters)
   );
 
   // Fetch friend recommended sitters
