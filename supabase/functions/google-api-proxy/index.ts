@@ -7,14 +7,17 @@ const corsHeaders = {
 }
 
 interface GeocodeRequest {
+  endpoint: string;
   address: string;
 }
 
 interface PlaceDetailsRequest {
+  endpoint: string;
   place_id: string;
 }
 
 interface PlaceAutocompleteRequest {
+  endpoint: string;
   input: string;
   types?: string;
 }
@@ -26,11 +29,10 @@ serve(async (req) => {
   }
 
   try {
-    const { searchParams } = new URL(req.url)
-    const endpoint = searchParams.get('endpoint')
     const GOOGLE_API_KEY = Deno.env.get('GOOGLE_API_KEY')
 
     if (!GOOGLE_API_KEY) {
+      console.error('Google API key not configured')
       return new Response(
         JSON.stringify({ error: 'Google API key not configured' }),
         { 
@@ -40,13 +42,34 @@ serve(async (req) => {
       )
     }
 
-    let googleUrl: string
-    let requestBody: any = null
+    let requestBody: any = {}
 
     // Parse request body for POST requests
     if (req.method === 'POST') {
-      requestBody = await req.json()
+      try {
+        const bodyText = await req.text()
+        console.log('Raw request body:', bodyText)
+        
+        if (bodyText.trim()) {
+          requestBody = JSON.parse(bodyText)
+          console.log('Parsed request body:', requestBody)
+        }
+      } catch (parseError) {
+        console.error('Failed to parse request body:', parseError)
+        return new Response(
+          JSON.stringify({ error: 'Invalid JSON in request body' }),
+          { 
+            status: 400, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        )
+      }
     }
+
+    const endpoint = requestBody.endpoint
+    console.log('Processing endpoint:', endpoint)
+
+    let googleUrl: string
 
     switch (endpoint) {
       case 'geocode':
@@ -99,9 +122,14 @@ serve(async (req) => {
         )
     }
 
+    console.log('Making request to Google API:', googleUrl.replace(GOOGLE_API_KEY, '[REDACTED]'))
+
     // Make request to Google API
     const response = await fetch(googleUrl)
     const data = await response.json()
+
+    console.log('Google API response status:', response.status)
+    console.log('Google API response data:', data)
 
     // Check for Google API errors
     if (data.status && data.status !== 'OK') {
@@ -128,7 +156,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in google-api-proxy:', error)
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
