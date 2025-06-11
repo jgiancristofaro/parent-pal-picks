@@ -42,6 +42,9 @@ serve(async (req) => {
       )
     }
 
+    console.log('Request method:', req.method)
+    console.log('Request headers:', Object.fromEntries(req.headers.entries()))
+
     let requestBody: any = {}
 
     // Parse request body for POST requests
@@ -53,6 +56,15 @@ serve(async (req) => {
         if (bodyText.trim()) {
           requestBody = JSON.parse(bodyText)
           console.log('Parsed request body:', requestBody)
+        } else {
+          console.error('Empty request body received')
+          return new Response(
+            JSON.stringify({ error: 'Request body is required' }),
+            { 
+              status: 400, 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            }
+          )
         }
       } catch (parseError) {
         console.error('Failed to parse request body:', parseError)
@@ -64,10 +76,30 @@ serve(async (req) => {
           }
         )
       }
+    } else {
+      console.error('Only POST method is supported')
+      return new Response(
+        JSON.stringify({ error: 'Only POST method is supported' }),
+        { 
+          status: 405, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
     }
 
     const endpoint = requestBody.endpoint
     console.log('Processing endpoint:', endpoint)
+
+    if (!endpoint) {
+      console.error('Endpoint is required but not provided')
+      return new Response(
+        JSON.stringify({ error: 'Endpoint is required' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
 
     let googleUrl: string
 
@@ -114,7 +146,7 @@ serve(async (req) => {
 
       default:
         return new Response(
-          JSON.stringify({ error: 'Invalid endpoint. Use geocode, place-details, or place-autocomplete' }),
+          JSON.stringify({ error: `Invalid endpoint: ${endpoint}. Use geocode, place-details, or place-autocomplete` }),
           { 
             status: 400, 
             headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
