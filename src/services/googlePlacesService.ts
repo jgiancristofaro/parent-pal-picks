@@ -1,4 +1,6 @@
 
+import { supabase } from "@/integrations/supabase/client";
+
 export interface AddressComponent {
   long_name: string;
   short_name: string;
@@ -34,103 +36,91 @@ export interface AutocompleteResponse {
 }
 
 class GooglePlacesService {
-  private async callGoogleAPI(endpoint: string, requestData: any) {
-    console.log(`GooglePlacesService: Calling ${endpoint} with data:`, requestData);
-    
-    try {
-      // Construct the Edge Function URL directly
-      const edgeFunctionUrl = 'https://jmyfwrbwpbbbmoournsg.supabase.co/functions/v1/google-api-proxy';
-      
-      const requestBody = {
-        endpoint,
-        ...requestData
-      };
+  private async callGoogleAPI(endpoint: string, data: any) {
+    const { data: result, error } = await supabase.functions.invoke('google-api-proxy', {
+      body: data,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-      console.log('GooglePlacesService: Final request body:', requestBody);
-
-      // Make direct fetch request with proper headers
-      const response = await fetch(edgeFunctionUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpteWZ3cmJ3cGJiYm1vb3VybnNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMDgyNTQsImV4cCI6MjA2MzY4NDI1NH0.rV3Tvvw1FeKarR5DSVoensPWowEHIr_WRBL__hqZNe0`,
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpteWZ3cmJ3cGJiYm1vb3VybnNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMDgyNTQsImV4cCI6MjA2MzY4NDI1NH0.rV3Tvvw1FeKarR5DSVoensPWowEHIr_WRBL__hqZNe0'
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      console.log('GooglePlacesService: Response status:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('GooglePlacesService: Direct fetch failed with status:', response.status);
-        console.error('GooglePlacesService: Error response body:', errorText);
-        
-        if (response.status === 500) {
-          throw new Error(`Google API service is currently unavailable. Please try again in a moment.`);
-        } else if (response.status === 400) {
-          throw new Error(`Google API request failed. This might be due to API key configuration or rate limits.`);
-        } else {
-          throw new Error(`Failed to connect to address service: ${response.status} ${response.statusText}`);
-        }
-      }
-
-      const result = await response.json();
-      console.log('GooglePlacesService: Response data:', result);
-
-      // Check for Google API specific errors in the result
-      if (result.error) {
-        console.error(`GooglePlacesService: Google API error in result:`, result);
-        throw new Error(`Address lookup failed: ${result.error.details || result.error}`);
-      }
-
-      console.log(`GooglePlacesService: Success response from ${endpoint}:`, result);
-      return result;
-    } catch (error) {
-      console.error(`GooglePlacesService: Network/parsing error for ${endpoint}:`, error);
-      
-      if (error instanceof Error && error.message.includes('Google API')) {
-        throw error; // Re-throw our custom error
-      }
-      
-      throw new Error(`Address service error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    if (error) {
+      console.error('Error calling Google API proxy:', error);
+      throw new Error('Failed to call Google API');
     }
+
+    return result;
   }
 
   async geocodeAddress(address: string): Promise<PlaceDetails[]> {
     try {
-      console.log('GooglePlacesService: Geocoding address:', address);
+      const response = await fetch(`https://jmyfwrbwpbbbmoournsg.supabase.co/functions/v1/google-api-proxy?endpoint=geocode`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpteWZ3cmJ3cGJiYm1vb3VybnNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMDgyNTQsImV4cCI6MjA2MzY4NDI1NH0.rV3Tvvw1FeKarR5DSVoensPWowEHIr_WRBL__hqZNe0`,
+        },
+        body: JSON.stringify({ address }),
+      });
+
+      const data = await response.json();
       
-      const result = await this.callGoogleAPI('geocode', { address });
-      return result?.results || [];
+      if (!response.ok) {
+        throw new Error(data.error || 'Geocoding failed');
+      }
+
+      return data.results || [];
     } catch (error) {
-      console.error('GooglePlacesService: Geocoding error:', error);
+      console.error('Geocoding error:', error);
       throw error;
     }
   }
 
   async getPlaceDetails(placeId: string): Promise<PlaceDetails | null> {
     try {
-      console.log('GooglePlacesService: Getting place details for:', placeId);
+      const response = await fetch(`https://jmyfwrbwpbbbmoournsg.supabase.co/functions/v1/google-api-proxy?endpoint=place-details`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpteWZ3cmJ3cGJiYm1vb3VybnNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMDgyNTQsImV4cCI6MjA2MzY4NDI1NH0.rV3Tvvw1FeKarR5DSVoensPWowEHIr_WRBL__hqZNe0`,
+        },
+        body: JSON.stringify({ place_id: placeId }),
+      });
+
+      const data = await response.json();
       
-      const result = await this.callGoogleAPI('place-details', { place_id: placeId });
-      return result?.result || null;
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to get place details');
+      }
+
+      return data.result || null;
     } catch (error) {
-      console.error('GooglePlacesService: Place details error:', error);
+      console.error('Place details error:', error);
       throw error;
     }
   }
 
   async getPlaceAutocomplete(input: string, types = 'address'): Promise<AutocompletePrediction[]> {
     try {
-      console.log('GooglePlacesService: Getting autocomplete for:', input, 'types:', types);
+      const response = await fetch(`https://jmyfwrbwpbbbmoournsg.supabase.co/functions/v1/google-api-proxy?endpoint=place-autocomplete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpteWZ3cmJ3cGJiYm1vb3VybnNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMDgyNTQsImV4cCI6MjA2MzY4NDI1NH0.rV3Tvvw1FeKarR5DSVoensPWowEHIr_WRBL__hqZNe0`,
+        },
+        body: JSON.stringify({ input, types }),
+      });
+
+      const data = await response.json();
       
-      const result = await this.callGoogleAPI('place-autocomplete', { input, types });
-      
-      console.log('GooglePlacesService: Autocomplete response:', result);
-      return result?.predictions || [];
+      if (!response.ok) {
+        throw new Error(data.error || 'Autocomplete failed');
+      }
+
+      return data.predictions || [];
     } catch (error) {
-      console.error('GooglePlacesService: Autocomplete error:', error);
+      console.error('Autocomplete error:', error);
       throw error;
     }
   }
