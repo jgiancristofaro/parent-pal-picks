@@ -1,6 +1,4 @@
 
-import { supabase } from "@/integrations/supabase/client";
-
 export interface AddressComponent {
   long_name: string;
   short_name: string;
@@ -40,6 +38,9 @@ class GooglePlacesService {
     console.log(`GooglePlacesService: Calling ${endpoint} with data:`, requestData);
     
     try {
+      // Construct the Edge Function URL directly
+      const edgeFunctionUrl = 'https://jmyfwrbwpbbbmoournsg.supabase.co/functions/v1/google-api-proxy';
+      
       const requestBody = {
         endpoint,
         ...requestData
@@ -47,34 +48,35 @@ class GooglePlacesService {
 
       console.log('GooglePlacesService: Final request body:', requestBody);
 
-      const { data: result, error } = await supabase.functions.invoke('google-api-proxy', {
-        body: JSON.stringify(requestBody),
+      // Make direct fetch request with proper headers
+      const response = await fetch(edgeFunctionUrl, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpteWZ3cmJ3cGJiYm1vb3VybnNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMDgyNTQsImV4cCI6MjA2MzY4NDI1NH0.rV3Tvvw1FeKarR5DSVoensPWowEHIr_WRBL__hqZNe0`,
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpteWZ3cmJ3cGJiYm1vb3VybnNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMDgyNTQsImV4cCI6MjA2MzY4NDI1NH0.rV3Tvvw1FeKarR5DSVoensPWowEHIr_WRBL__hqZNe0'
         },
+        body: JSON.stringify(requestBody)
       });
 
-      console.log('GooglePlacesService: Raw response:', { result, error });
+      console.log('GooglePlacesService: Response status:', response.status);
 
-      if (error) {
-        console.error(`GooglePlacesService: Supabase function error for ${endpoint}:`, error);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('GooglePlacesService: Direct fetch failed with status:', response.status);
+        console.error('GooglePlacesService: Error response body:', errorText);
         
-        // More specific error handling
-        if (error.message?.includes('FunctionsHttpError')) {
+        if (response.status === 500) {
           throw new Error(`Google API service is currently unavailable. Please try again in a moment.`);
-        } else if (error.message?.includes('FunctionsRelayError')) {
-          throw new Error(`Network connection error. Please check your internet connection and try again.`);
-        } else if (error.message?.includes('non-2xx status code')) {
+        } else if (response.status === 400) {
           throw new Error(`Google API request failed. This might be due to API key configuration or rate limits.`);
         } else {
-          throw new Error(`Failed to connect to address service: ${error.message}`);
+          throw new Error(`Failed to connect to address service: ${response.status} ${response.statusText}`);
         }
       }
 
-      if (!result) {
-        console.error(`GooglePlacesService: No result returned for ${endpoint}`);
-        throw new Error('No response received from address service');
-      }
+      const result = await response.json();
+      console.log('GooglePlacesService: Response data:', result);
 
       // Check for Google API specific errors in the result
       if (result.error) {
