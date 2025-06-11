@@ -9,7 +9,8 @@ export interface LocationFormData {
   street: string;
   city: string;
   is_primary: boolean;
-  // New Google Places fields
+  unit_number?: string;
+  // Google Places fields
   google_place_id?: string;
   standardized_address?: string;
   latitude?: number;

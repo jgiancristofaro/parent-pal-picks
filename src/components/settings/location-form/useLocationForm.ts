@@ -15,6 +15,7 @@ export const useLocationForm = (initialData?: any, onSuccess?: () => void) => {
     street: initialData?.address_details?.street || "",
     city: initialData?.address_details?.city || "",
     is_primary: initialData?.is_primary || false,
+    unit_number: initialData?.unit_number || "",
     google_place_id: initialData?.google_place_id || undefined,
     standardized_address: initialData?.standardized_address || undefined,
     latitude: initialData?.latitude || undefined,
@@ -36,10 +37,11 @@ export const useLocationForm = (initialData?: any, onSuccess?: () => void) => {
         address_details: {
           street: data.street,
           city: data.city,
+          unit_number: data.unit_number || null,
         },
         is_primary: data.is_primary,
         user_id: user.id,
-        // New Google Places fields
+        // Google Places fields
         google_place_id: data.google_place_id || null,
         standardized_address: data.standardized_address || null,
         latitude: data.latitude || null,
@@ -64,7 +66,7 @@ export const useLocationForm = (initialData?: any, onSuccess?: () => void) => {
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Location saved successfully with Google Places data!",
+        description: "Location saved successfully!",
       });
       if (onSuccess) onSuccess();
     },
@@ -77,10 +79,11 @@ export const useLocationForm = (initialData?: any, onSuccess?: () => void) => {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent, enhancedFormData?: LocationFormData) => {
     e.preventDefault();
     
-    const errors = validateFormData(formData);
+    const dataToValidate = enhancedFormData || formData;
+    const errors = validateFormData(dataToValidate);
     if (errors.length > 0) {
       toast({
         title: "Validation Error",
@@ -90,7 +93,7 @@ export const useLocationForm = (initialData?: any, onSuccess?: () => void) => {
       return;
     }
 
-    saveLocationMutation.mutate(formData);
+    saveLocationMutation.mutate(dataToValidate);
   };
 
   const handleInputChange = (field: keyof LocationFormData, value: string | boolean) => {
@@ -120,6 +123,8 @@ export const useLocationForm = (initialData?: any, onSuccess?: () => void) => {
       standardized_address: placeData.standardizedAddress,
       latitude: placeData.latitude,
       longitude: placeData.longitude,
+      street: placeData.standardizedAddress,
+      city: placeData.extractedComponents.city || prev.city,
       // Auto-fill zip code if available from Google
       zip_code: placeData.extractedComponents.zip_code || prev.zip_code,
     }));
