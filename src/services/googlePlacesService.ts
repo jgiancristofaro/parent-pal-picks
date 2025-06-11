@@ -37,8 +37,10 @@ export interface AutocompleteResponse {
 
 class GooglePlacesService {
   private async callGoogleAPI(endpoint: string, data: any) {
+    console.log(`GooglePlacesService: Calling ${endpoint} with data:`, data);
+    
     const { data: result, error } = await supabase.functions.invoke('google-api-proxy', {
-      body: data,
+      body: { ...data, endpoint },
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -46,81 +48,44 @@ class GooglePlacesService {
     });
 
     if (error) {
-      console.error('Error calling Google API proxy:', error);
-      throw new Error('Failed to call Google API');
+      console.error(`GooglePlacesService: Error calling ${endpoint}:`, error);
+      throw new Error(`Failed to call Google API: ${error.message}`);
     }
 
+    console.log(`GooglePlacesService: Success response from ${endpoint}:`, result);
     return result;
   }
 
   async geocodeAddress(address: string): Promise<PlaceDetails[]> {
     try {
-      const response = await fetch(`https://jmyfwrbwpbbbmoournsg.supabase.co/functions/v1/google-api-proxy?endpoint=geocode`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpteWZ3cmJ3cGJiYm1vb3VybnNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMDgyNTQsImV4cCI6MjA2MzY4NDI1NH0.rV3Tvvw1FeKarR5DSVoensPWowEHIr_WRBL__hqZNe0`,
-        },
-        body: JSON.stringify({ address }),
-      });
-
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Geocoding failed');
-      }
-
+      console.log('GooglePlacesService: Geocoding address:', address);
+      const data = await this.callGoogleAPI('geocode', { address });
       return data.results || [];
     } catch (error) {
-      console.error('Geocoding error:', error);
+      console.error('GooglePlacesService: Geocoding error:', error);
       throw error;
     }
   }
 
   async getPlaceDetails(placeId: string): Promise<PlaceDetails | null> {
     try {
-      const response = await fetch(`https://jmyfwrbwpbbbmoournsg.supabase.co/functions/v1/google-api-proxy?endpoint=place-details`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpteWZ3cmJ3cGJiYm1vb3VybnNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMDgyNTQsImV4cCI6MjA2MzY4NDI1NH0.rV3Tvvw1FeKarR5DSVoensPWowEHIr_WRBL__hqZNe0`,
-        },
-        body: JSON.stringify({ place_id: placeId }),
-      });
-
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to get place details');
-      }
-
+      console.log('GooglePlacesService: Getting place details for:', placeId);
+      const data = await this.callGoogleAPI('place-details', { place_id: placeId });
       return data.result || null;
     } catch (error) {
-      console.error('Place details error:', error);
+      console.error('GooglePlacesService: Place details error:', error);
       throw error;
     }
   }
 
   async getPlaceAutocomplete(input: string, types = 'address'): Promise<AutocompletePrediction[]> {
     try {
-      const response = await fetch(`https://jmyfwrbwpbbbmoournsg.supabase.co/functions/v1/google-api-proxy?endpoint=place-autocomplete`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpteWZ3cmJ3cGJiYm1vb3VybnNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMDgyNTQsImV4cCI6MjA2MzY4NDI1NH0.rV3Tvvw1FeKarR5DSVoensPWowEHIr_WRBL__hqZNe0`,
-        },
-        body: JSON.stringify({ input, types }),
-      });
-
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Autocomplete failed');
-      }
-
+      console.log('GooglePlacesService: Getting autocomplete for:', input, 'types:', types);
+      const data = await this.callGoogleAPI('place-autocomplete', { input, types });
+      console.log('GooglePlacesService: Autocomplete response:', data);
       return data.predictions || [];
     } catch (error) {
-      console.error('Autocomplete error:', error);
+      console.error('GooglePlacesService: Autocomplete error:', error);
       throw error;
     }
   }
