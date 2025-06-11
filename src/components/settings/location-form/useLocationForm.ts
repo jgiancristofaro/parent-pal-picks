@@ -15,6 +15,10 @@ export const useLocationForm = (initialData?: any, onSuccess?: () => void) => {
     street: initialData?.address_details?.street || "",
     city: initialData?.address_details?.city || "",
     is_primary: initialData?.is_primary || false,
+    google_place_id: initialData?.google_place_id || undefined,
+    standardized_address: initialData?.standardized_address || undefined,
+    latitude: initialData?.latitude || undefined,
+    longitude: initialData?.longitude || undefined,
   });
   
   const { toast } = useToast();
@@ -35,6 +39,11 @@ export const useLocationForm = (initialData?: any, onSuccess?: () => void) => {
         },
         is_primary: data.is_primary,
         user_id: user.id,
+        // New Google Places fields
+        google_place_id: data.google_place_id || null,
+        standardized_address: data.standardized_address || null,
+        latitude: data.latitude || null,
+        longitude: data.longitude || null,
       };
 
       if (initialData) {
@@ -53,6 +62,10 @@ export const useLocationForm = (initialData?: any, onSuccess?: () => void) => {
       }
     },
     onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Location saved successfully with Google Places data!",
+      });
       if (onSuccess) onSuccess();
     },
     onError: (error) => {
@@ -94,11 +107,30 @@ export const useLocationForm = (initialData?: any, onSuccess?: () => void) => {
     }));
   };
 
+  const handlePlaceSelect = (placeData: {
+    googlePlaceId: string;
+    standardizedAddress: string;
+    latitude: number;
+    longitude: number;
+    extractedComponents: any;
+  }) => {
+    setFormData(prev => ({
+      ...prev,
+      google_place_id: placeData.googlePlaceId,
+      standardized_address: placeData.standardizedAddress,
+      latitude: placeData.latitude,
+      longitude: placeData.longitude,
+      // Auto-fill zip code if available from Google
+      zip_code: placeData.extractedComponents.zip_code || prev.zip_code,
+    }));
+  };
+
   return {
     formData,
     handleSubmit,
     handleInputChange,
     handleDwellingTypeChange,
+    handlePlaceSelect,
     saveLocationMutation,
   };
 };

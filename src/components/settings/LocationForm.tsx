@@ -13,6 +13,7 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
     handleSubmit,
     handleInputChange,
     handleDwellingTypeChange,
+    handlePlaceSelect,
     saveLocationMutation,
   } = useLocationForm(initialData, onSuccess);
 
@@ -34,6 +35,7 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
         <AddressDetailsSection
           formData={formData}
           onInputChange={handleInputChange}
+          onPlaceSelect={handlePlaceSelect}
         />
 
         <PrimaryHomeCheckbox
