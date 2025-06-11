@@ -26,6 +26,8 @@ import Home from './pages/Home';
 import Settings from './pages/Settings';
 import ProductPage from './pages/ProductPage';
 import Security from './pages/Security';
+import ActivityFeedPage from './pages/ActivityFeedPage';
+import Profile from './pages/Profile';
 
 const queryClient = new QueryClient();
 
@@ -56,6 +58,9 @@ function App() {
                 <Route path="/product/:id" element={<ProductPage />} />
                 <Route path="/security" element={<Security />} />
                 <Route path="/test-google-api" element={<TestGoogleAPI />} />
+                <Route path="/activity-feed" element={<ActivityFeedPage />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/profile/:userId" element={<Profile />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <Toaster />
