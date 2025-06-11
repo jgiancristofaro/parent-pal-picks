@@ -35,7 +35,14 @@ export const LocationForm = ({ initialData, onSuccess }: LocationFormProps) => {
     longitude: number;
     addressComponents: any;
   }) => {
-    handlePlaceSelect(placeData);
+    // Map addressComponents to extractedComponents for the hook
+    handlePlaceSelect({
+      googlePlaceId: placeData.googlePlaceId,
+      standardizedAddress: placeData.standardizedAddress,
+      latitude: placeData.latitude,
+      longitude: placeData.longitude,
+      extractedComponents: placeData.addressComponents
+    });
     
     // Update the manual address data as well for display
     setManualAddressData({
