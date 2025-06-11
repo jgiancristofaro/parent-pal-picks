@@ -403,7 +403,7 @@ export type Database = {
       user_locations: {
         Row: {
           address_details: Json | null
-          building_identifier: string
+          building_identifier: string | null
           created_at: string
           dwelling_type: Database["public"]["Enums"]["dwelling_type_enum"]
           google_place_id: string | null
@@ -419,7 +419,7 @@ export type Database = {
         }
         Insert: {
           address_details?: Json | null
-          building_identifier: string
+          building_identifier?: string | null
           created_at?: string
           dwelling_type?: Database["public"]["Enums"]["dwelling_type_enum"]
           google_place_id?: string | null
@@ -435,7 +435,7 @@ export type Database = {
         }
         Update: {
           address_details?: Json | null
-          building_identifier?: string
+          building_identifier?: string | null
           created_at?: string
           dwelling_type?: Database["public"]["Enums"]["dwelling_type_enum"]
           google_place_id?: string | null
