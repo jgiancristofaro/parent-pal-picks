@@ -1,6 +1,16 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { FollowButton } from "@/components/FollowButton";
+import { useAdmin } from "@/hooks/useAdmin";
+import { Button } from "@/components/ui/button";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { Settings, Ban, Edit } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface ProfileHeaderProps {
   profileData: {
@@ -19,11 +29,38 @@ interface ProfileHeaderProps {
 
 export const ProfileHeader = ({ profileData, isOwnProfile = false }: ProfileHeaderProps) => {
   const queryClient = useQueryClient();
+  const { isAdmin } = useAdmin();
+  const navigate = useNavigate();
 
   const handleFollowStatusChange = () => {
     if (profileData.id) {
       queryClient.invalidateQueries({ queryKey: ['profile', profileData.id] });
     }
+  };
+
+  const AdminActions = () => {
+    if (!isAdmin || isOwnProfile || !profileData.id) return null;
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="mt-4">
+            <Settings className="w-4 h-4 mr-2" />
+            Admin Actions
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={() => navigate(`/admin/users/${profileData.id}/edit`)}>
+            <Edit className="w-4 h-4 mr-2" />
+            Edit User
+          </DropdownMenuItem>
+          <DropdownMenuItem className="text-red-600">
+            <Ban className="w-4 h-4 mr-2" />
+            Suspend User
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
   };
 
   return (
@@ -54,21 +91,26 @@ export const ProfileHeader = ({ profileData, isOwnProfile = false }: ProfileHead
             Edit Profile
           </a>
         ) : (
-          profileData.id && profileData.follow_status && profileData.follow_status !== 'own_profile' && (
-            <div className="mt-4">
-              <FollowButton
-                targetProfile={{
-                  id: profileData.id,
-                  full_name: profileData.name,
-                  profile_privacy_setting: profileData.profile_privacy_setting || 'private',
-                  follow_status: profileData.follow_status
-                }}
-                onStatusChange={handleFollowStatusChange}
-                size="default"
-                variant="default"
-              />
-            </div>
-          )
+          <div className="mt-4 flex flex-col items-center gap-2">
+            {/* Show admin actions if admin, otherwise show follow button */}
+            {isAdmin ? (
+              <AdminActions />
+            ) : (
+              profileData.id && profileData.follow_status && profileData.follow_status !== 'own_profile' && (
+                <FollowButton
+                  targetProfile={{
+                    id: profileData.id,
+                    full_name: profileData.name,
+                    profile_privacy_setting: profileData.profile_privacy_setting || 'private',
+                    follow_status: profileData.follow_status
+                  }}
+                  onStatusChange={handleFollowStatusChange}
+                  size="default"
+                  variant="default"
+                />
+              )
+            )}
+          </div>
         )}
       </div>
     </div>
