@@ -1,5 +1,5 @@
 
-import { SearchPageContent } from "@/components/search/SearchPageContent";
+import SearchPageContent from "@/components/search/SearchPageContent";
 
 interface EntitySearchPageProps {
   type: 'sitter' | 'product';
@@ -9,7 +9,7 @@ interface EntitySearchPageProps {
 const EntitySearchPage = ({ type, mode }: EntitySearchPageProps) => {
   return (
     <SearchPageContent 
-      type={type}
+      searchType={type}
       mode={mode}
     />
   );

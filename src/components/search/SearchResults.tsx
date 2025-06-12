@@ -1,54 +1,67 @@
 
-import { SitterCard } from "@/components/SitterCard";
+import React from 'react';
+import { Button } from "@/components/ui/button";
 
 interface SearchResultsProps {
-  searchResults: any[];
-  hasSearched: boolean;
-  friendRecommendedOnly: boolean;
+  results: any[];
+  searchType: 'sitter' | 'product' | 'parent';
+  loading: boolean;
+  hasMore: boolean;
+  onLoadMore: () => void;
+  searchQuery: string;
+  onClearSearch: () => void;
 }
 
-export const SearchResults = ({ searchResults, hasSearched, friendRecommendedOnly }: SearchResultsProps) => {
-  if (!hasSearched) return null;
+export const SearchResults = ({ 
+  results, 
+  searchType, 
+  loading, 
+  hasMore, 
+  onLoadMore, 
+  searchQuery, 
+  onClearSearch 
+}: SearchResultsProps) => {
+  if (loading) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-600">Searching...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="mt-6">
-      <h2 className="text-xl font-semibold mb-4">
-        {friendRecommendedOnly ? (
-          <>Friend-Recommended Sitters ({searchResults.length} found)</>
-        ) : (
-          <>Search Results ({searchResults.length} sitters found)</>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">
+          Search Results ({results.length} found)
+        </h2>
+        {searchQuery && (
+          <Button variant="outline" onClick={onClearSearch}>
+            Clear Search
+          </Button>
         )}
-      </h2>
-      {searchResults.length > 0 ? (
-        <div>
-          {searchResults.map((sitter) => (
-            <SitterCard
-              key={sitter.id}
-              id={sitter.id}
-              name={sitter.name}
-              image={sitter.image}
-              rating={sitter.rating}
-              experience={sitter.experience}
-              recommendedBy={sitter.recommendedBy}
-              friendRecommendationCount={sitter.friendRecommendationCount || 0}
-            />
+      </div>
+
+      {results.length > 0 ? (
+        <div className="space-y-4">
+          {results.map((result) => (
+            <div key={result.id} className="p-4 bg-white rounded-lg border border-gray-200">
+              <h3 className="font-medium">{result.full_name || result.name}</h3>
+              {result.username && <p className="text-sm text-gray-600">@{result.username}</p>}
+            </div>
           ))}
+          
+          {hasMore && (
+            <div className="text-center">
+              <Button onClick={onLoadMore} disabled={loading}>
+                Load More
+              </Button>
+            </div>
+          )}
         </div>
       ) : (
         <div className="text-center py-8">
-          {friendRecommendedOnly ? (
-            <>
-              <p className="text-gray-500">No friend-recommended sitters found.</p>
-              <p className="text-gray-400 text-sm mt-2">
-                Try following more friends or search without the filter.
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="text-gray-500">No sitters found matching your criteria.</p>
-              <p className="text-gray-400 text-sm mt-2">Try adjusting your filters.</p>
-            </>
-          )}
+          <p className="text-gray-600">No results found</p>
         </div>
       )}
     </div>

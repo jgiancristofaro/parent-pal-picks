@@ -1,11 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import SearchInput from './SearchInput';
-import SearchFilters from './SearchFilters';
-import SearchResults from './SearchResults';
-import NoResultsMessage from './NoResultsMessage';
-import SuggestedProfilesSection from './SuggestedProfilesSection';
+import { SearchInput } from './SearchInput';
+import { SearchResults } from './SearchResults';
+import { NoResultsMessage } from './NoResultsMessage';
+import { SuggestedProfilesSection } from './SuggestedProfilesSection';
 import { useSearchFilters } from '@/hooks/useSearchFilters';
 import { useUnifiedSearch } from '@/hooks/useUnifiedSearch';
 import { useAuth } from '@/contexts/AuthContext';
@@ -22,49 +21,51 @@ const SearchPageContent = ({ searchType, mode }: SearchPageContentProps) => {
   const { user } = useAuth();
 
   const {
-    filters,
-    updateFilter,
-    resetFilters,
-    hasActiveFilters
+    searchTerm,
+    setSearchTerm,
+    friendRecommendedOnly,
+    setFriendRecommendedOnly,
+    selectedUserHomeId,
+    setSelectedUserHomeId,
+    localSearchScope,
+    setLocalSearchScope
   } = useSearchFilters();
 
   const {
-    results,
-    loading,
-    error,
-    hasMore,
-    loadMore,
-    search
-  } = useUnifiedSearch({
-    searchType,
-    filters,
-    enabled: searchQuery.length > 0 || hasActiveFilters
-  });
+    searchTerm: unifiedSearchTerm,
+    setSearchTerm: setUnifiedSearchTerm,
+    searchResults,
+    isSearching,
+    handleSearch,
+    handleKeyPress,
+    refreshResults
+  } = useUnifiedSearch();
 
   useEffect(() => {
-    if (searchQuery.length > 0 || hasActiveFilters) {
-      search(searchQuery);
+    if (searchQuery.length > 0) {
+      setUnifiedSearchTerm(searchQuery);
+      handleSearch();
     }
-  }, [searchQuery, filters, hasActiveFilters, search]);
+  }, [searchQuery, setUnifiedSearchTerm, handleSearch]);
 
-  const handleSearch = (query: string) => {
+  const handleSearchInput = (query: string) => {
     setSearchQuery(query);
   };
 
   const handleClearSearch = () => {
     setSearchQuery('');
-    resetFilters();
+    setUnifiedSearchTerm('');
   };
 
-  const showResults = searchQuery.length > 0 || hasActiveFilters;
-  const showNoResults = showResults && results.length === 0 && !loading;
+  const showResults = searchQuery.length > 0;
+  const showNoResults = showResults && searchResults.length === 0 && !isSearching;
   const showSuggestions = !showResults && searchType === 'parent';
 
   return (
     <div className="space-y-6">
       <SearchInput
         searchType={searchType}
-        onSearch={handleSearch}
+        onSearch={handleSearchInput}
         initialValue={searchQuery}
         placeholder={
           searchType === 'sitter'
@@ -75,27 +76,13 @@ const SearchPageContent = ({ searchType, mode }: SearchPageContentProps) => {
         }
       />
 
-      <SearchFilters
-        searchType={searchType}
-        filters={filters}
-        onFilterChange={updateFilter}
-        onClearFilters={resetFilters}
-        hasActiveFilters={hasActiveFilters}
-      />
-
-      {error && (
-        <div className="text-center py-8">
-          <p className="text-red-600">Error: {error}</p>
-        </div>
-      )}
-
       {showResults && (
         <SearchResults
-          results={results}
+          results={searchResults}
           searchType={searchType}
-          loading={loading}
-          hasMore={hasMore}
-          onLoadMore={loadMore}
+          loading={isSearching}
+          hasMore={false}
+          onLoadMore={() => {}}
           searchQuery={searchQuery}
           onClearSearch={handleClearSearch}
         />

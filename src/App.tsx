@@ -2,8 +2,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
-import { AuthContextProvider } from '@/contexts/AuthContext';
-import { AlertsContextProvider } from '@/contexts/AlertsContext';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { AlertsProvider } from '@/contexts/AlertsContext';
 import Index from './pages/Index';
 import Login from './pages/Login';
 import ExistingUserLoginPage from './pages/ExistingUserLoginPage';
@@ -42,12 +42,12 @@ import AdminSitters from './pages/AdminSitters';
 import AdminSitterEdit from './pages/AdminSitterEdit';
 import AdminProducts from './pages/AdminProducts';
 import AdminProductEdit from './pages/AdminProductEdit';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
   return (
-    <AuthContextProvider>
-      <AlertsContextProvider>
+    <AuthProvider>
+      <AlertsProvider>
         <Router>
           <div className="App">
             <Routes>
@@ -96,8 +96,8 @@ function App() {
             <Toaster />
           </div>
         </Router>
-      </AlertsContextProvider>
-    </AuthContextProvider>
+      </AlertsProvider>
+    </AuthProvider>
   );
 }
 
