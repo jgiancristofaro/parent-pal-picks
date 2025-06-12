@@ -62,7 +62,7 @@ export const useAdminUsers = ({ searchTerm = '', page = 0, pageSize = 50 }: UseA
         throw error;
       }
 
-      return data as SuspendUserResponse;
+      return data as unknown as SuspendUserResponse;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
