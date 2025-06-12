@@ -188,6 +188,7 @@ export type Database = {
           phone_number: string | null
           phone_number_searchable: boolean
           profile_privacy_setting: Database["public"]["Enums"]["profile_privacy_enum"]
+          role: string
           updated_at: string
           username: string | null
         }
@@ -204,6 +205,7 @@ export type Database = {
           phone_number?: string | null
           phone_number_searchable?: boolean
           profile_privacy_setting?: Database["public"]["Enums"]["profile_privacy_enum"]
+          role?: string
           updated_at?: string
           username?: string | null
         }
@@ -220,6 +222,7 @@ export type Database = {
           phone_number?: string | null
           phone_number_searchable?: boolean
           profile_privacy_setting?: Database["public"]["Enums"]["profile_privacy_enum"]
+          role?: string
           updated_at?: string
           username?: string | null
         }

@@ -9,6 +9,8 @@ interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   isLoading: boolean;
+  userRole: string | null;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -87,11 +89,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Compute derived values
+  const userRole = profile?.role || null;
+  const isAdmin = userRole === 'ADMIN';
+
   const value = {
     session,
     user,
     profile,
     isLoading,
+    userRole,
+    isAdmin,
   };
 
   return (
