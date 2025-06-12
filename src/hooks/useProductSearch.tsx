@@ -20,10 +20,13 @@ interface Product {
   review_count: number | null;
 }
 
-export const useProductSearch = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+interface UseProductSearchProps {
+  searchTerm: string;
+  friendRecommendedOnly: boolean;
+}
+
+export const useProductSearch = ({ searchTerm, friendRecommendedOnly }: UseProductSearchProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [friendRecommendedOnly, setFriendRecommendedOnly] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,11 +127,7 @@ export const useProductSearch = () => {
     });
 
   return {
-    searchTerm,
-    setSearchTerm,
     selectedCategory,
-    friendRecommendedOnly,
-    setFriendRecommendedOnly,
     categories,
     loading,
     filteredProducts,
