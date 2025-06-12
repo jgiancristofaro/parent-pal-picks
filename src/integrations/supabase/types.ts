@@ -64,6 +64,36 @@ export type Database = {
           },
         ]
       }
+      audit_log: {
+        Row: {
+          action_type: string
+          admin_id: string
+          created_at: string
+          id: string
+          reason: string | null
+          target_id: string
+          timestamp: string
+        }
+        Insert: {
+          action_type: string
+          admin_id: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          target_id: string
+          timestamp?: string
+        }
+        Update: {
+          action_type?: string
+          admin_id?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          target_id?: string
+          timestamp?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -81,6 +111,45 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      flagged_content: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          id: string
+          reason: string
+          reported_by_user_id: string
+          resolved_at: string | null
+          resolved_by_admin_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          id?: string
+          reason: string
+          reported_by_user_id: string
+          resolved_at?: string | null
+          resolved_by_admin_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          reason?: string
+          reported_by_user_id?: string
+          resolved_at?: string | null
+          resolved_by_admin_id?: string | null
+          status?: string
           updated_at?: string
         }
         Relationships: []
@@ -125,6 +194,7 @@ export type Database = {
           id: string
           image_url: string | null
           image_urls: string[] | null
+          is_verified: boolean
           name: string
           price: number | null
           review_count: number | null
@@ -142,6 +212,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           image_urls?: string[] | null
+          is_verified?: boolean
           name: string
           price?: number | null
           review_count?: number | null
@@ -159,6 +230,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           image_urls?: string[] | null
+          is_verified?: boolean
           name?: string
           price?: number | null
           review_count?: number | null
@@ -182,12 +254,14 @@ export type Database = {
           full_name: string
           id: string
           identity_tag: string | null
+          is_suspended: boolean
           last_activity_feed_view_at: string | null
           last_alerts_viewed_at: string | null
           last_login_at: string | null
           phone_number: string | null
           phone_number_searchable: boolean
           profile_privacy_setting: Database["public"]["Enums"]["profile_privacy_enum"]
+          role: string
           updated_at: string
           username: string | null
         }
@@ -198,12 +272,14 @@ export type Database = {
           full_name: string
           id: string
           identity_tag?: string | null
+          is_suspended?: boolean
           last_activity_feed_view_at?: string | null
           last_alerts_viewed_at?: string | null
           last_login_at?: string | null
           phone_number?: string | null
           phone_number_searchable?: boolean
           profile_privacy_setting?: Database["public"]["Enums"]["profile_privacy_enum"]
+          role?: string
           updated_at?: string
           username?: string | null
         }
@@ -214,12 +290,14 @@ export type Database = {
           full_name?: string
           id?: string
           identity_tag?: string | null
+          is_suspended?: boolean
           last_activity_feed_view_at?: string | null
           last_alerts_viewed_at?: string | null
           last_login_at?: string | null
           phone_number?: string | null
           phone_number_searchable?: boolean
           profile_privacy_setting?: Database["public"]["Enums"]["profile_privacy_enum"]
+          role?: string
           updated_at?: string
           username?: string | null
         }
@@ -335,6 +413,7 @@ export type Database = {
           experience: string | null
           hourly_rate: number | null
           id: string
+          is_verified: boolean
           name: string
           phone_number: string | null
           phone_number_searchable: boolean
@@ -352,6 +431,7 @@ export type Database = {
           experience?: string | null
           hourly_rate?: number | null
           id?: string
+          is_verified?: boolean
           name: string
           phone_number?: string | null
           phone_number_searchable?: boolean
@@ -369,6 +449,7 @@ export type Database = {
           experience?: string | null
           hourly_rate?: number | null
           id?: string
+          is_verified?: boolean
           name?: string
           phone_number?: string | null
           phone_number_searchable?: boolean
@@ -456,6 +537,152 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_review: {
+        Args: { review_id: string; deletion_reason?: string }
+        Returns: Json
+      }
+      admin_delete_user: {
+        Args: { target_user_id: string; deletion_reason?: string }
+        Returns: Json
+      }
+      admin_get_all_products: {
+        Args: {
+          search_term?: string
+          page_limit?: number
+          page_offset?: number
+        }
+        Returns: {
+          id: string
+          name: string
+          brand_name: string
+          category: string
+          description: string
+          image_url: string
+          price: number
+          external_purchase_link: string
+          average_rating: number
+          review_count: number
+          is_verified: boolean
+          created_at: string
+          updated_at: string
+        }[]
+      }
+      admin_get_all_sitters: {
+        Args: {
+          search_term?: string
+          page_limit?: number
+          page_offset?: number
+        }
+        Returns: {
+          id: string
+          name: string
+          profile_image_url: string
+          bio: string
+          experience: string
+          hourly_rate: number
+          phone_number: string
+          email: string
+          certifications: string[]
+          rating: number
+          review_count: number
+          is_verified: boolean
+          created_at: string
+          updated_at: string
+        }[]
+      }
+      admin_get_flagged_content: {
+        Args: { p_status?: string; p_limit?: number; p_offset?: number }
+        Returns: {
+          flag_id: string
+          content_type: string
+          content_id: string
+          reported_by_user_id: string
+          reporter_name: string
+          reason: string
+          status: string
+          created_at: string
+          content_data: Json
+        }[]
+      }
+      admin_get_item_reviews: {
+        Args: { item_type: string; item_id: string }
+        Returns: {
+          id: string
+          user_id: string
+          user_full_name: string
+          rating: number
+          title: string
+          content: string
+          created_at: string
+          updated_at: string
+        }[]
+      }
+      admin_get_users: {
+        Args: {
+          search_term?: string
+          page_limit?: number
+          page_offset?: number
+        }
+        Returns: {
+          id: string
+          full_name: string
+          username: string
+          email: string
+          phone_number: string
+          role: string
+          is_suspended: boolean
+          created_at: string
+          last_login_at: string
+        }[]
+      }
+      admin_merge_duplicates: {
+        Args: {
+          item_type: string
+          source_id: string
+          target_id: string
+          merge_reason?: string
+        }
+        Returns: Json
+      }
+      admin_resolve_flag: {
+        Args: { p_flag_id: string; p_action: string; p_reason?: string }
+        Returns: Json
+      }
+      admin_set_verified_status: {
+        Args: { item_type: string; item_id: string; verified_status: boolean }
+        Returns: Json
+      }
+      admin_suspend_user: {
+        Args: { target_user_id: string; suspend_reason?: string }
+        Returns: Json
+      }
+      admin_update_product_details: {
+        Args: {
+          target_product_id: string
+          new_name?: string
+          new_brand_name?: string
+          new_category?: string
+          new_description?: string
+          new_image_url?: string
+          new_price?: number
+          new_external_purchase_link?: string
+        }
+        Returns: Json
+      }
+      admin_update_sitter_details: {
+        Args: {
+          target_sitter_id: string
+          new_name?: string
+          new_profile_image_url?: string
+          new_bio?: string
+          new_experience?: string
+          new_hourly_rate?: number
+          new_phone_number?: string
+          new_email?: string
+          new_certifications?: string[]
+        }
+        Returns: Json
+      }
       check_rate_limit: {
         Args: {
           p_identifier: string
@@ -484,6 +711,10 @@ export type Database = {
           p_certification_checkbox_value: boolean
           p_product_id?: string
         }
+        Returns: Json
+      }
+      flag_content: {
+        Args: { p_content_type: string; p_content_id: string; p_reason: string }
         Returns: Json
       }
       get_follow_status: {
@@ -522,6 +753,7 @@ export type Database = {
           experience: string | null
           hourly_rate: number | null
           id: string
+          is_verified: boolean
           name: string
           phone_number: string | null
           phone_number_searchable: boolean

@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import AdminLayout from "@/components/admin/AdminLayout";
 import { AlertsProvider } from "@/contexts/AlertsContext";
 
 import Index from "./pages/Index";
@@ -38,6 +39,7 @@ import NewlyRecommendedProductsPage from "./pages/NewlyRecommendedProductsPage";
 import EditProfile from "./pages/EditProfile";
 import AlertsPage from "./pages/AlertsPage";
 import EntitySearchPage from "./pages/EntitySearchPage";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -68,7 +70,7 @@ const App = () => (
             <Route path="/search-for-review/sitter" element={<ProtectedRoute><EntitySearchPage type="sitter" mode="review" /></ProtectedRoute>} />
             <Route path="/search-for-review/product" element={<ProtectedRoute><EntitySearchPage type="product" mode="review" /></ProtectedRoute>} />
             <Route path="/add-review" element={<ProtectedRoute><AddReview /></ProtectedRoute>} />
-            <Route path="/activity-feed" element={<ProtectedRoute><ActivityFeedPage /></ProtectedRoute>} />
+            <Route path="/activity" element={<ProtectedRoute><ActivityFeedPage /></ProtectedRoute>} />
             <Route path="/newly-recommended-sitters" element={<ProtectedRoute><NewlyRecommendedSittersPage /></ProtectedRoute>} />
             <Route path="/newly-recommended-products" element={<ProtectedRoute><NewlyRecommendedProductsPage /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
@@ -81,6 +83,16 @@ const App = () => (
             <Route path="/security" element={<ProtectedRoute><Security /></ProtectedRoute>} />
             <Route path="/help" element={<ProtectedRoute><Help /></ProtectedRoute>} />
             <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <AdminDashboard />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
