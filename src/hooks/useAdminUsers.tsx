@@ -99,7 +99,7 @@ export const useAdminUsers = () => {
       }
 
       // Type assertion to handle the Json type from Supabase
-      const response = data as SuspendUserResponse;
+      const response = data as unknown as SuspendUserResponse;
 
       // Update local state
       setUsers(prev => prev.map(user => 
@@ -138,7 +138,7 @@ export const useAdminUsers = () => {
       }
 
       // Type assertion to handle the Json type from Supabase
-      const response = data as DeleteUserResponse;
+      const response = data as unknown as DeleteUserResponse;
 
       // Remove user from local state
       setUsers(prev => prev.filter(user => user.id !== userId));
