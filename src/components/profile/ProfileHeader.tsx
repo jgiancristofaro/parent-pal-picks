@@ -1,6 +1,8 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { FollowButton } from "@/components/FollowButton";
+import { AdminActions } from "@/components/admin/AdminActions";
+import { useAdmin } from "@/hooks/useAdmin";
 
 interface ProfileHeaderProps {
   profileData: {
@@ -19,11 +21,56 @@ interface ProfileHeaderProps {
 
 export const ProfileHeader = ({ profileData, isOwnProfile = false }: ProfileHeaderProps) => {
   const queryClient = useQueryClient();
+  const { isAdmin } = useAdmin();
 
   const handleFollowStatusChange = () => {
     if (profileData.id) {
       queryClient.invalidateQueries({ queryKey: ['profile', profileData.id] });
     }
+  };
+
+  const renderActionButton = () => {
+    if (isOwnProfile) {
+      return (
+        <a 
+          href="/profile/edit"
+          className="mt-4 px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+        >
+          Edit Profile
+        </a>
+      );
+    }
+
+    if (isAdmin && profileData.id) {
+      return (
+        <div className="mt-4">
+          <AdminActions 
+            userId={profileData.id}
+            userType="user"
+          />
+        </div>
+      );
+    }
+
+    if (profileData.id && profileData.follow_status && profileData.follow_status !== 'own_profile') {
+      return (
+        <div className="mt-4">
+          <FollowButton
+            targetProfile={{
+              id: profileData.id,
+              full_name: profileData.name,
+              profile_privacy_setting: profileData.profile_privacy_setting || 'private',
+              follow_status: profileData.follow_status
+            }}
+            onStatusChange={handleFollowStatusChange}
+            size="default"
+            variant="default"
+          />
+        </div>
+      );
+    }
+
+    return null;
   };
 
   return (
@@ -46,30 +93,7 @@ export const ProfileHeader = ({ profileData, isOwnProfile = false }: ProfileHead
           <p className="text-gray-600 text-center mt-3 px-6 max-w-md">{profileData.bio}</p>
         )}
         
-        {isOwnProfile ? (
-          <a 
-            href="/profile/edit"
-            className="mt-4 px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
-          >
-            Edit Profile
-          </a>
-        ) : (
-          profileData.id && profileData.follow_status && profileData.follow_status !== 'own_profile' && (
-            <div className="mt-4">
-              <FollowButton
-                targetProfile={{
-                  id: profileData.id,
-                  full_name: profileData.name,
-                  profile_privacy_setting: profileData.profile_privacy_setting || 'private',
-                  follow_status: profileData.follow_status
-                }}
-                onStatusChange={handleFollowStatusChange}
-                size="default"
-                variant="default"
-              />
-            </div>
-          )
-        )}
+        {renderActionButton()}
       </div>
     </div>
   );
