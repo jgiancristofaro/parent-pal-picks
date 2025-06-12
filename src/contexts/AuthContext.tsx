@@ -9,8 +9,6 @@ interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   isLoading: boolean;
-  userRole: string | null;
-  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,7 +30,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [userRole, setUserRole] = useState<string | null>(null);
 
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -48,7 +45,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
 
       setProfile(data as Profile);
-      setUserRole(data.role || 'USER');
     } catch (error) {
       console.error('Error in fetchUserProfile:', error);
     }
@@ -68,7 +64,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           }, 0);
         } else {
           setProfile(null);
-          setUserRole(null);
         }
         
         setIsLoading(false);
@@ -97,8 +92,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     user,
     profile,
     isLoading,
-    userRole,
-    isAdmin: userRole === 'ADMIN',
   };
 
   return (
