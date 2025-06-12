@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -47,6 +46,7 @@ import AdminProducts from "./pages/AdminProducts";
 import AdminEditSitter from "./pages/AdminEditSitter";
 import AdminEditProduct from "./pages/AdminEditProduct";
 import AdminContentModeration from "./pages/AdminContentModeration";
+import AdminImport from "./pages/AdminImport";
 
 const queryClient = new QueryClient();
 
@@ -130,6 +130,11 @@ const App = () => (
             <Route path="/admin/content-moderation" element={
               <AdminLayout>
                 <AdminContentModeration />
+              </AdminLayout>
+            } />
+            <Route path="/admin/import" element={
+              <AdminLayout>
+                <AdminImport />
               </AdminLayout>
             } />
             

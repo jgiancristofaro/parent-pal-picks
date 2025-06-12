@@ -88,6 +88,21 @@ const AdminDashboard = () => {
               </button>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Bulk Import</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 mb-4">Import multiple sitters or products from CSV files.</p>
+              <button 
+                onClick={() => navigate('/admin/import')}
+                className="w-full bg-teal-600 text-white py-2 px-4 rounded hover:bg-teal-700 transition-colors"
+              >
+                Import Data
+              </button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
