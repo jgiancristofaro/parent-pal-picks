@@ -115,6 +115,45 @@ export type Database = {
         }
         Relationships: []
       }
+      flagged_content: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          id: string
+          reason: string
+          reported_by_user_id: string
+          resolved_at: string | null
+          resolved_by_admin_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          id?: string
+          reason: string
+          reported_by_user_id: string
+          resolved_at?: string | null
+          resolved_by_admin_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          reason?: string
+          reported_by_user_id?: string
+          resolved_at?: string | null
+          resolved_by_admin_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       follow_requests: {
         Row: {
           created_at: string
@@ -551,6 +590,20 @@ export type Database = {
           updated_at: string
         }[]
       }
+      admin_get_flagged_content: {
+        Args: { p_status?: string; p_limit?: number; p_offset?: number }
+        Returns: {
+          flag_id: string
+          content_type: string
+          content_id: string
+          reported_by_user_id: string
+          reporter_name: string
+          reason: string
+          status: string
+          created_at: string
+          content_data: Json
+        }[]
+      }
       admin_get_item_reviews: {
         Args: { item_type: string; item_id: string }
         Returns: {
@@ -589,6 +642,10 @@ export type Database = {
           target_id: string
           merge_reason?: string
         }
+        Returns: Json
+      }
+      admin_resolve_flag: {
+        Args: { p_flag_id: string; p_action: string; p_reason?: string }
         Returns: Json
       }
       admin_set_verified_status: {
@@ -654,6 +711,10 @@ export type Database = {
           p_certification_checkbox_value: boolean
           p_product_id?: string
         }
+        Returns: Json
+      }
+      flag_content: {
+        Args: { p_content_type: string; p_content_id: string; p_reason: string }
         Returns: Json
       }
       get_follow_status: {

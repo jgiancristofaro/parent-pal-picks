@@ -42,6 +42,7 @@ import AdminSitters from './pages/AdminSitters';
 import AdminSitterEdit from './pages/AdminSitterEdit';
 import AdminProducts from './pages/AdminProducts';
 import AdminProductEdit from './pages/AdminProductEdit';
+import AdminFlags from './pages/AdminFlags';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
@@ -90,6 +91,7 @@ function App() {
               <Route path="/admin/sitters/:id" element={<ProtectedRoute><AdminSitterEdit /></ProtectedRoute>} />
               <Route path="/admin/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
               <Route path="/admin/products/:id" element={<ProtectedRoute><AdminProductEdit /></ProtectedRoute>} />
+              <Route path="/admin/flags" element={<ProtectedRoute><AdminFlags /></ProtectedRoute>} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Shield, Users, Database, Settings, User, Package } from 'lucide-react';
+import { Shield, Users, Database, Settings, User, Package, AlertTriangle } from 'lucide-react';
 
 const AdminDashboard = () => {
   const { profile } = useAuth();
@@ -76,6 +76,22 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
 
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/admin/flags')}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Content Moderation</CardTitle>
+              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">Flagged Content</div>
+              <p className="text-xs text-muted-foreground">
+                Review and manage user-reported content
+              </p>
+              <Button variant="outline" className="w-full mt-4">
+                Open Moderation Queue
+              </Button>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Database Management</CardTitle>
@@ -111,12 +127,12 @@ const AdminDashboard = () => {
             <CardContent>
               <p className="text-gray-600">
                 You have administrator privileges for the ParentPal platform. This dashboard 
-                provides access to user management and system administration tools.
+                provides access to user management, content moderation, and system administration tools.
               </p>
               <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  <strong>New:</strong> Sitter and Product Management are now available! You can edit profiles, 
-                  set verification status, merge duplicates, and manage reviews with full audit logging.
+                  <strong>New:</strong> Content Moderation is now available! You can review user-flagged content 
+                  and take appropriate action to maintain community standards.
                 </p>
               </div>
             </CardContent>

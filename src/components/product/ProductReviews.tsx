@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserReview } from "@/hooks/useUserReview";
 import { EditReviewButton } from "@/components/review/EditReviewButton";
+import { FlagContentButton } from "@/components/moderation/FlagContentButton";
 
 interface Review {
   id: string;
@@ -260,15 +262,23 @@ export const ProductReviews = ({ productId, onUserReviewChange }: ProductReviews
                       <span className="text-sm text-gray-500">
                         {formatDate(review.created_at)}
                       </span>
-                      {user && review.user_id === user.id && (
-                        <EditReviewButton
-                          reviewId={review.id}
-                          rating={review.rating}
-                          title={review.title}
-                          content={review.content}
-                          productId={productId}
-                        />
-                      )}
+                      <div className="flex items-center space-x-1">
+                        {user && review.user_id === user.id && (
+                          <EditReviewButton
+                            reviewId={review.id}
+                            rating={review.rating}
+                            title={review.title}
+                            content={review.content}
+                            productId={productId}
+                          />
+                        )}
+                        {user && review.user_id !== user.id && (
+                          <FlagContentButton
+                            contentType="review"
+                            contentId={review.id}
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
                   
