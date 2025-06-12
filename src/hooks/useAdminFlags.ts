@@ -49,7 +49,13 @@ export const useAdminFlags = () => {
         return;
       }
 
-      setFlags(data || []);
+      // Type cast the data to match our interface
+      const typedFlags = (data || []).map((item: any) => ({
+        ...item,
+        content_data: item.content_data as FlaggedContent['content_data']
+      })) as FlaggedContent[];
+
+      setFlags(typedFlags);
       
     } catch (error) {
       console.error('Error in fetchFlags:', error);
@@ -81,7 +87,9 @@ export const useAdminFlags = () => {
         return false;
       }
 
-      if (data?.success) {
+      // Type cast the response
+      const response = data as { success?: boolean };
+      if (response?.success) {
         // Remove flag from local state
         setFlags(prev => prev.filter(flag => flag.flag_id !== flagId));
 

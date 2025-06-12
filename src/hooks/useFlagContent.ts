@@ -33,16 +33,19 @@ export const useFlagContent = () => {
         return false;
       }
 
-      if (result?.error) {
+      // Type cast the response
+      const response = result as { error?: string; success?: boolean };
+
+      if (response?.error) {
         toast({
           title: "Error",
-          description: result.error,
+          description: response.error,
           variant: "destructive",
         });
         return false;
       }
 
-      if (result?.success) {
+      if (response?.success) {
         toast({
           title: "Content Flagged",
           description: "Thank you for reporting this content. We'll review it soon.",
