@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Shield, Users, Database, Settings } from 'lucide-react';
+import { Shield, Users, Database, Settings, User, Package } from 'lucide-react';
 
 const AdminDashboard = () => {
   const { profile } = useAuth();
@@ -40,6 +40,38 @@ const AdminDashboard = () => {
               </p>
               <Button variant="outline" className="w-full mt-4">
                 Open User Management
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/admin/sitters')}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Sitter Management</CardTitle>
+              <User className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">Manage Sitters</div>
+              <p className="text-xs text-muted-foreground">
+                Edit profiles, verify sitters, and manage reviews
+              </p>
+              <Button variant="outline" className="w-full mt-4">
+                Open Sitter Management
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/admin/products')}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Product Management</CardTitle>
+              <Package className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">Manage Products</div>
+              <p className="text-xs text-muted-foreground">
+                Edit listings, verify products, and manage reviews
+              </p>
+              <Button variant="outline" className="w-full mt-4">
+                Open Product Management
               </Button>
             </CardContent>
           </Card>
@@ -83,8 +115,8 @@ const AdminDashboard = () => {
               </p>
               <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  <strong>New:</strong> User Management is now available! You can search, view, suspend, 
-                  and delete user accounts with full audit logging for accountability.
+                  <strong>New:</strong> Sitter and Product Management are now available! You can edit profiles, 
+                  set verification status, merge duplicates, and manage reviews with full audit logging.
                 </p>
               </div>
             </CardContent>
