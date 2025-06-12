@@ -42,6 +42,10 @@ import EntitySearchPage from "./pages/EntitySearchPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminEditUser from "./pages/AdminEditUser";
+import AdminSitters from "./pages/AdminSitters";
+import AdminProducts from "./pages/AdminProducts";
+import AdminEditSitter from "./pages/AdminEditSitter";
+import AdminEditProduct from "./pages/AdminEditProduct";
 
 const queryClient = new QueryClient();
 
@@ -100,6 +104,26 @@ const App = () => (
             <Route path="/admin/users/:userId/edit" element={
               <AdminLayout>
                 <AdminEditUser />
+              </AdminLayout>
+            } />
+            <Route path="/admin/sitters" element={
+              <AdminLayout>
+                <AdminSitters />
+              </AdminLayout>
+            } />
+            <Route path="/admin/sitters/:sitterId" element={
+              <AdminLayout>
+                <AdminEditSitter />
+              </AdminLayout>
+            } />
+            <Route path="/admin/products" element={
+              <AdminLayout>
+                <AdminProducts />
+              </AdminLayout>
+            } />
+            <Route path="/admin/products/:productId" element={
+              <AdminLayout>
+                <AdminEditProduct />
               </AdminLayout>
             } />
             

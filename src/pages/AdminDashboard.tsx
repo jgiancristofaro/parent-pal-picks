@@ -34,11 +34,41 @@ const AdminDashboard = () => {
 
           <Card>
             <CardHeader>
+              <CardTitle className="text-lg">Sitter Management</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 mb-4">Edit sitter profiles, verify accounts, and manage reviews.</p>
+              <button 
+                onClick={() => navigate('/admin/sitters')}
+                className="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition-colors"
+              >
+                Manage Sitters
+              </button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Product Management</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 mb-4">Edit product listings, verify items, and moderate content.</p>
+              <button 
+                onClick={() => navigate('/admin/products')}
+                className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors"
+              >
+                Manage Products
+              </button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle className="text-lg">Content Moderation</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 mb-4">Review flagged content and moderate reviews.</p>
-              <button className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors">
+              <button className="w-full bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700 transition-colors">
                 Review Content
               </button>
             </CardContent>
@@ -50,7 +80,7 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 mb-4">View platform statistics and user engagement.</p>
-              <button className="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition-colors">
+              <button className="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 transition-colors">
                 View Analytics
               </button>
             </CardContent>
