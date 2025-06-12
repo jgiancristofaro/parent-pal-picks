@@ -22,9 +22,9 @@ export const BottomNavigation = () => {
         <Home className={`w-6 h-6 ${isActive("/")}`} />
         <span className={`text-xs mt-1 ${isActive("/")}`}>Home</span>
       </Link>
-      <Link to="/activity" className="flex flex-col items-center">
-        <Users className={`w-6 h-6 ${isActive("/activity")}`} />
-        <span className={`text-xs mt-1 ${isActive("/activity")}`}>Friends</span>
+      <Link to="/activity-feed" className="flex flex-col items-center">
+        <Users className={`w-6 h-6 ${isActive("/activity-feed")}`} />
+        <span className={`text-xs mt-1 ${isActive("/activity-feed")}`}>Friends</span>
       </Link>
       <Link to="/search" className="flex flex-col items-center">
         <Search className={`w-6 h-6 ${isActive("/search")}`} />

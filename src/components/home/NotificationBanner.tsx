@@ -17,7 +17,7 @@ export const NotificationBanner = ({
     <div className="mx-4 mt-4 mb-4 bg-blue-100 border border-blue-200 rounded-lg overflow-hidden hover:bg-blue-200 transition-colors">
       <div className="flex items-center justify-between">
         <Link 
-          to="/activity" 
+          to="/activity-feed" 
           className="flex items-center flex-1 p-4 cursor-pointer"
           onClick={onActivityFeedClick}
         >

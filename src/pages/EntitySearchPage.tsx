@@ -1,19 +1,28 @@
 
-import SearchPageContent from "@/components/search/SearchPageContent";
+import { SearchPageContent } from "@/components/search/SearchPageContent";
 
 interface EntitySearchPageProps {
   type: 'sitter' | 'product';
   mode: 'discovery' | 'review';
+  onSitterSelect?: (sitter: any) => void;
+  onProductSelect?: (product: any) => void;
+  onCreateNew?: () => void;
 }
 
-const EntitySearchPage = ({ type, mode }: EntitySearchPageProps) => {
-  // Map review mode to search for compatibility with SearchPageContent
-  const searchMode = mode === 'review' ? 'search' : mode;
-
+const EntitySearchPage = ({ 
+  type, 
+  mode, 
+  onSitterSelect, 
+  onProductSelect, 
+  onCreateNew 
+}: EntitySearchPageProps) => {
   return (
     <SearchPageContent 
-      searchType={type}
-      mode={searchMode}
+      type={type}
+      mode={mode}
+      onSitterSelect={onSitterSelect}
+      onProductSelect={onProductSelect}
+      onCreateNew={onCreateNew}
     />
   );
 };

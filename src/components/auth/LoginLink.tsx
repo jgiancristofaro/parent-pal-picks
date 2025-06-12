@@ -7,7 +7,7 @@ const LoginLink = () => {
       <p className="text-gray-600">
         Already have an account?{" "}
         <Link 
-          to="/existing-user-login" 
+          to="/login-existing" 
           className="text-purple-500 font-semibold hover:text-purple-600 underline"
         >
           Log In

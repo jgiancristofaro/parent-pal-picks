@@ -1,12 +1,9 @@
 
 import React from "react";
 import { StarIcon } from "@/components/StarIcon";
-import { AdminActions } from "@/components/admin/AdminActions";
-import { useAdmin } from "@/hooks/useAdmin";
 
 interface ProfileHeaderProps {
   sitter: {
-    id?: string;
     name: string;
     role: string;
     rating: number;
@@ -17,8 +14,6 @@ interface ProfileHeaderProps {
 }
 
 export const ProfileHeader = ({ sitter, renderStars }: ProfileHeaderProps) => {
-  const { isAdmin } = useAdmin();
-
   return (
     <div className="bg-white pb-6">
       <div className="flex flex-col items-center pt-6 pb-4">
@@ -39,16 +34,6 @@ export const ProfileHeader = ({ sitter, renderStars }: ProfileHeaderProps) => {
             {sitter.rating} ({sitter.reviewCount} reviews)
           </span>
         </div>
-        
-        {isAdmin && sitter.id && (
-          <div className="mt-4">
-            <AdminActions 
-              userId={sitter.id}
-              userType="sitter"
-              entityId={sitter.id}
-            />
-          </div>
-        )}
       </div>
     </div>
   );

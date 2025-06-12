@@ -12,7 +12,6 @@ export interface Profile {
   phone_number_searchable: boolean;
   bio: string | null;
   identity_tag: string | null;
-  role: string;
   created_at: string;
   updated_at: string;
 }

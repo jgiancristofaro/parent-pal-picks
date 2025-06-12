@@ -45,7 +45,7 @@ export const FriendsActivity = ({ currentUserId }: FriendsActivityProps) => {
       <div className="flex justify-between items-center px-4 mb-2">
         <h2 className="text-xl font-bold">Friends' Activity</h2>
         {friendsActivity.length > 0 && (
-          <Link to="/activity" className="flex items-center text-purple-500 text-sm font-medium hover:text-purple-600">
+          <Link to="/activity-feed" className="flex items-center text-purple-500 text-sm font-medium hover:text-purple-600">
             View All
             <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
