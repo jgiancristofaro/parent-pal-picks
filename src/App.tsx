@@ -92,6 +92,7 @@ function App() {
               <Route path="/admin/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
               <Route path="/admin/products/:id" element={<ProtectedRoute><AdminProductEdit /></ProtectedRoute>} />
               <Route path="/admin/flags" element={<ProtectedRoute><AdminFlags /></ProtectedRoute>} />
+              <Route path="/admin/import" element={<ProtectedRoute><AdminImport /></ProtectedRoute>} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>

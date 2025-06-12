@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Shield, Users, Database, Settings, User, Package, AlertTriangle } from 'lucide-react';
+import { Shield, Users, Database, Settings, User, Package, AlertTriangle, Upload } from 'lucide-react';
 
 const AdminDashboard = () => {
   const { profile } = useAuth();
@@ -92,6 +92,22 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
 
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/admin/import')}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Bulk Import</CardTitle>
+              <Upload className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">Import Data</div>
+              <p className="text-xs text-muted-foreground">
+                Upload CSV files to add multiple sitters or products
+              </p>
+              <Button variant="outline" className="w-full mt-4">
+                Open Bulk Import
+              </Button>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Database Management</CardTitle>
@@ -127,12 +143,11 @@ const AdminDashboard = () => {
             <CardContent>
               <p className="text-gray-600">
                 You have administrator privileges for the ParentPal platform. This dashboard 
-                provides access to user management, content moderation, and system administration tools.
+                provides access to user management, content moderation, system administration tools, and bulk import functionality.
               </p>
               <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  <strong>New:</strong> Content Moderation is now available! You can review user-flagged content 
-                  and take appropriate action to maintain community standards.
+                  <strong>New:</strong> Bulk Import is now available! You can upload CSV files to quickly add multiple sitters or products to the platform.
                 </p>
               </div>
             </CardContent>
