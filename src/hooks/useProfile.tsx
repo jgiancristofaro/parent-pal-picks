@@ -13,6 +13,8 @@ interface ProfileWithFollowStatus {
   phone_number_searchable: boolean;
   bio: string | null;
   identity_tag: string | null;
+  role: string;
+  is_suspended: boolean;
   created_at: string;
   updated_at: string;
   last_activity_feed_view_at: string | null;

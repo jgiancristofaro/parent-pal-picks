@@ -21,6 +21,13 @@ interface UseAdminUsersProps {
   pageSize?: number;
 }
 
+interface SuspendUserResponse {
+  success: boolean;
+  action: string;
+  target_user_id: string;
+  new_status: boolean;
+}
+
 export const useAdminUsers = ({ searchTerm = '', page = 0, pageSize = 50 }: UseAdminUsersProps = {}) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -55,7 +62,7 @@ export const useAdminUsers = ({ searchTerm = '', page = 0, pageSize = 50 }: UseA
         throw error;
       }
 
-      return data;
+      return data as SuspendUserResponse;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
