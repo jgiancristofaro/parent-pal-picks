@@ -4,28 +4,36 @@ import { Input } from "@/components/ui/input";
 import { Search as SearchIcon } from "lucide-react";
 
 interface SearchInputProps {
-  searchType: 'sitter' | 'product' | 'parent';
-  onSearch: (query: string) => void;
+  searchType?: 'sitter' | 'product' | 'parent';
+  onSearch?: (query: string) => void;
   initialValue?: string;
   placeholder?: string;
+  searchTerm?: string;
+  onSearchTermChange?: (term: string) => void;
 }
 
 export const SearchInput = ({ 
   searchType, 
   onSearch, 
   initialValue = '', 
-  placeholder = 'Search...' 
+  placeholder = 'Search...',
+  searchTerm,
+  onSearchTermChange
 }: SearchInputProps) => {
-  const [value, setValue] = useState(initialValue);
+  // Support both interface patterns for backward compatibility
+  const [value, setValue] = useState(searchTerm || initialValue);
+  const searchHandler = onSearch || onSearchTermChange;
 
   useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
+    setValue(searchTerm || initialValue);
+  }, [searchTerm, initialValue]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setValue(newValue);
-    onSearch(newValue);
+    if (searchHandler) {
+      searchHandler(newValue);
+    }
   };
 
   return (

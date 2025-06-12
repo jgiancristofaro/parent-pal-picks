@@ -20,33 +20,16 @@ const SearchPageContent = ({ searchType, mode }: SearchPageContentProps) => {
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const { user } = useAuth();
 
-  const {
-    searchTerm,
-    setSearchTerm,
-    friendRecommendedOnly,
-    setFriendRecommendedOnly,
-    selectedUserHomeId,
-    setSelectedUserHomeId,
-    localSearchScope,
-    setLocalSearchScope
-  } = useSearchFilters();
+  const searchFilters = useSearchFilters();
 
-  const {
-    searchTerm: unifiedSearchTerm,
-    setSearchTerm: setUnifiedSearchTerm,
-    searchResults,
-    isSearching,
-    handleSearch,
-    handleKeyPress,
-    refreshResults
-  } = useUnifiedSearch();
+  const unifiedSearch = useUnifiedSearch();
 
   useEffect(() => {
     if (searchQuery.length > 0) {
-      setUnifiedSearchTerm(searchQuery);
-      handleSearch();
+      unifiedSearch.setSearchTerm(searchQuery);
+      unifiedSearch.handleSearch();
     }
-  }, [searchQuery, setUnifiedSearchTerm, handleSearch]);
+  }, [searchQuery]);
 
   const handleSearchInput = (query: string) => {
     setSearchQuery(query);
@@ -54,11 +37,11 @@ const SearchPageContent = ({ searchType, mode }: SearchPageContentProps) => {
 
   const handleClearSearch = () => {
     setSearchQuery('');
-    setUnifiedSearchTerm('');
+    unifiedSearch.setSearchTerm('');
   };
 
   const showResults = searchQuery.length > 0;
-  const showNoResults = showResults && searchResults.length === 0 && !isSearching;
+  const showNoResults = showResults && unifiedSearch.searchResults.length === 0 && !unifiedSearch.isSearching;
   const showSuggestions = !showResults && searchType === 'parent';
 
   return (
@@ -78,9 +61,9 @@ const SearchPageContent = ({ searchType, mode }: SearchPageContentProps) => {
 
       {showResults && (
         <SearchResults
-          results={searchResults}
+          results={unifiedSearch.searchResults}
           searchType={searchType}
-          loading={isSearching}
+          loading={unifiedSearch.isSearching}
           hasMore={false}
           onLoadMore={() => {}}
           searchQuery={searchQuery}

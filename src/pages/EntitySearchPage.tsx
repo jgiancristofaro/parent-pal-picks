@@ -7,10 +7,13 @@ interface EntitySearchPageProps {
 }
 
 const EntitySearchPage = ({ type, mode }: EntitySearchPageProps) => {
+  // Map review mode to search for compatibility with SearchPageContent
+  const searchMode = mode === 'review' ? 'search' : mode;
+
   return (
     <SearchPageContent 
       searchType={type}
-      mode={mode}
+      mode={searchMode}
     />
   );
 };
