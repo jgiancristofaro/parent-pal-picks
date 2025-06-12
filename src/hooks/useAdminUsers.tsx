@@ -15,6 +15,19 @@ interface AdminUser {
   last_login_at: string | null;
 }
 
+interface SuspendUserResponse {
+  success: boolean;
+  action: string;
+  target_user_id: string;
+  new_status: boolean;
+}
+
+interface DeleteUserResponse {
+  success: boolean;
+  action: string;
+  target_user_id: string;
+}
+
 export const useAdminUsers = () => {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(false);
@@ -85,16 +98,19 @@ export const useAdminUsers = () => {
         return false;
       }
 
+      // Type assertion to handle the Json type from Supabase
+      const response = data as SuspendUserResponse;
+
       // Update local state
       setUsers(prev => prev.map(user => 
         user.id === userId 
-          ? { ...user, is_suspended: data.new_status }
+          ? { ...user, is_suspended: response.new_status }
           : user
       ));
 
       toast({
         title: "Success",
-        description: `User ${data.new_status ? 'suspended' : 'unsuspended'} successfully`,
+        description: `User ${response.new_status ? 'suspended' : 'unsuspended'} successfully`,
       });
 
       return true;
@@ -120,6 +136,9 @@ export const useAdminUsers = () => {
         });
         return false;
       }
+
+      // Type assertion to handle the Json type from Supabase
+      const response = data as DeleteUserResponse;
 
       // Remove user from local state
       setUsers(prev => prev.filter(user => user.id !== userId));
