@@ -24,7 +24,7 @@ export const AdminReviewActions = ({ reviewId, onDeleted }: AdminReviewActionsPr
 
     try {
       const { error } = await supabase
-        .from('sitter_reviews')
+        .from('reviews')
         .delete()
         .eq('id', reviewId);
 

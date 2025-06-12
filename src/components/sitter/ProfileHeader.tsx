@@ -47,7 +47,9 @@ export const ProfileHeader = ({ sitter, renderStars }: ProfileHeaderProps) => {
             </Button>
           )}
           {sitter.is_verified && (
-            <Check className="h-4 w-4 text-green-600" title="Verified" />
+            <div title="Verified">
+              <Check className="h-4 w-4 text-green-600" />
+            </div>
           )}
         </div>
         <p className="text-purple-500">{sitter.role}</p>
