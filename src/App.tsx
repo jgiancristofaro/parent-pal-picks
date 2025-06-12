@@ -43,6 +43,7 @@ import AdminSitterEdit from './pages/AdminSitterEdit';
 import AdminProducts from './pages/AdminProducts';
 import AdminProductEdit from './pages/AdminProductEdit';
 import AdminFlags from './pages/AdminFlags';
+import AdminImport from './pages/AdminImport';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
