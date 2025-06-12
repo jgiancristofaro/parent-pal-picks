@@ -24,6 +24,12 @@ interface FlaggedContentItem {
   };
 }
 
+interface FlagContentResponse {
+  success?: boolean;
+  error?: string;
+  flag_id?: string;
+}
+
 export const useFlagContent = () => {
   const { toast } = useToast();
 
@@ -40,10 +46,10 @@ export const useFlagContent = () => {
       });
 
       if (error) throw error;
-      return data;
+      return data as FlagContentResponse;
     },
     onSuccess: (data) => {
-      if (data.error) {
+      if (data?.error) {
         toast({
           title: "Error",
           description: data.error,
@@ -83,7 +89,14 @@ export const useAdminFlaggedContent = (status = 'pending') => {
       });
 
       if (error) throw error;
-      return data || [];
+      
+      // Transform the data to match our interface
+      return (data || []).map((item: any) => ({
+        ...item,
+        content_data: typeof item.content_data === 'string' 
+          ? JSON.parse(item.content_data) 
+          : item.content_data
+      })) as FlaggedContentItem[];
     },
   });
 
