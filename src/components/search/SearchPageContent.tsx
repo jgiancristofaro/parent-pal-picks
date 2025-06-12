@@ -152,7 +152,7 @@ export const SearchPageContent = ({
         setLocalSearchScope={setLocalSearchScope}
         displayedSitters={displayedSitters}
         localSittersLoading={localSittersLoading}
-        shouldFetchLocalSitters={shouldFetchLocalSitters}
+        shouldFetchLocalSitters={Boolean(shouldFetchLocalSitters)}
         handleSelectForReview={handleSelectForReview}
         handleCreateNewForReview={handleCreateNewForReview}
       />
