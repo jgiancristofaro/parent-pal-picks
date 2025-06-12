@@ -64,6 +64,36 @@ export type Database = {
           },
         ]
       }
+      audit_log: {
+        Row: {
+          action_type: string
+          admin_id: string
+          created_at: string
+          id: string
+          reason: string | null
+          target_id: string
+          timestamp: string
+        }
+        Insert: {
+          action_type: string
+          admin_id: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          target_id: string
+          timestamp?: string
+        }
+        Update: {
+          action_type?: string
+          admin_id?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          target_id?: string
+          timestamp?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -182,6 +212,7 @@ export type Database = {
           full_name: string
           id: string
           identity_tag: string | null
+          is_suspended: boolean
           last_activity_feed_view_at: string | null
           last_alerts_viewed_at: string | null
           last_login_at: string | null
@@ -199,6 +230,7 @@ export type Database = {
           full_name: string
           id: string
           identity_tag?: string | null
+          is_suspended?: boolean
           last_activity_feed_view_at?: string | null
           last_alerts_viewed_at?: string | null
           last_login_at?: string | null
@@ -216,6 +248,7 @@ export type Database = {
           full_name?: string
           id?: string
           identity_tag?: string | null
+          is_suspended?: boolean
           last_activity_feed_view_at?: string | null
           last_alerts_viewed_at?: string | null
           last_login_at?: string | null
@@ -459,6 +492,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_user: {
+        Args: { target_user_id: string; deletion_reason?: string }
+        Returns: Json
+      }
+      admin_get_users: {
+        Args: {
+          search_term?: string
+          page_limit?: number
+          page_offset?: number
+        }
+        Returns: {
+          id: string
+          full_name: string
+          username: string
+          email: string
+          phone_number: string
+          role: string
+          is_suspended: boolean
+          created_at: string
+          last_login_at: string
+        }[]
+      }
+      admin_suspend_user: {
+        Args: { target_user_id: string; suspend_reason?: string }
+        Returns: Json
+      }
       check_rate_limit: {
         Args: {
           p_identifier: string
