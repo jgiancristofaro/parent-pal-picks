@@ -40,6 +40,8 @@ import EditProfile from "./pages/EditProfile";
 import AlertsPage from "./pages/AlertsPage";
 import EntitySearchPage from "./pages/EntitySearchPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminUsers from "./pages/AdminUsers";
+import AdminEditUser from "./pages/AdminEditUser";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +90,16 @@ const App = () => (
             <Route path="/admin" element={
               <AdminLayout>
                 <AdminDashboard />
+              </AdminLayout>
+            } />
+            <Route path="/admin/users" element={
+              <AdminLayout>
+                <AdminUsers />
+              </AdminLayout>
+            } />
+            <Route path="/admin/users/:userId/edit" element={
+              <AdminLayout>
+                <AdminEditUser />
               </AdminLayout>
             } />
             

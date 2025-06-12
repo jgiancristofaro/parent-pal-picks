@@ -2,9 +2,11 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
   const { profile } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -21,7 +23,10 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 mb-4">Manage users, view profiles, and handle suspensions.</p>
-              <button className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors">
+              <button 
+                onClick={() => navigate('/admin/users')}
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
+              >
                 Manage Users
               </button>
             </CardContent>
