@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { EditReviewButton } from "@/components/review/EditReviewButton";
 import { useProfileFollowing } from "@/hooks/useProfileFollowing";
 import { Button } from "@/components/ui/button";
+import { FlagButton } from "@/components/moderation/FlagButton";
 
 interface Review {
   id: string;
@@ -86,15 +87,23 @@ export const ReviewsSection = ({ reviews, renderStars, sitterId }: ReviewsSectio
                   <p className="font-medium">{review.userName}</p>
                   <p className="text-gray-500 text-sm">{review.date}</p>
                 </div>
-                {user && review.userId === user.id && sitterId && (
-                  <EditReviewButton
-                    reviewId={review.id}
-                    rating={review.rating}
-                    title={review.title || ""}
-                    content={review.content}
-                    sitterId={sitterId}
-                  />
-                )}
+                <div className="flex items-center gap-2">
+                  {user && review.userId === user.id && sitterId && (
+                    <EditReviewButton
+                      reviewId={review.id}
+                      rating={review.rating}
+                      title={review.title || ""}
+                      content={review.content}
+                      sitterId={sitterId}
+                    />
+                  )}
+                  {user && review.userId !== user.id && (
+                    <FlagButton
+                      contentType="review"
+                      contentId={review.id}
+                    />
+                  )}
+                </div>
               </div>
               <div className="flex mb-2">
                 {renderStars(review.rating)}

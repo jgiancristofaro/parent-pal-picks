@@ -68,7 +68,10 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 mb-4">Review flagged content and moderate reviews.</p>
-              <button className="w-full bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700 transition-colors">
+              <button 
+                onClick={() => navigate('/admin/content-moderation')}
+                className="w-full bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700 transition-colors"
+              >
                 Review Content
               </button>
             </CardContent>

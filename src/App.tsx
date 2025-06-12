@@ -46,6 +46,7 @@ import AdminSitters from "./pages/AdminSitters";
 import AdminProducts from "./pages/AdminProducts";
 import AdminEditSitter from "./pages/AdminEditSitter";
 import AdminEditProduct from "./pages/AdminEditProduct";
+import AdminContentModeration from "./pages/AdminContentModeration";
 
 const queryClient = new QueryClient();
 
@@ -124,6 +125,11 @@ const App = () => (
             <Route path="/admin/products/:productId" element={
               <AdminLayout>
                 <AdminEditProduct />
+              </AdminLayout>
+            } />
+            <Route path="/admin/content-moderation" element={
+              <AdminLayout>
+                <AdminContentModeration />
               </AdminLayout>
             } />
             
