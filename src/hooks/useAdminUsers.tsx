@@ -43,6 +43,8 @@ export const useAdminUsers = ({ searchTerm = '', page = 0, pageSize = 50 }: UseA
   const { data: users = [], isLoading, error, isFetching } = useQuery({
     queryKey: ['admin-users', effectiveSearchTerm, page, pageSize],
     queryFn: async (): Promise<AdminUser[]> => {
+      console.log('Fetching admin users with search term:', effectiveSearchTerm);
+      
       const { data, error } = await supabase.rpc('admin_get_users', {
         search_term: effectiveSearchTerm,
         page_limit: pageSize,
@@ -51,9 +53,15 @@ export const useAdminUsers = ({ searchTerm = '', page = 0, pageSize = 50 }: UseA
 
       if (error) {
         console.error('Error fetching admin users:', error);
+        toast({
+          title: "Error",
+          description: `Failed to fetch users: ${error.message}`,
+          variant: "destructive",
+        });
         throw error;
       }
 
+      console.log('Successfully fetched admin users:', data?.length || 0, 'results');
       return data || [];
     },
     enabled: shouldSearch, // Only run query when search criteria is met

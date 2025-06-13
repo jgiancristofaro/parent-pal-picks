@@ -8,8 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Edit, UserX, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
+import { Search, Edit, UserX, Trash2, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import { useAdminUsers } from '@/hooks/useAdminUsers';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { format } from 'date-fns';
 
 const AdminUsers = () => {
@@ -27,7 +28,8 @@ const AdminUsers = () => {
     suspendUser, 
     deleteUser, 
     isSuspending, 
-    isDeleting 
+    isDeleting,
+    error
   } = useAdminUsers({
     searchTerm,
     page,
@@ -126,6 +128,16 @@ const AdminUsers = () => {
                   `Found ${users.length} user${users.length !== 1 ? 's' : ''} matching "${searchTerm}"`
                 )}
               </div>
+            )}
+
+            {/* Error Display */}
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Error loading users: {error.message}
+                </AlertDescription>
+              </Alert>
             )}
           </CardHeader>
 
