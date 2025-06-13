@@ -105,10 +105,11 @@ export const useAdminProductMutations = () => {
 
   const deleteProductMutation = useMutation({
     mutationFn: async ({ productId, reason }: { productId: string; reason?: string }) => {
-      const { data, error } = await supabase.rpc('admin_delete_product', {
-        target_product_id: productId,
-        deletion_reason: reason || 'Admin deletion',
-      });
+      const { data, error } = await supabase
+        .rpc('admin_delete_product', {
+          target_product_id: productId,
+          deletion_reason: reason || 'Admin deletion',
+        });
 
       if (error) throw error;
       return data;

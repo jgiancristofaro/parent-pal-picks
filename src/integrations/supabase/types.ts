@@ -537,6 +537,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_product: {
+        Args: { target_product_id: string; deletion_reason?: string }
+        Returns: Json
+      }
       admin_delete_review: {
         Args: { review_id: string; deletion_reason?: string }
         Returns: Json
