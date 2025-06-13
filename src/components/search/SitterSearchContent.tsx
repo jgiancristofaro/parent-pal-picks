@@ -3,6 +3,7 @@ import { SearchFilters } from "@/components/search/SearchFilters";
 import { HyperLocalSitters } from "@/components/search/HyperLocalSitters";
 import { SearchResultsGrid } from "@/components/search/SearchResultsGrid";
 import { SitterSearchResultCard } from "@/components/review/SitterSearchResultCard";
+import { EnhancedSitterSearchResultCard } from "@/components/review/EnhancedSitterSearchResultCard";
 import { NoResultsMessage } from "./NoResultsMessage";
 
 interface SitterSearchContentProps {
@@ -22,6 +23,7 @@ interface SitterSearchContentProps {
   localSittersLoading: boolean;
   shouldFetchLocalSitters: boolean;
   handleSelectForReview: (item: any) => void;
+  handleEditExistingReview?: (reviewData: any) => void;
   handleCreateNewForReview: () => void;
 }
 
@@ -42,6 +44,7 @@ export const SitterSearchContent = ({
   localSittersLoading,
   shouldFetchLocalSitters,
   handleSelectForReview,
+  handleEditExistingReview,
   handleCreateNewForReview,
 }: SitterSearchContentProps) => {
   return (
@@ -75,10 +78,11 @@ export const SitterSearchContent = ({
         mode === 'review' ? (
           <div className="space-y-3">
             {displayedSitters.map((sitter) => (
-              <SitterSearchResultCard
+              <EnhancedSitterSearchResultCard
                 key={sitter.id}
                 sitter={sitter}
-                onSelectSitter={() => handleSelectForReview(sitter)}
+                onSelectForNewReview={() => handleSelectForReview(sitter)}
+                onEditExistingReview={handleEditExistingReview || (() => {})}
               />
             ))}
           </div>

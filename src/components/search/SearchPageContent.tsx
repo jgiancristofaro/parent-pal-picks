@@ -83,6 +83,17 @@ export const SearchPageContent = ({
     }
   };
 
+  const handleEditExistingReview = (reviewData: any) => {
+    if (mode === 'review') {
+      navigate('/add-review', { 
+        state: { 
+          editMode: true,
+          ...reviewData
+        }
+      });
+    }
+  };
+
   const handleCreateNewForReview = () => {
     if (mode === 'review') {
       navigate('/add-review', { 
@@ -124,6 +135,7 @@ export const SearchPageContent = ({
           handleCategoryClick={handleCategoryClick}
           filteredProducts={filteredProducts}
           handleSelectForReview={handleSelectForReview}
+          handleEditExistingReview={handleEditExistingReview}
           handleCreateNewForReview={handleCreateNewForReview}
         />
         
@@ -154,6 +166,7 @@ export const SearchPageContent = ({
         localSittersLoading={localSittersLoading}
         shouldFetchLocalSitters={Boolean(shouldFetchLocalSitters)}
         handleSelectForReview={handleSelectForReview}
+        handleEditExistingReview={handleEditExistingReview}
         handleCreateNewForReview={handleCreateNewForReview}
       />
       

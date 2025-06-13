@@ -4,6 +4,7 @@ import { FriendRecommendationToggle } from "@/components/search/FriendRecommenda
 import { CategoryFilterPills } from "@/components/search/CategoryFilterPills";
 import { ProductsGrid } from "@/components/search/ProductsGrid";
 import { ProductSearchResultCard } from "@/components/review/ProductSearchResultCard";
+import { EnhancedProductSearchResultCard } from "@/components/review/EnhancedProductSearchResultCard";
 import { NoResultsMessage } from "./NoResultsMessage";
 
 interface ProductSearchContentProps {
@@ -17,6 +18,7 @@ interface ProductSearchContentProps {
   handleCategoryClick: (category: string | null) => void;
   filteredProducts: any[];
   handleSelectForReview: (item: any) => void;
+  handleEditExistingReview?: (reviewData: any) => void;
   handleCreateNewForReview: () => void;
 }
 
@@ -31,6 +33,7 @@ export const ProductSearchContent = ({
   handleCategoryClick,
   filteredProducts,
   handleSelectForReview,
+  handleEditExistingReview,
   handleCreateNewForReview,
 }: ProductSearchContentProps) => {
   return (
@@ -55,10 +58,11 @@ export const ProductSearchContent = ({
         mode === 'review' ? (
           <div className="space-y-3">
             {filteredProducts.map((product) => (
-              <ProductSearchResultCard
+              <EnhancedProductSearchResultCard
                 key={product.id}
                 product={product}
-                onSelect={() => handleSelectForReview(product)}
+                onSelectForNewReview={() => handleSelectForReview(product)}
+                onEditExistingReview={handleEditExistingReview || (() => {})}
               />
             ))}
           </div>
