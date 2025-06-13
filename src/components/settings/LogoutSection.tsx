@@ -4,13 +4,11 @@ import { LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 
 export const LogoutSection = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { session } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
@@ -19,20 +17,10 @@ export const LogoutSection = () => {
     setIsLoggingOut(true);
     
     try {
-      // Check if we have a valid session before attempting logout
-      if (!session) {
-        console.log('No active session found, clearing storage and redirecting...');
-        // Clear any stored data and redirect
-        localStorage.clear();
-        sessionStorage.clear();
-        navigate("/");
-        return;
-      }
-
-      console.log('Attempting to sign out user:', session.user?.id);
+      console.log('Attempting to sign out...');
       
-      // Sign out from Supabase
-      const { error } = await supabase.auth.signOut();
+      // Sign out from Supabase with global scope to ensure complete logout
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
       
       if (error) {
         console.error('Logout error:', error);
@@ -44,7 +32,7 @@ export const LogoutSection = () => {
         return;
       }
 
-      // Only clear storage after successful logout
+      // Clear storage after successful logout
       localStorage.clear();
       sessionStorage.clear();
       
