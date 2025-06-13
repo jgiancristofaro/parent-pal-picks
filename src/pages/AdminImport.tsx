@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -229,7 +228,7 @@ const AdminImport = () => {
                   <div key={field}>
                     <Label>{label}</Label>
                     <Select
-                      value={Object.keys(columnMapping).find(key => columnMapping[key] === field) || ''}
+                      value={Object.keys(columnMapping).find(key => columnMapping[key] === field) || 'no-mapping'}
                       onValueChange={(csvColumn) => {
                         const newMapping = { ...columnMapping };
                         // Remove any existing mapping to this field
@@ -238,8 +237,8 @@ const AdminImport = () => {
                             delete newMapping[key];
                           }
                         });
-                        // Add new mapping
-                        if (csvColumn) {
+                        // Add new mapping only if not "no-mapping"
+                        if (csvColumn && csvColumn !== 'no-mapping') {
                           newMapping[csvColumn] = field;
                         }
                         setColumnMapping(newMapping);
@@ -249,7 +248,7 @@ const AdminImport = () => {
                         <SelectValue placeholder="Select CSV column..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">-- No mapping --</SelectItem>
+                        <SelectItem value="no-mapping">-- No mapping --</SelectItem>
                         {csvData.headers.map(header => (
                           <SelectItem key={header} value={header}>{header}</SelectItem>
                         ))}
