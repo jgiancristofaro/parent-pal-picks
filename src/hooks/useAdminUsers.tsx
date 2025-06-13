@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
 
 interface AdminUser {
   id: string;
@@ -31,12 +32,19 @@ interface SuspendUserResponse {
 export const useAdminUsers = ({ searchTerm = '', page = 0, pageSize = 50 }: UseAdminUsersProps = {}) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Debounce search term with 500ms delay
+  const debouncedSearchTerm = useDebouncedSearch(searchTerm, 500);
+  
+  // Only search if term is at least 2 characters or empty (for initial load)
+  const shouldSearch = debouncedSearchTerm.length === 0 || debouncedSearchTerm.length >= 2;
+  const effectiveSearchTerm = shouldSearch ? debouncedSearchTerm : '';
 
-  const { data: users = [], isLoading, error } = useQuery({
-    queryKey: ['admin-users', searchTerm, page, pageSize],
+  const { data: users = [], isLoading, error, isFetching } = useQuery({
+    queryKey: ['admin-users', effectiveSearchTerm, page, pageSize],
     queryFn: async (): Promise<AdminUser[]> => {
       const { data, error } = await supabase.rpc('admin_get_users', {
-        search_term: searchTerm,
+        search_term: effectiveSearchTerm,
         page_limit: pageSize,
         page_offset: page * pageSize,
       });
@@ -48,6 +56,9 @@ export const useAdminUsers = ({ searchTerm = '', page = 0, pageSize = 50 }: UseA
 
       return data || [];
     },
+    enabled: shouldSearch, // Only run query when search criteria is met
+    staleTime: 30000, // Cache for 30 seconds
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });
 
   const suspendUserMutation = useMutation({
@@ -113,7 +124,10 @@ export const useAdminUsers = ({ searchTerm = '', page = 0, pageSize = 50 }: UseA
   return {
     users,
     isLoading,
+    isFetching,
     error,
+    isSearching: !shouldSearch || (searchTerm !== debouncedSearchTerm),
+    hasSearchTerm: debouncedSearchTerm.length > 0,
     suspendUser: suspendUserMutation.mutate,
     deleteUser: deleteUserMutation.mutate,
     isSuspending: suspendUserMutation.isPending,
