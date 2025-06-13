@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +10,9 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ArrowLeft, Save, Trash2, Merge } from 'lucide-react';
-import { useAdminProducts, useAdminProductReviews } from '@/hooks/useAdminProducts';
+import { useAdminProduct } from '@/hooks/useAdminProduct';
+import { useAdminProductMutations } from '@/hooks/admin/useAdminProductMutations';
+import { useAdminProductReviews } from '@/hooks/admin/useAdminProductReviews';
 import { useToast } from '@/hooks/use-toast';
 
 const AdminEditProduct = () => {
@@ -17,10 +20,9 @@ const AdminEditProduct = () => {
   const { productId } = useParams<{ productId: string }>();
   const { toast } = useToast();
   
-  const { products, updateProduct, setVerifiedStatus, isUpdating } = useAdminProducts();
+  const { product, isLoading: isLoadingProduct, error: productError } = useAdminProduct(productId || '');
+  const { updateProduct, setVerifiedStatus, isUpdating } = useAdminProductMutations();
   const { reviews, deleteReview, isDeleting } = useAdminProductReviews(productId || '');
-  
-  const product = products.find(p => p.id === productId);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -80,7 +82,19 @@ const AdminEditProduct = () => {
     }
   };
 
-  if (!product) {
+  if (isLoadingProduct) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center py-8">
+            <p className="text-gray-500">Loading product...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (productError || !product) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-5xl mx-auto">
