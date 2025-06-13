@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CheckCircle, Loader2 } from 'lucide-react';
-import { useSignUpForm } from '@/hooks/useSignUpForm';
+import { useSignUpFlow } from '@/hooks/useSignUpFlow';
 
 interface SignUpData {
   firstName: string;
@@ -21,24 +21,10 @@ interface ConfirmationStepProps {
 }
 
 const ConfirmationStep = ({ signUpData, onPrev }: ConfirmationStepProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { handleSubmit: submitSignUp } = useSignUpForm();
+  const { signUp, isLoading } = useSignUpFlow();
 
   const handleCreateAccount = async () => {
-    setIsSubmitting(true);
-    
-    // Create a mock form event for the existing hook
-    const mockEvent = {
-      preventDefault: () => {},
-    } as React.FormEvent;
-
-    try {
-      await submitSignUp(mockEvent);
-    } catch (error) {
-      console.error('Sign up error:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await signUp(signUpData);
   };
 
   return (
@@ -76,17 +62,17 @@ const ConfirmationStep = ({ signUpData, onPrev }: ConfirmationStepProps) => {
           onClick={onPrev}
           variant="outline"
           className="flex-1 py-6 text-lg"
-          disabled={isSubmitting}
+          disabled={isLoading}
         >
           Back
         </Button>
         
         <Button
           onClick={handleCreateAccount}
-          disabled={isSubmitting}
+          disabled={isLoading}
           className="flex-1 py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-lg"
         >
-          {isSubmitting ? (
+          {isLoading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               Creating Account...

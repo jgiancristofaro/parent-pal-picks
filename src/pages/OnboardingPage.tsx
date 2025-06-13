@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -26,12 +25,12 @@ const OnboardingPage = () => {
 
   const handleSignUp = () => {
     localStorage.setItem('hasSeenParentPalOnboarding', 'true');
-    navigate('/login');
+    navigate('/signup');
   };
 
   const handleLogin = () => {
     localStorage.setItem('hasSeenParentPalOnboarding', 'true');
-    navigate('/login-existing');
+    navigate('/login');
   };
 
   const handleNext = () => {

@@ -23,8 +23,8 @@ const Index = () => {
       // First-time user, redirect to onboarding
       navigate("/onboarding");
     } else {
-      // Returning user, proceed to login
-      navigate("/login");
+      // Returning user, proceed to signup (they can navigate to login from there)
+      navigate("/signup");
     }
   }, [navigate, session, isLoading]);
 

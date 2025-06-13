@@ -1,6 +1,5 @@
-
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -11,6 +10,7 @@ import { AlertsProvider } from "@/contexts/AlertsContext";
 
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+import SignUpFlow from "./pages/SignUpFlow";
 import ExistingUserLoginPage from "./pages/ExistingUserLoginPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import UpdatePasswordPage from "./pages/UpdatePasswordPage";
@@ -62,7 +62,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
-            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUpFlow />} />
+            <Route path="/login" element={<ExistingUserLoginPage />} />
             <Route path="/login-existing" element={<ExistingUserLoginPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/update-password" element={<UpdatePasswordPage />} />
