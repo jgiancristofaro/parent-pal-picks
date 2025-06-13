@@ -6,20 +6,64 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ArrowLeft, Search, Edit, Shield, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Search, Edit, Shield, ShieldCheck, AlertCircle } from 'lucide-react';
 import { useAdminProducts } from '@/hooks/useAdminProducts';
+import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 
 const AdminProducts = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const { products, isLoading } = useAdminProducts(searchTerm);
+  const debouncedSearchTerm = useDebouncedSearch(searchTerm, 500);
+  const { products, isLoading, error } = useAdminProducts(debouncedSearchTerm);
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-4 mb-6">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/admin')}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Dashboard
+            </Button>
+          </div>
+          <Card>
+            <CardContent className="p-8 text-center">
+              <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Products</h3>
+              <p className="text-gray-600 mb-4">
+                {error.message || 'There was an error loading the products. Please try again.'}
+              </p>
+              <Button onClick={() => window.location.reload()}>
+                Retry
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-4 mb-6">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/admin')}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Dashboard
+            </Button>
+          </div>
           <div className="text-center py-8">
-            <p className="text-gray-500">Loading products...</p>
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            <p className="text-gray-500 mt-4">Loading products...</p>
           </div>
         </div>
       </div>
@@ -58,6 +102,11 @@ const AdminProducts = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
+              {searchTerm !== debouncedSearchTerm && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin h-4 w-4 border-2 border-gray-300 border-t-gray-600 rounded-full"></div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -65,7 +114,14 @@ const AdminProducts = () => {
         {/* Products Table */}
         <Card>
           <CardHeader>
-            <CardTitle>All Products ({products.length})</CardTitle>
+            <CardTitle>
+              All Products ({products.length})
+              {debouncedSearchTerm && (
+                <span className="text-sm font-normal text-gray-500 ml-2">
+                  - filtered by "{debouncedSearchTerm}"
+                </span>
+              )}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
@@ -140,9 +196,11 @@ const AdminProducts = () => {
               </TableBody>
             </Table>
 
-            {products.length === 0 && (
+            {products.length === 0 && !isLoading && (
               <div className="text-center py-8">
-                <p className="text-gray-500">No products found</p>
+                <p className="text-gray-500">
+                  {debouncedSearchTerm ? `No products found for "${debouncedSearchTerm}"` : 'No products found'}
+                </p>
               </div>
             )}
           </CardContent>

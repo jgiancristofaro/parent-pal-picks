@@ -34,9 +34,11 @@ export const useAdminProducts = (searchTerm = '', page = 0, pageSize = 50) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: products = [], isLoading, error } = useQuery({
+  const { data: products = [], isLoading, error, isFetching } = useQuery({
     queryKey: ['admin-products', searchTerm, page, pageSize],
     queryFn: async (): Promise<AdminProduct[]> => {
+      console.log('Fetching admin products with search term:', searchTerm);
+      
       const { data, error } = await supabase.rpc('admin_get_all_products', {
         search_term: searchTerm,
         page_limit: pageSize,
@@ -48,8 +50,11 @@ export const useAdminProducts = (searchTerm = '', page = 0, pageSize = 50) => {
         throw error;
       }
 
+      console.log('Successfully fetched admin products:', data?.length || 0, 'results');
       return data || [];
     },
+    staleTime: 30000, // Cache for 30 seconds
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });
 
   const updateProductMutation = useMutation({
@@ -151,6 +156,7 @@ export const useAdminProducts = (searchTerm = '', page = 0, pageSize = 50) => {
   return {
     products,
     isLoading,
+    isFetching,
     error,
     updateProduct: updateProductMutation.mutate,
     setVerifiedStatus: setVerifiedStatusMutation.mutate,
