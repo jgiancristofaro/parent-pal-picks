@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { StarIcon } from "./StarIcon";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +39,27 @@ export const SitterCard = ({
     return `Recommended by ${count} friends`;
   };
 
+  const renderStars = (rating: number) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+    
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<StarIcon key={i} filled={true} className="w-3 h-3 text-yellow-500" />);
+    }
+    
+    if (hasHalfStar) {
+      stars.push(<StarIcon key="half" filled={false} className="w-3 h-3 text-yellow-500" />);
+    }
+    
+    const remainingStars = 5 - Math.ceil(rating);
+    for (let i = 0; i < remainingStars; i++) {
+      stars.push(<StarIcon key={`empty-${i}`} filled={false} className="w-3 h-3 text-gray-300" />);
+    }
+    
+    return stars;
+  };
+
   const renderLocalRecommendationBadge = () => {
     if (!localRecommendationType || !locationContextName) return null;
 
@@ -66,6 +88,8 @@ export const SitterCard = ({
     return null;
   };
 
+  const displayRating = userSpecificRating !== undefined ? userSpecificRating : rating;
+
   return (
     <Link to={`/sitter/${id}`}>
       <div className="flex flex-col bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
@@ -78,12 +102,17 @@ export const SitterCard = ({
         </div>
         <div className="flex-grow p-3">
           <h3 className="font-semibold text-gray-800 text-sm mb-1">{name}</h3>
-          <div className="flex items-center mb-1">
-            <StarIcon filled={true} className="w-3 h-3 text-yellow-500" />
-            <span className="text-xs text-gray-600 ml-1">
-              {userSpecificRating !== undefined ? userSpecificRating : rating}
-            </span>
-          </div>
+          
+          {/* Updated star display to match ProductCard */}
+          {displayRating > 0 && (
+            <div className="flex items-center mb-1">
+              <div className="flex mr-1">
+                {renderStars(displayRating)}
+              </div>
+              <span className="text-xs text-gray-600">({displayRating})</span>
+            </div>
+          )}
+          
           {experience && <p className="text-xs text-gray-500 mb-1">{experience}</p>}
           
           {/* Local recommendation badge */}

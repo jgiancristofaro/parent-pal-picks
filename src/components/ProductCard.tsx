@@ -14,6 +14,7 @@ interface ProductCardProps {
   uniqueRecommenderCount?: number;
   userSpecificRating?: number;
   reviewSnippet?: string;
+  textColorClass?: string;
 }
 
 export const ProductCard = ({ 
@@ -26,7 +27,8 @@ export const ProductCard = ({
   friendRecommendationCount,
   uniqueRecommenderCount,
   userSpecificRating,
-  reviewSnippet
+  reviewSnippet,
+  textColorClass = "text-purple-600"
 }: ProductCardProps) => {
   const renderStars = (rating: number) => {
     const stars = [];
@@ -87,21 +89,21 @@ export const ProductCard = ({
           
           {/* Show review snippet if provided, otherwise show recommendation counts */}
           {reviewSnippet ? (
-            <p className="text-xs text-purple-600 mt-1 italic">"{reviewSnippet}..."</p>
+            <p className={`text-xs mt-1 italic ${textColorClass}`}>"{reviewSnippet}..."</p>
           ) : (
             <>
               {uniqueRecommenderCount !== undefined && uniqueRecommenderCount > 0 && (
-                <p className="text-xs text-purple-600 mt-1">
+                <p className={`text-xs mt-1 ${textColorClass}`}>
                   {formatUniqueRecommenderText(uniqueRecommenderCount)}
                 </p>
               )}
               
               {recommendedBy && (
-                <p className="text-xs text-purple-600 mt-1">Recommended by {recommendedBy}</p>
+                <p className={`text-xs mt-1 ${textColorClass}`}>Recommended by {recommendedBy}</p>
               )}
               
               {friendRecommendationCount !== undefined && friendRecommendationCount > 0 && (
-                <p className="text-xs text-purple-600 mt-1">
+                <p className={`text-xs mt-1 ${textColorClass}`}>
                   {formatRecommendationText(friendRecommendationCount)}
                 </p>
               )}

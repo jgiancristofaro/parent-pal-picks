@@ -63,6 +63,7 @@ export const TopCommunityPicks = () => {
                   category={pick.product_category}
                   rating={pick.average_rating ? Number(pick.average_rating) : undefined}
                   friendRecommendationCount={Number(pick.unique_recommender_count)}
+                  textColorClass="text-gray-600"
                 />
               </div>
             ))}

@@ -67,7 +67,7 @@ export const NewRecommendedProducts = ({ currentUserId }: NewRecommendedProducts
                   category={product.product_category || 'Product'}
                   recommendedBy={product.recommender_full_name}
                   rating={product.recommendation_rating ? Number(product.recommendation_rating) : undefined}
-                  friendRecommendationCount={1}
+                  textColorClass="text-gray-600"
                 />
               </div>
             ))}
