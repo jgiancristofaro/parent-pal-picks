@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { StarIcon } from "./StarIcon";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,7 @@ interface SitterCardProps {
   locationContextName?: string | null;
   userSpecificRating?: number;
   reviewSnippet?: string;
+  compactText?: boolean;
 }
 
 export const SitterCard = ({ 
@@ -30,7 +32,8 @@ export const SitterCard = ({
   localRecommendationType,
   locationContextName,
   userSpecificRating,
-  reviewSnippet
+  reviewSnippet,
+  compactText = false
 }: SitterCardProps) => {
   const formatFriendRecommendation = (count: number) => {
     if (count === 0) return "New sitter";
@@ -103,7 +106,9 @@ export const SitterCard = ({
           {reviewSnippet ? (
             <p className="text-xs text-gray-600 italic">"{reviewSnippet}..."</p>
           ) : recommendedBy ? (
-            <p className="text-xs text-gray-600">Recommended by {recommendedBy}</p>
+            <p className="text-xs text-gray-600">
+              {compactText ? `Rec. by ${recommendedBy}` : `Recommended by ${recommendedBy}`}
+            </p>
           ) : (
             <p className="text-xs text-gray-600">{formatFriendRecommendation(friendRecommendationCount)}</p>
           )}
