@@ -39,7 +39,10 @@ export const useFavoriteStatus = (itemId: string, itemType: 'sitter' | 'product'
           p_item_type: itemType
         });
         if (error) throw error;
-        if (data?.error) throw new Error(data.error);
+        // Handle potential error in the response data
+        if (data && typeof data === 'object' && 'error' in data && data.error) {
+          throw new Error(data.error as string);
+        }
         return data;
       } else {
         const { data, error } = await supabase.rpc('remove_favorite', {
@@ -47,7 +50,10 @@ export const useFavoriteStatus = (itemId: string, itemType: 'sitter' | 'product'
           p_item_type: itemType
         });
         if (error) throw error;
-        if (data?.error) throw new Error(data.error);
+        // Handle potential error in the response data
+        if (data && typeof data === 'object' && 'error' in data && data.error) {
+          throw new Error(data.error as string);
+        }
         return data;
       }
     },
