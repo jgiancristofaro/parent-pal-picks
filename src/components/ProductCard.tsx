@@ -2,6 +2,7 @@
 import { Link } from "react-router-dom";
 import { StarIcon } from "@/components/StarIcon";
 import { ProductImage } from "@/components/ui/ProductImage";
+import { FavoriteButton } from "@/components/FavoriteButton";
 
 interface ProductCardProps {
   id: string;
@@ -64,53 +65,65 @@ export const ProductCard = ({
   const displayRating = userSpecificRating !== undefined ? userSpecificRating : rating;
 
   return (
-    <Link to={`/product/${id}`}>
-      <div className="rounded-lg overflow-hidden bg-white shadow-md hover:shadow-lg transition-shadow duration-200">
-        <div className="aspect-square overflow-hidden">
-          <ProductImage 
-            imageUrl={image}
-            category={category}
-            productName={name}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="p-3">
-          <h3 className="font-semibold text-gray-800 truncate">{name}</h3>
-          {category && <p className="text-sm text-gray-500">{category}</p>}
-          
-          {displayRating && (
-            <div className="flex items-center mt-1">
-              <div className="flex mr-1">
-                {renderStars(displayRating)}
+    <div className="relative">
+      <Link to={`/product/${id}`}>
+        <div className="rounded-lg overflow-hidden bg-white shadow-md hover:shadow-lg transition-shadow duration-200">
+          <div className="aspect-square overflow-hidden">
+            <ProductImage 
+              imageUrl={image}
+              category={category}
+              productName={name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="p-3">
+            <h3 className="font-semibold text-gray-800 truncate">{name}</h3>
+            {category && <p className="text-sm text-gray-500">{category}</p>}
+            
+            {displayRating && (
+              <div className="flex items-center mt-1">
+                <div className="flex mr-1">
+                  {renderStars(displayRating)}
+                </div>
+                <span className="text-xs text-gray-600">({displayRating})</span>
               </div>
-              <span className="text-xs text-gray-600">({displayRating})</span>
-            </div>
-          )}
-          
-          {/* Show review snippet if provided, otherwise show recommendation counts */}
-          {reviewSnippet ? (
-            <p className={`text-xs mt-1 italic ${textColorClass}`}>"{reviewSnippet}..."</p>
-          ) : (
-            <>
-              {uniqueRecommenderCount !== undefined && uniqueRecommenderCount > 0 && (
-                <p className={`text-xs mt-1 ${textColorClass}`}>
-                  {formatUniqueRecommenderText(uniqueRecommenderCount)}
-                </p>
-              )}
-              
-              {recommendedBy && (
-                <p className={`text-xs mt-1 ${textColorClass}`}>Recommended by {recommendedBy}</p>
-              )}
-              
-              {friendRecommendationCount !== undefined && friendRecommendationCount > 0 && (
-                <p className={`text-xs mt-1 ${textColorClass}`}>
-                  {formatRecommendationText(friendRecommendationCount)}
-                </p>
-              )}
-            </>
-          )}
+            )}
+            
+            {/* Show review snippet if provided, otherwise show recommendation counts */}
+            {reviewSnippet ? (
+              <p className={`text-xs mt-1 italic ${textColorClass}`}>"{reviewSnippet}..."</p>
+            ) : (
+              <>
+                {uniqueRecommenderCount !== undefined && uniqueRecommenderCount > 0 && (
+                  <p className={`text-xs mt-1 ${textColorClass}`}>
+                    {formatUniqueRecommenderText(uniqueRecommenderCount)}
+                  </p>
+                )}
+                
+                {recommendedBy && (
+                  <p className={`text-xs mt-1 ${textColorClass}`}>Recommended by {recommendedBy}</p>
+                )}
+                
+                {friendRecommendationCount !== undefined && friendRecommendationCount > 0 && (
+                  <p className={`text-xs mt-1 ${textColorClass}`}>
+                    {formatRecommendationText(friendRecommendationCount)}
+                  </p>
+                )}
+              </>
+            )}
+          </div>
         </div>
+      </Link>
+      
+      {/* Favorite Button - positioned in top-right corner */}
+      <div className="absolute top-2 right-2">
+        <FavoriteButton 
+          itemId={id} 
+          itemType="product" 
+          size="sm"
+          variant="ghost"
+        />
       </div>
-    </Link>
+    </div>
   );
 };

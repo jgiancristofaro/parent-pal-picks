@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StarIcon } from "@/components/StarIcon";
 import { AddOrEditReviewButton } from "@/components/buttons/AddOrEditReviewButton";
+import { useFavoriteStatus } from "@/hooks/useFavoriteStatus";
 
 interface Product {
   id: string;
@@ -27,6 +28,8 @@ interface ProductInfoProps {
 }
 
 export const ProductInfo = ({ product }: ProductInfoProps) => {
+  const { isFavorited, toggleFavorite, isLoading: favoriteLoading } = useFavoriteStatus(product.id, 'product');
+
   const formatPrice = (price: number | null) => {
     if (!price) return "Price not available";
     return new Intl.NumberFormat('en-US', {
@@ -97,6 +100,16 @@ export const ProductInfo = ({ product }: ProductInfoProps) => {
             Buy Product
           </Button>
         )}
+
+        {/* Favorite Button - Text-based */}
+        <Button 
+          variant="outline"
+          className="w-full py-3 text-lg"
+          onClick={toggleFavorite}
+          disabled={favoriteLoading}
+        >
+          {isFavorited ? 'Unfavorite Product' : 'Favorite Product'}
+        </Button>
 
         {/* Review Button - using the new reusable component */}
         <AddOrEditReviewButton

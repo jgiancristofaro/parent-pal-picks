@@ -16,6 +16,7 @@ import { AddOrEditReviewButton } from "@/components/buttons/AddOrEditReviewButto
 import { useSitterProfile } from "@/hooks/useSitterProfile";
 import { useSitterReviews } from "@/hooks/useSitterReviews";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
+import { useFavoriteStatus } from "@/hooks/useFavoriteStatus";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const SitterProfile = () => {
@@ -23,6 +24,7 @@ const SitterProfile = () => {
   const { data: sitter, isLoading: sitterLoading, error: sitterError } = useSitterProfile(id);
   const { data: reviewsData = [], isLoading: reviewsLoading } = useSitterReviews(id);
   const { isSubscribed } = useSubscriptionStatus();
+  const { isFavorited, toggleFavorite, isLoading: favoriteLoading } = useFavoriteStatus(id!, 'sitter');
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   const renderStars = (rating: number) => {
@@ -111,6 +113,16 @@ const SitterProfile = () => {
             onClick={() => setIsContactModalOpen(true)}
           >
             Contact Now
+          </Button>
+
+          {/* Favorite Button - Text-based */}
+          <Button 
+            variant="outline"
+            className="w-full py-3 border-purple-300 text-purple-700 hover:bg-purple-50"
+            onClick={toggleFavorite}
+            disabled={favoriteLoading}
+          >
+            {isFavorited ? 'Unfavorite Sitter' : 'Favorite Sitter'}
           </Button>
 
           {/* Add/Edit Review Button */}
