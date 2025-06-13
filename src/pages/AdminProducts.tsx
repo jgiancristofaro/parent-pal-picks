@@ -6,10 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { ArrowLeft, Search, Edit, Shield, ShieldCheck, AlertCircle, Trash2 } from 'lucide-react';
+import { ArrowLeft, Search, Edit, Shield, ShieldCheck, AlertCircle } from 'lucide-react';
 import { useAdminProducts } from '@/hooks/useAdminProducts';
-import { useAdminProductMutations } from '@/hooks/admin/useAdminProductMutations';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 
 const AdminProducts = () => {
@@ -17,14 +15,6 @@ const AdminProducts = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebouncedSearch(searchTerm, 500);
   const { products, isLoading, error } = useAdminProducts(debouncedSearchTerm);
-  const { deleteProduct, isDeleting } = useAdminProductMutations();
-
-  const handleDeleteProduct = (productId: string, productName: string) => {
-    deleteProduct({ 
-      productId, 
-      reason: `Admin deletion of product "${productName}" from products list` 
-    });
-  };
 
   if (error) {
     return (
@@ -191,47 +181,15 @@ const AdminProducts = () => {
                       {new Date(product.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => navigate(`/admin/products/${product.id}`)}
-                          className="flex items-center gap-2"
-                        >
-                          <Edit className="w-4 h-4" />
-                          Edit
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              disabled={isDeleting}
-                              className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                              Delete
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Product</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete "{product.name}"? This will permanently remove the product and all {product.review_count} associated reviews. This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDeleteProduct(product.id, product.name)}
-                                className="bg-red-600 hover:bg-red-700"
-                              >
-                                Delete Product
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate(`/admin/products/${product.id}`)}
+                        className="flex items-center gap-2"
+                      >
+                        <Edit className="w-4 h-4" />
+                        Edit
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
