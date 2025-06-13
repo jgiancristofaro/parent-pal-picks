@@ -6,11 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
 
 interface CSVData {
   headers: string[];
@@ -22,7 +20,6 @@ interface ColumnMapping {
 }
 
 const AdminImport = () => {
-  const { isAdmin, isLoading } = useAuth();
   const { toast } = useToast();
   const [importType, setImportType] = useState<'sitters' | 'products'>('sitters');
   const [file, setFile] = useState<File | null>(null);
@@ -31,45 +28,7 @@ const AdminImport = () => {
   const [isImporting, setIsImporting] = useState(false);
   const [importResult, setImportResult] = useState<any>(null);
 
-  // Show loading state while auth is still loading
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <Skeleton className="h-8 w-64 mb-2" />
-            <Skeleton className="h-4 w-96" />
-          </div>
-          <Card className="mb-6">
-            <CardHeader>
-              <Skeleton className="h-6 w-48" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-64 w-full" />
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  // Only check admin status after loading is complete
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-center text-red-600">Access Denied</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-center text-gray-600">
-              You need admin privileges to access this page.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  console.log('AdminImport component rendered');
 
   const parseCSV = (csvText: string): CSVData => {
     const lines = csvText.split('\n').filter(line => line.trim());
@@ -87,6 +46,7 @@ const AdminImport = () => {
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('File upload handler triggered');
     const selectedFile = event.target.files?.[0];
     if (!selectedFile) return;
 
@@ -99,17 +59,20 @@ const AdminImport = () => {
       return;
     }
 
+    console.log('Processing CSV file:', selectedFile.name);
     setFile(selectedFile);
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const csvText = e.target?.result as string;
         const parsed = parseCSV(csvText);
+        console.log('CSV parsed successfully:', parsed.headers.length, 'columns,', parsed.rows.length, 'rows');
         setCsvData(parsed);
         setImportResult(null);
         // Reset column mapping when new file is uploaded
         setColumnMapping({});
       } catch (error) {
+        console.error('CSV parse error:', error);
         toast({
           title: "Parse Error",
           description: "Failed to parse CSV file",
@@ -148,6 +111,7 @@ const AdminImport = () => {
   const handleImport = async () => {
     if (!csvData || !file) return;
 
+    console.log('Starting import process for', csvData.rows.length, 'records');
     setIsImporting(true);
     try {
       const { data, error } = await supabase.functions.invoke('admin_bulk_import', {
@@ -160,6 +124,7 @@ const AdminImport = () => {
 
       if (error) throw error;
 
+      console.log('Import completed:', data);
       setImportResult(data);
       
       if (data.success) {
