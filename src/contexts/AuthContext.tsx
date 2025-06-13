@@ -59,6 +59,28 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          // Handle sign up event - create profile if needed
+          if (event === 'SIGNED_UP' && session.user.user_metadata) {
+            const { first_name, last_name, phone_number, profile_privacy_setting, phone_number_searchable } = session.user.user_metadata;
+            
+            // Create or update profile with first_name and last_name
+            const { error: profileError } = await supabase
+              .from('profiles')
+              .upsert({
+                id: session.user.id,
+                first_name: first_name || '',
+                last_name: last_name || '',
+                full_name: `${first_name || ''} ${last_name || ''}`.trim() || 'User',
+                phone_number: phone_number || null,
+                profile_privacy_setting: profile_privacy_setting || 'private',
+                phone_number_searchable: phone_number_searchable || false,
+              });
+
+            if (profileError) {
+              console.error('Error creating profile:', profileError);
+            }
+          }
+          
           // Defer profile fetching to avoid deadlock
           setTimeout(() => {
             fetchUserProfile(session.user.id);

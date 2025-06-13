@@ -13,8 +13,10 @@ const Login = () => {
     setEmail,
     password,
     setPassword,
-    fullName,
-    setFullName,
+    firstName,
+    setFirstName,
+    lastName,
+    setLastName,
     phoneNumber,
     setPhoneNumber,
     profilePrivacySetting,
@@ -30,8 +32,10 @@ const Login = () => {
       <div className="flex-grow flex flex-col items-center justify-center px-6 pb-16">
         <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
           <SignUpForm
-            fullName={fullName}
-            setFullName={setFullName}
+            firstName={firstName}
+            setFirstName={setFirstName}
+            lastName={lastName}
+            setLastName={setLastName}
             email={email}
             setEmail={setEmail}
             password={password}

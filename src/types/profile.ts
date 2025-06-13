@@ -4,7 +4,9 @@ export type FollowRequestStatus = 'pending' | 'approved' | 'denied';
 
 export interface Profile {
   id: string;
-  full_name: string;
+  first_name: string;
+  last_name: string;
+  full_name: string; // Kept for backward compatibility
   username: string | null;
   avatar_url: string | null;
   profile_privacy_setting: ProfilePrivacySetting;
@@ -28,6 +30,8 @@ export interface FollowRequest {
 
 export interface ProfileSearchResult {
   id: string;
+  first_name: string;
+  last_name: string;
   full_name: string;
   username: string | null;
   avatar_url: string | null;

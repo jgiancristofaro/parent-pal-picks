@@ -251,6 +251,7 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string
+          first_name: string
           full_name: string
           id: string
           identity_tag: string | null
@@ -258,6 +259,7 @@ export type Database = {
           last_activity_feed_view_at: string | null
           last_alerts_viewed_at: string | null
           last_login_at: string | null
+          last_name: string
           phone_number: string | null
           phone_number_searchable: boolean
           profile_privacy_setting: Database["public"]["Enums"]["profile_privacy_enum"]
@@ -269,6 +271,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          first_name: string
           full_name: string
           id: string
           identity_tag?: string | null
@@ -276,6 +279,7 @@ export type Database = {
           last_activity_feed_view_at?: string | null
           last_alerts_viewed_at?: string | null
           last_login_at?: string | null
+          last_name: string
           phone_number?: string | null
           phone_number_searchable?: boolean
           profile_privacy_setting?: Database["public"]["Enums"]["profile_privacy_enum"]
@@ -287,6 +291,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          first_name?: string
           full_name?: string
           id?: string
           identity_tag?: string | null
@@ -294,6 +299,7 @@ export type Database = {
           last_activity_feed_view_at?: string | null
           last_alerts_viewed_at?: string | null
           last_login_at?: string | null
+          last_name?: string
           phone_number?: string | null
           phone_number_searchable?: boolean
           profile_privacy_setting?: Database["public"]["Enums"]["profile_privacy_enum"]

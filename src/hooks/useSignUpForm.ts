@@ -7,7 +7,8 @@ import { useToast } from "@/components/ui/use-toast";
 export const useSignUpForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phoneNumberSearchable, setPhoneNumberSearchable] = useState(true);
   const [profilePrivacySetting, setProfilePrivacySetting] = useState<'public' | 'private'>('private');
@@ -53,10 +54,10 @@ export const useSignUpForm = () => {
 
     try {
       // Validate required fields including phone number
-      if (!email || !password || !fullName || !phoneNumber) {
+      if (!email || !password || !firstName || !lastName || !phoneNumber) {
         toast({
           title: "Missing required information",
-          description: "Please fill in your name, email, password, and phone number to continue.",
+          description: "Please fill in your first name, last name, email, password, and phone number to continue.",
           variant: "destructive",
         });
         return;
@@ -67,7 +68,9 @@ export const useSignUpForm = () => {
         password,
         options: {
           data: {
-            full_name: fullName,
+            first_name: firstName,
+            last_name: lastName,
+            full_name: `${firstName} ${lastName}`, // Keep for backward compatibility
             phone_number: phoneNumber,
             profile_privacy_setting: profilePrivacySetting,
             phone_number_searchable: phoneNumberSearchable
@@ -110,8 +113,10 @@ export const useSignUpForm = () => {
     setEmail,
     password,
     setPassword,
-    fullName,
-    setFullName,
+    firstName,
+    setFirstName,
+    lastName,
+    setLastName,
     phoneNumber,
     setPhoneNumber,
     phoneNumberSearchable,

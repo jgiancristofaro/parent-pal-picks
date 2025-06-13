@@ -2,8 +2,10 @@
 import { Input } from "@/components/ui/input";
 
 interface SignUpFormProps {
-  fullName: string;
-  setFullName: (value: string) => void;
+  firstName: string;
+  setFirstName: (value: string) => void;
+  lastName: string;
+  setLastName: (value: string) => void;
   email: string;
   setEmail: (value: string) => void;
   password: string;
@@ -14,8 +16,10 @@ interface SignUpFormProps {
 }
 
 const SignUpForm = ({
-  fullName,
-  setFullName,
+  firstName,
+  setFirstName,
+  lastName,
+  setLastName,
   email,
   setEmail,
   password,
@@ -26,16 +30,29 @@ const SignUpForm = ({
 }: SignUpFormProps) => {
   return (
     <div className="space-y-6">
-      <div>
-        <Input
-          type="text"
-          placeholder="Full Name"
-          className="input-field"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          disabled={isLoading}
-          required
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Input
+            type="text"
+            placeholder="First Name"
+            className="input-field"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            disabled={isLoading}
+            required
+          />
+        </div>
+        <div>
+          <Input
+            type="text"
+            placeholder="Last Name"
+            className="input-field"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            disabled={isLoading}
+            required
+          />
+        </div>
       </div>
 
       <div>
