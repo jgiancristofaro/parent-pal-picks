@@ -1,25 +1,18 @@
 
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { ArrowLeft, Save, Trash2, Merge } from 'lucide-react';
 import { useAdminProduct } from '@/hooks/useAdminProduct';
 import { useAdminProductMutations } from '@/hooks/admin/useAdminProductMutations';
 import { useAdminProductReviews } from '@/hooks/admin/useAdminProductReviews';
-import { useToast } from '@/hooks/use-toast';
+import { ProductEditHeader } from '@/components/admin/products/ProductEditHeader';
+import { ProductDetailsForm } from '@/components/admin/products/ProductDetailsForm';
+import { ProductReviewsCard } from '@/components/admin/products/ProductReviewsCard';
+import { ProductMergeCard } from '@/components/admin/products/ProductMergeCard';
+import { ProductDeleteCard } from '@/components/admin/products/ProductDeleteCard';
 
 const AdminEditProduct = () => {
   const navigate = useNavigate();
   const { productId } = useParams<{ productId: string }>();
-  const { toast } = useToast();
   
   const { product, isLoading: isLoadingProduct, error: productError } = useAdminProduct(productId || '');
   const { updateProduct, setVerifiedStatus, deleteProduct, isUpdating, isDeleting } = useAdminProductMutations();
@@ -125,264 +118,32 @@ const AdminEditProduct = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/admin/products')}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Products
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Edit Product</h1>
-              <p className="text-gray-600">Modify product details</p>
-            </div>
-          </div>
-          
-          <Button onClick={handleSave} disabled={isUpdating} className="flex items-center gap-2">
-            <Save className="w-4 h-4" />
-            {isUpdating ? 'Saving...' : 'Save Changes'}
-          </Button>
-        </div>
+        <ProductEditHeader onSave={handleSave} isUpdating={isUpdating} />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Product Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Product Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Product Name</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
-              </div>
+          <ProductDetailsForm 
+            formData={formData}
+            setFormData={setFormData}
+            onVerificationToggle={handleVerificationToggle}
+          />
 
-              <div className="space-y-2">
-                <Label htmlFor="brandName">Brand Name</Label>
-                <Input
-                  id="brandName"
-                  value={formData.brandName}
-                  onChange={(e) => setFormData({ ...formData, brandName: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <Input
-                  id="category"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="price">Price ($)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="imageUrl">Image URL</Label>
-                <Input
-                  id="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="externalPurchaseLink">Purchase Link</Label>
-                <Input
-                  id="externalPurchaseLink"
-                  value={formData.externalPurchaseLink}
-                  onChange={(e) => setFormData({ ...formData, externalPurchaseLink: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={4}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="isVerified">Verified Status</Label>
-                  <p className="text-sm text-gray-500">Mark this product as verified</p>
-                </div>
-                <Switch
-                  id="isVerified"
-                  checked={formData.isVerified}
-                  onCheckedChange={handleVerificationToggle}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Reviews and Actions */}
           <div className="space-y-6">
-            {/* Reviews */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Reviews ({reviews.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {reviews.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>User</TableHead>
-                        <TableHead>Rating</TableHead>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {reviews.map((review) => (
-                        <TableRow key={review.id}>
-                          <TableCell>{review.user_full_name}</TableCell>
-                          <TableCell>
-                            <Badge variant="secondary">{review.rating}/5</Badge>
-                          </TableCell>
-                          <TableCell className="max-w-xs truncate">{review.title}</TableCell>
-                          <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteReview(review.id)}
-                              disabled={isDeletingReview}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <p className="text-gray-500 text-center py-4">No reviews found</p>
-                )}
-              </CardContent>
-            </Card>
+            <ProductReviewsCard 
+              reviews={reviews}
+              onDeleteReview={handleDeleteReview}
+              isDeletingReview={isDeletingReview}
+            />
 
-            {/* Merge Duplicates */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Merge Duplicates</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="targetProductId">Target Product ID</Label>
-                  <Input
-                    id="targetProductId"
-                    value={mergeData.targetProductId}
-                    onChange={(e) => setMergeData({ ...mergeData, targetProductId: e.target.value })}
-                    placeholder="Enter ID of product to merge into"
-                  />
-                </div>
+            <ProductMergeCard 
+              mergeData={mergeData}
+              setMergeData={setMergeData}
+            />
 
-                <div className="space-y-2">
-                  <Label htmlFor="mergeReason">Merge Reason</Label>
-                  <Input
-                    id="mergeReason"
-                    value={mergeData.reason}
-                    onChange={(e) => setMergeData({ ...mergeData, reason: e.target.value })}
-                    placeholder="Reason for merging"
-                  />
-                </div>
-
-                <Button
-                  variant="destructive"
-                  disabled={!mergeData.targetProductId}
-                  className="w-full flex items-center gap-2"
-                  onClick={() => {
-                    if (confirm('Are you sure you want to merge this product? This action cannot be undone.')) {
-                      // mergeDuplicates logic would go here
-                      toast({
-                        title: "Feature Coming Soon",
-                        description: "Merge functionality will be implemented",
-                      });
-                    }
-                  }}
-                >
-                  <Merge className="w-4 h-4" />
-                  Merge Product
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Delete Product */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Delete Product</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-gray-600">
-                  Permanently delete this product and all associated data. This action cannot be undone.
-                </p>
-                
-                {product.review_count > 0 && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
-                    <p className="text-sm text-yellow-800">
-                      <strong>Warning:</strong> This product has {product.review_count} reviews that will also be deleted.
-                    </p>
-                  </div>
-                )}
-
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      disabled={isDeleting}
-                      className="w-full flex items-center gap-2"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      {isDeleting ? 'Deleting...' : 'Delete Product'}
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Product</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Are you sure you want to delete "{product.name}"? 
-                        {product.review_count > 0 && (
-                          <span className="block mt-2 font-medium text-red-600">
-                            This will permanently remove the product and all {product.review_count} associated reviews.
-                          </span>
-                        )}
-                        <span className="block mt-2">This action cannot be undone.</span>
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={handleDeleteProduct}
-                        className="bg-red-600 hover:bg-red-700"
-                      >
-                        Delete Product
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </CardContent>
-            </Card>
+            <ProductDeleteCard 
+              product={product}
+              onDeleteProduct={handleDeleteProduct}
+              isDeleting={isDeleting}
+            />
           </div>
         </div>
       </div>
