@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,7 +22,7 @@ const AdminEditProduct = () => {
   const { toast } = useToast();
   
   const { product, isLoading: isLoadingProduct, error: productError } = useAdminProduct(productId || '');
-  const { updateProduct, setVerifiedStatus, deleteProduct, isUpdating, isDeleting, isDeletingReview } = useAdminProductMutations();
+  const { updateProduct, setVerifiedStatus, deleteProduct, isUpdating, isDeleting } = useAdminProductMutations();
   const { reviews, deleteReview, isDeleting: isDeletingReview } = useAdminProductReviews(productId || '');
   
   const [formData, setFormData] = useState({
