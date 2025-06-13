@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Session, User, AuthChangeEvent } from '@supabase/supabase-js';
+import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/profile';
 
@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         
         if (session?.user) {
           // Handle sign in event - check if this is a new user registration
-          if (event === AuthChangeEvent.SIGNED_IN && session.user.user_metadata) {
+          if (event === 'SIGNED_IN' && session.user.user_metadata) {
             // Check if profile already exists
             const { data: existingProfile } = await supabase
               .from('profiles')
