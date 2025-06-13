@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserReview } from "@/hooks/useUserReview";
 import { EditReviewButton } from "@/components/review/EditReviewButton";
+import { FlagButton } from "@/components/moderation/FlagButton";
 
 interface Review {
   id: string;
@@ -260,13 +261,20 @@ export const ProductReviews = ({ productId, onUserReviewChange }: ProductReviews
                       <span className="text-sm text-gray-500">
                         {formatDate(review.created_at)}
                       </span>
-                      {user && review.user_id === user.id && (
+                      {user && review.user_id === user.id ? (
                         <EditReviewButton
                           reviewId={review.id}
                           rating={review.rating}
                           title={review.title}
                           content={review.content}
                           productId={productId}
+                        />
+                      ) : user && (
+                        <FlagButton
+                          contentType="review"
+                          contentId={review.id}
+                          size="sm"
+                          variant="ghost"
                         />
                       )}
                     </div>
