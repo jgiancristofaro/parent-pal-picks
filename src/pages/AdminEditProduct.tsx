@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,8 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ArrowLeft, Save, Trash2, Merge } from 'lucide-react';
-import { useAdminProducts } from '@/hooks/useAdminProducts';
-import { useAdminProductReviews } from '@/hooks/useAdminProducts';
+import { useAdminProducts, useAdminProductReviews } from '@/hooks/useAdminProducts';
 import { useToast } from '@/hooks/use-toast';
 
 const AdminEditProduct = () => {
