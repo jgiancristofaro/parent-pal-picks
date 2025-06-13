@@ -103,12 +103,40 @@ export const useAdminProductMutations = () => {
     },
   });
 
+  const deleteProductMutation = useMutation({
+    mutationFn: async ({ productId, reason }: { productId: string; reason?: string }) => {
+      const { data, error } = await supabase.rpc('admin_delete_product', {
+        target_product_id: productId,
+        deletion_reason: reason || 'Admin deletion',
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      toast({
+        title: "Success",
+        description: `Product "${data.product_name}" deleted successfully. ${data.deleted_review_count} reviews were also removed.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: `Failed to delete product: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     updateProduct: updateProductMutation.mutate,
     setVerifiedStatus: setVerifiedStatusMutation.mutate,
     mergeDuplicates: mergeDuplicatesMutation.mutate,
+    deleteProduct: deleteProductMutation.mutate,
     isUpdating: updateProductMutation.isPending,
     isSettingVerification: setVerifiedStatusMutation.isPending,
     isMerging: mergeDuplicatesMutation.isPending,
+    isDeleting: deleteProductMutation.isPending,
   };
 };
