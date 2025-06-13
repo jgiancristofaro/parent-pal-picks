@@ -460,6 +460,38 @@ export type Database = {
         }
         Relationships: []
       }
+      user_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          item_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          item_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          item_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_follows: {
         Row: {
           created_at: string
@@ -537,6 +569,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_favorite: {
+        Args: { p_item_id: string; p_item_type: string }
+        Returns: Json
+      }
       admin_delete_product: {
         Args: { target_product_id: string; deletion_reason?: string }
         Returns: Json
@@ -888,6 +924,10 @@ export type Database = {
       mark_alerts_as_viewed: {
         Args: { user_id: string }
         Returns: undefined
+      }
+      remove_favorite: {
+        Args: { p_item_id: string; p_item_type: string }
+        Returns: Json
       }
       search_all_profiles: {
         Args: { search_term: string }
