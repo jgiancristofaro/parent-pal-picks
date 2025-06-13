@@ -17,6 +17,11 @@ interface ImportRequest {
   columnMapping: { [csvColumn: string]: string };
 }
 
+interface Category {
+  id: string;
+  name: string;
+}
+
 // Helper function to get CSV column name for a database field
 const getCsvColumnForField = (fieldName: string, columnMapping: { [csvColumn: string]: string }): string | null => {
   for (const [csvColumn, dbField] of Object.entries(columnMapping)) {
@@ -25,6 +30,20 @@ const getCsvColumnForField = (fieldName: string, columnMapping: { [csvColumn: st
     }
   }
   return null;
+};
+
+// Helper function to find category ID by name (case-insensitive)
+const findCategoryId = (categoryName: string, categories: Category[]): string | null => {
+  if (!categoryName || typeof categoryName !== 'string') {
+    return null;
+  }
+  
+  const normalizedName = categoryName.trim().toLowerCase();
+  const category = categories.find(cat => 
+    cat.name.toLowerCase() === normalizedName
+  );
+  
+  return category?.id || null;
 };
 
 serve(async (req) => {
@@ -73,6 +92,51 @@ serve(async (req) => {
     const { importType, data, columnMapping }: ImportRequest = await req.json();
 
     console.log(`Starting bulk import for ${importType} with ${data.length} rows`);
+
+    // Load categories for product imports
+    let categories: Category[] = [];
+    let otherCategoryId: string | null = null;
+    
+    if (importType === 'products') {
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('categories')
+        .select('id, name');
+      
+      if (categoriesError) {
+        console.error('Error loading categories:', categoriesError);
+        return new Response(
+          JSON.stringify({ error: 'Failed to load categories' }),
+          { 
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
+      
+      categories = categoriesData || [];
+      console.log(`Loaded ${categories.length} categories:`, categories.map(c => c.name));
+      
+      // Find or create "Other" category as fallback
+      const otherCategory = categories.find(cat => cat.name.toLowerCase() === 'other');
+      if (otherCategory) {
+        otherCategoryId = otherCategory.id;
+      } else {
+        // Create "Other" category if it doesn't exist
+        const { data: newCategory, error: createError } = await supabase
+          .from('categories')
+          .insert({ name: 'Other' })
+          .select('id')
+          .single();
+        
+        if (createError) {
+          console.error('Error creating Other category:', createError);
+        } else {
+          otherCategoryId = newCategory.id;
+          categories.push({ id: newCategory.id, name: 'Other' });
+          console.log('Created "Other" category as fallback');
+        }
+      }
+    }
 
     let insertData: any[] = [];
     let insertErrors: string[] = [];
@@ -127,11 +191,31 @@ serve(async (req) => {
           const imageUrlColumn = getCsvColumnForField('image_url', columnMapping);
           const purchaseLinkColumn = getCsvColumnForField('external_purchase_link', columnMapping);
 
+          // Map category text to category_id
+          let categoryId: string | null = null;
+          if (categoryColumn && row[categoryColumn]) {
+            const categoryText = row[categoryColumn] as string;
+            categoryId = findCategoryId(categoryText, categories);
+            
+            if (!categoryId) {
+              console.log(`Row ${i + 1}: Category "${categoryText}" not found, using fallback`);
+              categoryId = otherCategoryId;
+            }
+          } else {
+            categoryId = otherCategoryId;
+          }
+
+          if (!categoryId) {
+            insertErrors.push(`Row ${i + 1}: Could not determine category_id`);
+            continue;
+          }
+
           transformedRow = {
             name: nameColumn ? (row[nameColumn] || '') : '',
             description: descriptionColumn ? (row[descriptionColumn] || null) : null,
             brand_name: brandNameColumn ? (row[brandNameColumn] || '') : '',
             category: categoryColumn ? (row[categoryColumn] || null) : null,
+            category_id: categoryId,
             price: priceColumn && row[priceColumn] ? 
               parseFloat(row[priceColumn] as string) : null,
             image_url: imageUrlColumn ? (row[imageUrlColumn] || null) : null,
