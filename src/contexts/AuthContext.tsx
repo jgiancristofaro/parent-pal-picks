@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Session, User, AuthChangeEvent } from '@supabase/supabase-js';
+import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/profile';
 
@@ -54,7 +54,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: AuthChangeEvent, session) => {
+      (event, session) => {
+        console.log('Auth state change:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -63,22 +64,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           if (event === 'SIGNED_UP' && session.user.user_metadata) {
             const { first_name, last_name, phone_number, profile_privacy_setting, phone_number_searchable } = session.user.user_metadata;
             
-            // Create or update profile with first_name and last_name
-            const { error: profileError } = await supabase
-              .from('profiles')
-              .upsert({
-                id: session.user.id,
-                first_name: first_name || '',
-                last_name: last_name || '',
-                full_name: `${first_name || ''} ${last_name || ''}`.trim() || 'User',
-                phone_number: phone_number || null,
-                profile_privacy_setting: profile_privacy_setting || 'private',
-                phone_number_searchable: phone_number_searchable || false,
-              });
+            // Defer profile creation to avoid deadlock
+            setTimeout(async () => {
+              const { error: profileError } = await supabase
+                .from('profiles')
+                .upsert({
+                  id: session.user.id,
+                  first_name: first_name || '',
+                  last_name: last_name || '',
+                  full_name: `${first_name || ''} ${last_name || ''}`.trim() || 'User',
+                  phone_number: phone_number || null,
+                  profile_privacy_setting: profile_privacy_setting || 'private',
+                  phone_number_searchable: phone_number_searchable || false,
+                });
 
-            if (profileError) {
-              console.error('Error creating profile:', profileError);
-            }
+              if (profileError) {
+                console.error('Error creating profile:', profileError);
+              }
+            }, 0);
           }
           
           // Defer profile fetching to avoid deadlock

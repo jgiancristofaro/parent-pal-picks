@@ -4,17 +4,38 @@ import { LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
 
 export const LogoutSection = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { session } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
+    if (isLoggingOut) return; // Prevent multiple logout attempts
+    
+    setIsLoggingOut(true);
+    
     try {
+      // Check if we have a valid session before attempting logout
+      if (!session) {
+        console.log('No active session found, clearing storage and redirecting...');
+        // Clear any stored data and redirect
+        localStorage.clear();
+        sessionStorage.clear();
+        navigate("/");
+        return;
+      }
+
+      console.log('Attempting to sign out user:', session.user?.id);
+      
       // Sign out from Supabase
       const { error } = await supabase.auth.signOut();
       
       if (error) {
+        console.error('Logout error:', error);
         toast({
           title: "Logout failed",
           description: error.message,
@@ -23,7 +44,7 @@ export const LogoutSection = () => {
         return;
       }
 
-      // Clear any stored user data (localStorage, sessionStorage, etc.)
+      // Only clear storage after successful logout
       localStorage.clear();
       sessionStorage.clear();
       
@@ -35,13 +56,16 @@ export const LogoutSection = () => {
       
       // Navigate to login page
       navigate("/");
+      
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Unexpected logout error:', error);
       toast({
         title: "Logout failed",
         description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -50,6 +74,7 @@ export const LogoutSection = () => {
       <div className="bg-white rounded-lg shadow-sm">
         <Button
           onClick={handleLogout}
+          disabled={isLoggingOut}
           variant="ghost"
           className="w-full flex items-center justify-start p-4 h-auto text-left hover:bg-red-50 text-red-600 hover:text-red-700 rounded-lg"
         >
@@ -60,7 +85,9 @@ export const LogoutSection = () => {
           </div>
           
           <div className="flex-grow">
-            <h3 className="text-base font-medium">Log Out</h3>
+            <h3 className="text-base font-medium">
+              {isLoggingOut ? 'Logging Out...' : 'Log Out'}
+            </h3>
             <p className="text-sm text-red-500 mt-1">Sign out of your account</p>
           </div>
         </Button>
