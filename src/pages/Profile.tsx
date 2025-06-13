@@ -4,10 +4,12 @@ import { BottomNavigation } from "@/components/BottomNavigation";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileStats } from "@/components/profile/ProfileStats";
 import { RecommendationsTabs } from "@/components/profile/RecommendationsTabs";
+import { FavoritesTabs } from "@/components/profile/FavoritesTabs";
 import { useProfile } from "@/hooks/useProfile";
 import { useProfileFollowers } from "@/hooks/useProfileFollowers";
 import { useProfileFollowing } from "@/hooks/useProfileFollowing";
 import { useUserRecommendations } from "@/hooks/useUserRecommendations";
+import { useUserFavorites } from "@/hooks/useUserFavorites";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -26,6 +28,7 @@ const Profile = () => {
   const { data: following = [], isLoading: followingLoading } = useProfileFollowing(profileUserId);
   const { data: sitterRecommendations = [] } = useUserRecommendations(profileUserId, 'sitter');
   const { data: productRecommendations = [] } = useUserRecommendations(profileUserId, 'product');
+  const { data: favoritesData, isLoading: favoritesLoading } = useUserFavorites(profileUserId);
   
   const [isOwnProfile, setIsOwnProfile] = useState(false);
 
@@ -104,6 +107,15 @@ const Profile = () => {
         followersData={followers}
         followingData={following}
       />
+
+      {/* My Favorites Section - Only show for own profile */}
+      {isOwnProfile && !favoritesLoading && (
+        <FavoritesTabs 
+          sitterFavorites={favoritesData.sitterFavorites}
+          productFavorites={favoritesData.productFavorites}
+        />
+      )}
+      
       <RecommendationsTabs 
         sitterRecommendations={sitterRecommendations}
         productRecommendations={productRecommendations}
