@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,14 +12,15 @@ import { ArrowLeft, Save, Trash2, Merge } from 'lucide-react';
 import { useAdminSitters } from '@/hooks/useAdminSitters';
 import { useAdminSitterReviews } from '@/hooks/useAdminSitters';
 import { useToast } from '@/hooks/use-toast';
+import { SitterDeleteCard } from '@/components/admin/sitters/SitterDeleteCard';
 
 const AdminEditSitter = () => {
   const navigate = useNavigate();
   const { sitterId } = useParams<{ sitterId: string }>();
   const { toast } = useToast();
   
-  const { sitters, updateSitter, setVerifiedStatus, isUpdating } = useAdminSitters();
-  const { reviews, deleteReview, isDeleting } = useAdminSitterReviews(sitterId || '');
+  const { sitters, updateSitter, setVerifiedStatus, deleteSitter, isUpdating, isDeleting } = useAdminSitters();
+  const { reviews, deleteReview, isDeleting: isDeletingReview } = useAdminSitterReviews(sitterId || '');
   
   const sitter = sitters.find(s => s.id === sitterId);
   
@@ -87,6 +87,21 @@ const AdminEditSitter = () => {
     if (confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
       deleteReview({ reviewId, reason: 'Admin deletion' });
     }
+  };
+
+  const handleDeleteSitter = (reason: string) => {
+    if (!sitterId || !sitter) return;
+    
+    deleteSitter({ 
+      sitterId, 
+      reason: reason || `Admin deletion of sitter "${sitter.name}" from edit form` 
+    });
+    
+    // Navigate back to sitters list after successful deletion
+    // The mutation success handler will show the toast
+    setTimeout(() => {
+      navigate('/admin/sitters');
+    }, 1000);
   };
 
   if (!sitter) {
@@ -257,7 +272,7 @@ const AdminEditSitter = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDeleteReview(review.id)}
-                              disabled={isDeleting}
+                              disabled={isDeletingReview}
                               className="text-red-600 hover:text-red-700"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -318,6 +333,13 @@ const AdminEditSitter = () => {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Delete Sitter */}
+            <SitterDeleteCard 
+              sitter={sitter}
+              onDeleteSitter={handleDeleteSitter}
+              isDeleting={isDeleting}
+            />
           </div>
         </div>
       </div>

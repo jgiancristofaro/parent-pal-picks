@@ -545,6 +545,10 @@ export type Database = {
         Args: { review_id: string; deletion_reason?: string }
         Returns: Json
       }
+      admin_delete_sitter: {
+        Args: { target_sitter_id: string; deletion_reason?: string }
+        Returns: Json
+      }
       admin_delete_user: {
         Args: { target_user_id: string; deletion_reason?: string }
         Returns: Json

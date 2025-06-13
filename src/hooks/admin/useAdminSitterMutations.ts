@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -105,12 +104,40 @@ export const useAdminSitterMutations = () => {
     },
   });
 
+  const deleteSitterMutation = useMutation({
+    mutationFn: async ({ sitterId, reason }: { sitterId: string; reason?: string }) => {
+      const { data, error } = await supabase.rpc('admin_delete_sitter', {
+        target_sitter_id: sitterId,
+        deletion_reason: reason || 'Admin deletion',
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-sitters'] });
+      toast({
+        title: "Success",
+        description: "Sitter deleted successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: `Failed to delete sitter: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     updateSitter: updateSitterMutation.mutate,
     setVerifiedStatus: setVerifiedStatusMutation.mutate,
     mergeDuplicates: mergeDuplicatesMutation.mutate,
+    deleteSitter: deleteSitterMutation.mutate,
     isUpdating: updateSitterMutation.isPending,
     isSettingVerification: setVerifiedStatusMutation.isPending,
     isMerging: mergeDuplicatesMutation.isPending,
+    isDeleting: deleteSitterMutation.isPending,
   };
 };
