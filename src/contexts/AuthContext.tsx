@@ -76,9 +76,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   useEffect(() => {
-    // Set up auth state listener
+    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         console.log('Auth state change:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
@@ -86,19 +86,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         if (session?.user) {
           // Handle sign in event - check if this is a new user registration
           if (event === 'SIGNED_IN' && session.user.user_metadata) {
-            // Check if profile already exists
-            const { data: existingProfile } = await supabase
-              .from('profiles')
-              .select('id')
-              .eq('id', session.user.id)
-              .single();
-            
-            // If no existing profile, this is a new user - create profile
-            if (!existingProfile) {
-              setTimeout(() => {
-                createUserProfile(session.user.id, session.user.user_metadata);
-              }, 0);
-            }
+            // Defer profile creation to avoid deadlock
+            setTimeout(async () => {
+              const { data: existingProfile } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('id', session.user.id)
+                .single();
+              
+              // If no existing profile, this is a new user - create profile
+              if (!existingProfile) {
+                await createUserProfile(session.user.id, session.user.user_metadata);
+              }
+            }, 0);
           }
           
           // Defer profile fetching to avoid deadlock
@@ -113,7 +113,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     );
 
-    // Check for existing session
+    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
