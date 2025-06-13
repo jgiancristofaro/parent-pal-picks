@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface CSVData {
   headers: string[];
@@ -21,7 +22,7 @@ interface ColumnMapping {
 }
 
 const AdminImport = () => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, isLoading } = useAuth();
   const { toast } = useToast();
   const [importType, setImportType] = useState<'sitters' | 'products'>('sitters');
   const [file, setFile] = useState<File | null>(null);
@@ -30,6 +31,29 @@ const AdminImport = () => {
   const [isImporting, setIsImporting] = useState(false);
   const [importResult, setImportResult] = useState<any>(null);
 
+  // Show loading state while auth is still loading
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <Skeleton className="h-8 w-64 mb-2" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <Card className="mb-6">
+            <CardHeader>
+              <Skeleton className="h-6 w-48" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-64 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Only check admin status after loading is complete
   if (!isAdmin) {
     return (
       <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
