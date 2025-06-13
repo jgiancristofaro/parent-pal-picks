@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAdminProduct } from '@/hooks/useAdminProduct';
@@ -16,7 +15,13 @@ const AdminEditProduct = () => {
   
   const { product, isLoading: isLoadingProduct, error: productError } = useAdminProduct(productId || '');
   const { updateProduct, setVerifiedStatus, deleteProduct, isUpdating, isDeleting } = useAdminProductMutations();
-  const { reviews, deleteReview, isDeleting: isDeletingReview } = useAdminProductReviews(productId || '');
+  const { 
+    reviews, 
+    deleteReview, 
+    isDeleting: isDeletingReview, 
+    isLoading: isLoadingReviews, 
+    error: reviewsError 
+  } = useAdminProductReviews(productId || '');
   
   const [formData, setFormData] = useState({
     name: '',
@@ -132,6 +137,8 @@ const AdminEditProduct = () => {
               reviews={reviews}
               onDeleteReview={handleDeleteReview}
               isDeletingReview={isDeletingReview}
+              isLoading={isLoadingReviews}
+              error={reviewsError}
             />
 
             <ProductMergeCard 

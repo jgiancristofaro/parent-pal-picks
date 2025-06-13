@@ -4,23 +4,55 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Loader2, AlertCircle } from 'lucide-react';
 import { AdminReview } from '@/hooks/admin/useAdminProductsTypes';
 
 interface ProductReviewsCardProps {
   reviews: AdminReview[];
   onDeleteReview: (reviewId: string) => void;
   isDeletingReview: boolean;
+  isLoading?: boolean;
+  error?: Error | null;
 }
 
-export const ProductReviewsCard = ({ reviews, onDeleteReview, isDeletingReview }: ProductReviewsCardProps) => {
+export const ProductReviewsCard = ({ 
+  reviews, 
+  onDeleteReview, 
+  isDeletingReview, 
+  isLoading = false,
+  error = null 
+}: ProductReviewsCardProps) => {
+  console.log('ProductReviewsCard render:', { 
+    reviewsCount: reviews.length, 
+    isLoading, 
+    error: error?.message,
+    isDeletingReview 
+  });
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Reviews ({reviews.length})</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          Reviews ({reviews.length})
+          {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        {reviews.length > 0 ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="flex items-center gap-2 text-gray-500">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Loading reviews...</span>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="flex items-center gap-2 text-red-600">
+              <AlertCircle className="w-4 h-4" />
+              <span>Error loading reviews: {error.message}</span>
+            </div>
+          </div>
+        ) : reviews.length > 0 ? (
           <Table>
             <TableHeader>
               <TableRow>
@@ -46,7 +78,11 @@ export const ProductReviewsCard = ({ reviews, onDeleteReview, isDeletingReview }
                       disabled={isDeletingReview}
                       className="text-red-600 hover:text-red-700"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      {isDeletingReview ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
                     </Button>
                   </TableCell>
                 </TableRow>
