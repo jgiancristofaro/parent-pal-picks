@@ -1,6 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { StarIcon } from "@/components/StarIcon";
+import { ProductImage } from "@/components/ui/ProductImage";
 
 interface ProductCardProps {
   id: string;
@@ -64,9 +65,10 @@ export const ProductCard = ({
     <Link to={`/product/${id}`}>
       <div className="rounded-lg overflow-hidden bg-white shadow-md hover:shadow-lg transition-shadow duration-200">
         <div className="aspect-square overflow-hidden">
-          <img 
-            src={image} 
-            alt={name} 
+          <ProductImage 
+            imageUrl={image}
+            category={category}
+            productName={name}
             className="w-full h-full object-cover"
           />
         </div>

@@ -2,17 +2,20 @@
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ProductImage } from "@/components/ui/ProductImage";
 
 interface ProductImageGalleryProps {
   imageUrl: string | null;
   imageUrls: string[] | null;
   productName: string;
+  category?: string | null;
 }
 
 export const ProductImageGallery = ({ 
   imageUrl, 
   imageUrls, 
-  productName 
+  productName,
+  category 
 }: ProductImageGalleryProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
@@ -22,8 +25,7 @@ export const ProductImageGallery = ({
     ...(imageUrls || [])
   ].filter(Boolean);
 
-  const fallbackImage = "https://images.unsplash.com/photo-1586685715203-7cfac24d9afa?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-  const imagesToShow = allImages.length > 0 ? allImages : [fallbackImage];
+  const imagesToShow = allImages.length > 0 ? allImages : [null]; // Use null to trigger fallback
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => 
@@ -41,9 +43,10 @@ export const ProductImageGallery = ({
     <div className="space-y-4">
       {/* Main Image */}
       <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
-        <img
-          src={imagesToShow[currentImageIndex]}
-          alt={productName}
+        <ProductImage
+          imageUrl={imagesToShow[currentImageIndex]}
+          category={category}
+          productName={productName}
           className="w-full h-full object-cover"
         />
         
@@ -88,9 +91,10 @@ export const ProductImageGallery = ({
                 index === currentImageIndex ? 'border-purple-500' : 'border-gray-200'
               }`}
             >
-              <img
-                src={image}
-                alt={`${productName} ${index + 1}`}
+              <ProductImage
+                imageUrl={image}
+                category={category}
+                productName={`${productName} ${index + 1}`}
                 className="w-full h-full object-cover"
               />
             </button>

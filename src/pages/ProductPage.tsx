@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Header } from "@/components/Header";
@@ -110,6 +109,7 @@ const ProductPage = () => {
               imageUrl={product.image_url}
               imageUrls={product.image_urls}
               productName={product.name}
+              category={product.category?.name}
             />
             
             {/* Right Column - Product Info */}

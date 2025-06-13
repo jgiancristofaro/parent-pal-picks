@@ -2,6 +2,7 @@
 import { Link } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { StarIcon } from "@/components/StarIcon";
+import { ProductImage } from "@/components/ui/ProductImage";
 
 interface RecommendedProductFeedItemProps {
   productId: string;
@@ -32,17 +33,12 @@ export const RecommendedProductFeedItem = ({
         {/* Product Image */}
         <div className="flex-shrink-0">
           <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100">
-            {productImageUrl ? (
-              <img 
-                src={productImageUrl} 
-                alt={productName}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                <span className="text-gray-400 text-sm">No Image</span>
-              </div>
-            )}
+            <ProductImage
+              imageUrl={productImageUrl}
+              category={productCategory}
+              productName={productName}
+              className="w-full h-full object-cover"
+            />
           </div>
         </div>
         
