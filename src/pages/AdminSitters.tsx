@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ArrowLeft, Search, Edit, Shield, ShieldCheck, Loader2 } from 'lucide-react';
+import { ArrowLeft, Search, Edit, Shield, ShieldCheck, Loader2, AlertCircle } from 'lucide-react';
 import { useAdminSitters } from '@/hooks/useAdminSitters';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const AdminSitters = () => {
   const navigate = useNavigate();
@@ -21,7 +22,8 @@ const AdminSitters = () => {
     isLoading, 
     isFetching, 
     isSearching, 
-    hasSearchTerm 
+    hasSearchTerm,
+    error
   } = useAdminSitters({
     searchTerm,
     page,
@@ -97,6 +99,16 @@ const AdminSitters = () => {
                   `Found ${sitters.length} sitter${sitters.length !== 1 ? 's' : ''} matching "${searchTerm}"`
                 )}
               </div>
+            )}
+
+            {/* Error Display */}
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Error loading sitters: {error.message}
+                </AlertDescription>
+              </Alert>
             )}
           </CardHeader>
 

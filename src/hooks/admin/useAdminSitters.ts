@@ -19,6 +19,8 @@ export const useAdminSitters = ({ searchTerm = '', page = 0, pageSize = 50 }: Us
   const { data: sitters = [], isLoading, error, isFetching } = useQuery({
     queryKey: ['admin-sitters', effectiveSearchTerm, page, pageSize],
     queryFn: async (): Promise<AdminSitter[]> => {
+      console.log('Fetching admin sitters with search term:', effectiveSearchTerm);
+      
       const { data, error } = await supabase.rpc('admin_get_all_sitters', {
         search_term: effectiveSearchTerm,
         page_limit: pageSize,
@@ -27,9 +29,15 @@ export const useAdminSitters = ({ searchTerm = '', page = 0, pageSize = 50 }: Us
 
       if (error) {
         console.error('Error fetching admin sitters:', error);
+        toast({
+          title: "Error",
+          description: `Failed to fetch sitters: ${error.message}`,
+          variant: "destructive",
+        });
         throw error;
       }
 
+      console.log('Successfully fetched admin sitters:', data?.length || 0, 'results');
       return data || [];
     },
     enabled: shouldSearch, // Only run query when search criteria is met
