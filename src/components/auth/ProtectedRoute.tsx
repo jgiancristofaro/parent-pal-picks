@@ -26,8 +26,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
           <Skeleton className="h-64 w-full" />
           <Skeleton className="h-12 w-full" />
         </div>
-      );
-    }
+      </div>
+    );
   }
 
   if (!session) {
