@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Session, User } from '@supabase/supabase-js';
+import { Session, User, AuthChangeEvent } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/profile';
 
@@ -51,37 +51,54 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const createUserProfile = async (userId: string, metadata: any) => {
+    try {
+      const { first_name, last_name, phone_number, profile_privacy_setting, phone_number_searchable } = metadata;
+      
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: userId,
+          first_name: first_name || '',
+          last_name: last_name || '',
+          full_name: `${first_name || ''} ${last_name || ''}`.trim() || 'User',
+          phone_number: phone_number || null,
+          profile_privacy_setting: profile_privacy_setting || 'private',
+          phone_number_searchable: phone_number_searchable || false,
+        });
+
+      if (profileError) {
+        console.error('Error creating profile:', profileError);
+      }
+    } catch (error) {
+      console.error('Error in createUserProfile:', error);
+    }
+  };
+
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         console.log('Auth state change:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Handle sign up event - create profile if needed
-          if (event === 'SIGNED_UP' && session.user.user_metadata) {
-            const { first_name, last_name, phone_number, profile_privacy_setting, phone_number_searchable } = session.user.user_metadata;
+          // Handle sign in event - check if this is a new user registration
+          if (event === AuthChangeEvent.SIGNED_IN && session.user.user_metadata) {
+            // Check if profile already exists
+            const { data: existingProfile } = await supabase
+              .from('profiles')
+              .select('id')
+              .eq('id', session.user.id)
+              .single();
             
-            // Defer profile creation to avoid deadlock
-            setTimeout(async () => {
-              const { error: profileError } = await supabase
-                .from('profiles')
-                .upsert({
-                  id: session.user.id,
-                  first_name: first_name || '',
-                  last_name: last_name || '',
-                  full_name: `${first_name || ''} ${last_name || ''}`.trim() || 'User',
-                  phone_number: phone_number || null,
-                  profile_privacy_setting: profile_privacy_setting || 'private',
-                  phone_number_searchable: phone_number_searchable || false,
-                });
-
-              if (profileError) {
-                console.error('Error creating profile:', profileError);
-              }
-            }, 0);
+            // If no existing profile, this is a new user - create profile
+            if (!existingProfile) {
+              setTimeout(() => {
+                createUserProfile(session.user.id, session.user.user_metadata);
+              }, 0);
+            }
           }
           
           // Defer profile fetching to avoid deadlock
