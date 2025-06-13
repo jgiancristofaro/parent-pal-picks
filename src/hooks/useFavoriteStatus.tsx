@@ -34,18 +34,20 @@ export const useFavoriteStatus = (itemId: string, itemType: 'sitter' | 'product'
   const toggleMutation = useMutation({
     mutationFn: async (shouldAdd: boolean) => {
       if (shouldAdd) {
-        const { data, error } = await supabase.functions.invoke('add_favorite', {
-          body: { p_item_id: itemId, p_item_type: itemType }
+        const { data, error } = await supabase.rpc('add_favorite', {
+          p_item_id: itemId,
+          p_item_type: itemType
         });
         if (error) throw error;
-        if (data.error) throw new Error(data.error);
+        if (data?.error) throw new Error(data.error);
         return data;
       } else {
-        const { data, error } = await supabase.functions.invoke('remove_favorite', {
-          body: { p_item_id: itemId, p_item_type: itemType }
+        const { data, error } = await supabase.rpc('remove_favorite', {
+          p_item_id: itemId,
+          p_item_type: itemType
         });
         if (error) throw error;
-        if (data.error) throw new Error(data.error);
+        if (data?.error) throw new Error(data.error);
         return data;
       }
     },
@@ -85,6 +87,7 @@ export const useFavoriteStatus = (itemId: string, itemType: 'sitter' | 'product'
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: ['favorites'] });
       queryClient.invalidateQueries({ queryKey: ['favorite-status', itemId, itemType] });
+      queryClient.invalidateQueries({ queryKey: ['user-favorites'] });
     },
   });
 
