@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ArrowRight } from "lucide-react";
@@ -70,7 +69,6 @@ export const NewRecommendedSitters = ({ currentUserId }: NewRecommendedSittersPr
                   rating={sitter.sitter_rating || 0}
                   recommendedBy={sitter.recommender_full_name}
                   friendRecommendationCount={1}
-                  compactText={true}
                 />
               </div>
             ))}
