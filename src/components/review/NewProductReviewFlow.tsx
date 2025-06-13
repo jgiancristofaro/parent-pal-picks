@@ -4,6 +4,7 @@ import { CreateProductForm } from "./CreateProductForm";
 import { ReviewForm } from "./ReviewForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface ProductFormData {
@@ -38,6 +39,7 @@ export const NewProductReviewFlow = ({ onCancel, onSelectExistingProduct }: NewP
   const [hasVerifiedExperience, setHasVerifiedExperience] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleProductNext = (data: ProductFormData & { image_url?: string }) => {
     setProductData(data);
@@ -107,7 +109,9 @@ export const NewProductReviewFlow = ({ onCancel, onSelectExistingProduct }: NewP
         title: "Success",
         description: "Your product and review have been created!",
       });
-      onCancel(); // Return to main page
+      
+      // Redirect to the newly created product page instead of calling onCancel
+      navigate(`/product/${newProduct.id}`);
     } catch (error) {
       console.error("Error creating product and review:", error);
       toast({

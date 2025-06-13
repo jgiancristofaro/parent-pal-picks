@@ -114,7 +114,7 @@ export const ProductReviewForm = ({
           navigate(-1); // Go back to the product page
         }
       } else {
-        // Create new review logic (existing code)
+        // Create new review logic
         const productId = selectedProduct?.id;
         
         if (!productId) {
@@ -143,7 +143,9 @@ export const ProductReviewForm = ({
           title: "Success",
           description: "Your review has been submitted!",
         });
-        onCancel();
+        
+        // Redirect to the product page instead of calling onCancel
+        navigate(`/product/${productId}`);
       }
     } catch (error) {
       console.error("Error with review:", error);

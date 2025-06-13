@@ -168,7 +168,9 @@ export const EnhancedSitterReviewForm = ({
             title: "Success",
             description: data.message || "Your review has been submitted!",
           });
-          onCancel();
+          
+          // Redirect to the sitter profile page instead of calling onCancel
+          navigate(`/sitter/${selectedSitter?.id}`);
         } else {
           toast({
             title: "Error",
