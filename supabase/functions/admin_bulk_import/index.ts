@@ -17,6 +17,16 @@ interface ImportRequest {
   columnMapping: { [csvColumn: string]: string };
 }
 
+// Helper function to get CSV column name for a database field
+const getCsvColumnForField = (fieldName: string, columnMapping: { [csvColumn: string]: string }): string | null => {
+  for (const [csvColumn, dbField] of Object.entries(columnMapping)) {
+    if (dbField === fieldName) {
+      return csvColumn;
+    }
+  }
+  return null;
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -74,18 +84,27 @@ serve(async (req) => {
         let transformedRow: any = {};
 
         if (importType === 'sitters') {
-          // Map sitter fields
+          // Map sitter fields using proper column lookup
+          const nameColumn = getCsvColumnForField('name', columnMapping);
+          const bioColumn = getCsvColumnForField('bio', columnMapping);
+          const experienceColumn = getCsvColumnForField('experience', columnMapping);
+          const hourlyRateColumn = getCsvColumnForField('hourly_rate', columnMapping);
+          const phoneNumberColumn = getCsvColumnForField('phone_number', columnMapping);
+          const emailColumn = getCsvColumnForField('email', columnMapping);
+          const profileImageColumn = getCsvColumnForField('profile_image_url', columnMapping);
+          const certificationsColumn = getCsvColumnForField('certifications', columnMapping);
+
           transformedRow = {
-            name: row[columnMapping['name']] || '',
-            bio: row[columnMapping['bio']] || null,
-            experience: row[columnMapping['experience']] || null,
-            hourly_rate: row[columnMapping['hourly_rate']] ? 
-              parseFloat(row[columnMapping['hourly_rate']] as string) : null,
-            phone_number: row[columnMapping['phone_number']] || null,
-            email: row[columnMapping['email']] || null,
-            profile_image_url: row[columnMapping['profile_image_url']] || null,
-            certifications: row[columnMapping['certifications']] ? 
-              (row[columnMapping['certifications']] as string).split(',').map(cert => cert.trim()) : [],
+            name: nameColumn ? (row[nameColumn] || '') : '',
+            bio: bioColumn ? (row[bioColumn] || null) : null,
+            experience: experienceColumn ? (row[experienceColumn] || null) : null,
+            hourly_rate: hourlyRateColumn && row[hourlyRateColumn] ? 
+              parseFloat(row[hourlyRateColumn] as string) : null,
+            phone_number: phoneNumberColumn ? (row[phoneNumberColumn] || null) : null,
+            email: emailColumn ? (row[emailColumn] || null) : null,
+            profile_image_url: profileImageColumn ? (row[profileImageColumn] || null) : null,
+            certifications: certificationsColumn && row[certificationsColumn] ? 
+              (row[certificationsColumn] as string).split(',').map(cert => cert.trim()) : [],
             created_by_user_id: user.id,
             is_verified: false,
             rating: 0,
@@ -99,16 +118,24 @@ serve(async (req) => {
           }
 
         } else if (importType === 'products') {
-          // Map product fields
+          // Map product fields using proper column lookup
+          const nameColumn = getCsvColumnForField('name', columnMapping);
+          const descriptionColumn = getCsvColumnForField('description', columnMapping);
+          const brandNameColumn = getCsvColumnForField('brand_name', columnMapping);
+          const categoryColumn = getCsvColumnForField('category', columnMapping);
+          const priceColumn = getCsvColumnForField('price', columnMapping);
+          const imageUrlColumn = getCsvColumnForField('image_url', columnMapping);
+          const purchaseLinkColumn = getCsvColumnForField('external_purchase_link', columnMapping);
+
           transformedRow = {
-            name: row[columnMapping['name']] || '',
-            description: row[columnMapping['description']] || null,
-            brand_name: row[columnMapping['brand_name']] || '',
-            category: row[columnMapping['category']] || null,
-            price: row[columnMapping['price']] ? 
-              parseFloat(row[columnMapping['price']] as string) : null,
-            image_url: row[columnMapping['image_url']] || null,
-            external_purchase_link: row[columnMapping['external_purchase_link']] || null,
+            name: nameColumn ? (row[nameColumn] || '') : '',
+            description: descriptionColumn ? (row[descriptionColumn] || null) : null,
+            brand_name: brandNameColumn ? (row[brandNameColumn] || '') : '',
+            category: categoryColumn ? (row[categoryColumn] || null) : null,
+            price: priceColumn && row[priceColumn] ? 
+              parseFloat(row[priceColumn] as string) : null,
+            image_url: imageUrlColumn ? (row[imageUrlColumn] || null) : null,
+            external_purchase_link: purchaseLinkColumn ? (row[purchaseLinkColumn] || null) : null,
             created_by_user_id: user.id,
             is_verified: false,
             average_rating: 0,
