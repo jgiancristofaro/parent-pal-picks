@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
 interface SignUpData {
@@ -52,14 +52,10 @@ export const useSignUpFlow = () => {
             description: 'An account with this email already exists. Please try logging in instead or use a different email address.',
             variant: 'destructive',
             duration: 8000,
-            action: (
-              <button 
-                onClick={() => navigate('/login')}
-                className="text-purple-600 hover:text-purple-700 font-medium underline"
-              >
-                Go to login page
-              </button>
-            ),
+            action: {
+              label: 'Go to login page',
+              onClick: () => navigate('/login'),
+            },
           });
         } else {
           toast({
