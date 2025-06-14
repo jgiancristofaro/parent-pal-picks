@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
 import BrandedOnboardingSlide from '@/components/onboarding/BrandedOnboardingSlide';
 
 const OnboardingPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
@@ -22,6 +23,17 @@ const OnboardingPage = () => {
       setCurrent(api.selectedScrollSnap() + 1);
     });
   }, [api]);
+
+  // Handle direct navigation to specific slide
+  useEffect(() => {
+    const slideParam = searchParams.get('slide');
+    if (slideParam && api) {
+      const slideIndex = parseInt(slideParam, 10);
+      if (!isNaN(slideIndex) && slideIndex >= 0 && slideIndex < count) {
+        api.scrollTo(slideIndex);
+      }
+    }
+  }, [searchParams, api, count]);
 
   const handleSignUp = () => {
     localStorage.setItem('hasSeenParentPalOnboarding', 'true');

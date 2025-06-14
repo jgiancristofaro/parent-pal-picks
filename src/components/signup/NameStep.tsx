@@ -2,6 +2,8 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 interface NameStepProps {
   firstName: string;
@@ -11,14 +13,32 @@ interface NameStepProps {
 }
 
 const NameStep = ({ firstName, lastName, onNext, onUpdate }: NameStepProps) => {
+  const navigate = useNavigate();
+
   const handleNext = () => {
     if (firstName.trim() && lastName.trim()) {
       onNext();
     }
   };
 
+  const handleBackToOnboarding = () => {
+    navigate('/onboarding?slide=2');
+  };
+
   return (
     <div className="space-y-6">
+      {/* Back to Onboarding Button */}
+      <div className="mb-4">
+        <Button
+          onClick={handleBackToOnboarding}
+          variant="ghost"
+          className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 p-2"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Login Options
+        </Button>
+      </div>
+
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold mb-4">What's your name?</h2>
         <p className="text-gray-600">Let's start with the basics</p>
