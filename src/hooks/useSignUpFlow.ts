@@ -44,11 +44,32 @@ export const useSignUpFlow = () => {
 
       if (error) {
         console.error('Sign up error:', error);
-        toast({
-          title: 'Sign up failed',
-          description: error.message,
-          variant: 'destructive',
-        });
+        
+        // Enhanced error handling for duplicate email
+        if (error.message?.includes('User already registered')) {
+          toast({
+            title: 'Account already exists',
+            description: (
+              <div className="space-y-2">
+                <p>An account with this email already exists.</p>
+                <button 
+                  onClick={() => navigate('/login')}
+                  className="text-purple-600 hover:text-purple-700 font-medium underline"
+                >
+                  Go to login page →
+                </button>
+              </div>
+            ),
+            variant: 'destructive',
+            duration: 8000,
+          });
+        } else {
+          toast({
+            title: 'Sign up failed',
+            description: error.message,
+            variant: 'destructive',
+          });
+        }
         return { success: false, error };
       }
 
