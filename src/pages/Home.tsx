@@ -13,7 +13,7 @@ import { TopCommunityPicks } from "@/components/home/TopCommunityPicks";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Home = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, isLoading: authLoading } = useAuth();
   
   // Real notification system
   const { 
@@ -42,7 +42,43 @@ const Home = () => {
     setShowNotification(false);
   };
 
-  const userName = profile?.full_name?.split(' ')[0] || 'User';
+  // Get user name from profile or fallback to User
+  const userName = profile?.full_name?.split(' ')[0] || 
+                   profile?.first_name || 
+                   user?.user_metadata?.first_name || 
+                   'User';
+
+  console.log('Home: Rendering with auth state:', { 
+    authLoading, 
+    hasProfile: !!profile, 
+    profileName: profile?.full_name,
+    userName,
+    userId: user?.id 
+  });
+
+  // Show loading state while auth is still loading
+  if (authLoading) {
+    return (
+      <div className="min-h-screen pb-20 bg-gray-50">
+        <Header 
+          showUserProfileImage={false}
+          userProfileImageUrl={profile?.avatar_url}
+          userFullName="Loading..."
+          showBack={false}
+          showSettings={true}
+          showLogo={true}
+          logoUrl="/assets/logo.png"
+        />
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading your home...</p>
+          </div>
+        </div>
+        <BottomNavigation />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
