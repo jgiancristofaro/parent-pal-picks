@@ -1,11 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
 import BrandedOnboardingSlide from '@/components/onboarding/BrandedOnboardingSlide';
 
 const OnboardingPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isReturningUser = searchParams.get('returning') === 'true';
+  
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
@@ -21,7 +25,12 @@ const OnboardingPage = () => {
     api.on('select', () => {
       setCurrent(api.selectedScrollSnap() + 1);
     });
-  }, [api]);
+
+    // Auto-navigate to last slide for returning users
+    if (isReturningUser) {
+      api.scrollTo(2); // Navigate to the last slide (index 2)
+    }
+  }, [api, isReturningUser]);
 
   const handleSignUp = () => {
     localStorage.setItem('hasSeenParentPalOnboarding', 'true');
@@ -60,14 +69,16 @@ const OnboardingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 flex flex-col items-center justify-center p-6 relative">
-      {/* Skip Button */}
-      <Button 
-        variant="ghost"
-        onClick={handleSignUp}
-        className="absolute top-4 right-4 z-10 text-purple-600 hover:text-purple-700 hover:bg-purple-100"
-      >
-        Skip
-      </Button>
+      {/* Skip Button - only show for new users */}
+      {!isReturningUser && (
+        <Button 
+          variant="ghost"
+          onClick={handleSignUp}
+          className="absolute top-4 right-4 z-10 text-purple-600 hover:text-purple-700 hover:bg-purple-100"
+        >
+          Skip
+        </Button>
+      )}
 
       <div className="w-full max-w-md">
         <Carousel setApi={setApi} className="w-full">

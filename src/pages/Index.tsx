@@ -23,8 +23,8 @@ const Index = () => {
       // First-time user, redirect to onboarding
       navigate("/onboarding");
     } else {
-      // Returning user, proceed to signup (they can navigate to login from there)
-      navigate("/signup");
+      // Returning user, redirect to onboarding with parameter to show last slide
+      navigate("/onboarding?returning=true");
     }
   }, [navigate, session, isLoading]);
 
