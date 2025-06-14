@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -53,7 +54,10 @@ export const useSignUpFlow = () => {
             variant: 'destructive',
             duration: 8000,
             action: (
-              <ToastAction onClick={() => navigate('/login')}>
+              <ToastAction 
+                altText="Navigate to login page"
+                onClick={() => navigate('/login')}
+              >
                 Go to login page
               </ToastAction>
             ),
