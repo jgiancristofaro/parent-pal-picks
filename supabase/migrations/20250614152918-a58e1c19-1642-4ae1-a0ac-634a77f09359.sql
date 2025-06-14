@@ -1,0 +1,52 @@
+
+-- Move pg_trgm extension to a dedicated schema for better organization
+CREATE SCHEMA IF NOT EXISTS extensions;
+ALTER EXTENSION pg_trgm SET SCHEMA extensions;
+
+-- Set secure search_path for all database functions
+ALTER FUNCTION public.update_updated_at_column SET search_path = public, extensions;
+ALTER FUNCTION public.update_activity_feed_view SET search_path = public, extensions;
+ALTER FUNCTION public.get_profile_followers SET search_path = public, extensions;
+ALTER FUNCTION public.get_profile_following SET search_path = public, extensions;
+ALTER FUNCTION public.get_new_activity_count SET search_path = public, extensions;
+ALTER FUNCTION public.get_new_alerts_status SET search_path = public, extensions;
+ALTER FUNCTION public.search_profile_by_phone SET search_path = public, extensions;
+ALTER FUNCTION public.update_follow_request_updated_at SET search_path = public, extensions;
+ALTER FUNCTION public.mark_alerts_as_viewed SET search_path = public, extensions;
+ALTER FUNCTION public.cleanup_rate_limits SET search_path = public, extensions;
+ALTER FUNCTION public.check_rate_limit SET search_path = public, extensions;
+ALTER FUNCTION public.get_user_recommendations_with_review_snippets SET search_path = public, extensions;
+ALTER FUNCTION public.update_review SET search_path = public, extensions;
+ALTER FUNCTION public.get_local_sitters SET search_path = public, extensions;
+ALTER FUNCTION public.search_profile_by_phone_secure SET search_path = public, extensions;
+ALTER FUNCTION public.get_follow_status SET search_path = public, extensions;
+ALTER FUNCTION public.get_newly_recommended_sitters_from_followed_users SET search_path = public, extensions;
+ALTER FUNCTION public.get_top_community_picks SET search_path = public, extensions;
+ALTER FUNCTION public.get_newly_recommended_products_from_followed_users SET search_path = public, extensions;
+ALTER FUNCTION public.handle_review_update SET search_path = public, extensions;
+ALTER FUNCTION public.create_follow_relationship SET search_path = public, extensions;
+ALTER FUNCTION public.get_profile_with_follow_status SET search_path = public, extensions;
+ALTER FUNCTION public.get_recent_activity_summary SET search_path = public, extensions;
+ALTER FUNCTION public.search_all_profiles SET search_path = public, extensions;
+ALTER FUNCTION public.get_suggested_profiles SET search_path = public, extensions;
+ALTER FUNCTION public.search_sitters SET search_path = public, extensions;
+ALTER FUNCTION public.create_review SET search_path = public, extensions;
+ALTER FUNCTION public.get_friends_activity_feed SET search_path = public, extensions;
+ALTER FUNCTION public.admin_get_users SET search_path = public, extensions;
+ALTER FUNCTION public.admin_delete_product SET search_path = public, extensions;
+ALTER FUNCTION public.admin_get_all_products SET search_path = public, extensions;
+ALTER FUNCTION public.admin_delete_sitter SET search_path = public, extensions;
+ALTER FUNCTION public.admin_get_all_sitters SET search_path = public, extensions;
+ALTER FUNCTION public.add_favorite SET search_path = public, extensions;
+ALTER FUNCTION public.remove_favorite SET search_path = public, extensions;
+ALTER FUNCTION public.flag_content SET search_path = public, extensions;
+ALTER FUNCTION public.admin_get_flagged_content SET search_path = public, extensions;
+ALTER FUNCTION public.admin_resolve_flag SET search_path = public, extensions;
+ALTER FUNCTION public.admin_suspend_user SET search_path = public, extensions;
+ALTER FUNCTION public.admin_delete_user SET search_path = public, extensions;
+ALTER FUNCTION public.admin_update_sitter_details SET search_path = public, extensions;
+ALTER FUNCTION public.admin_update_product_details SET search_path = public, extensions;
+ALTER FUNCTION public.admin_set_verified_status SET search_path = public, extensions;
+ALTER FUNCTION public.admin_merge_duplicates SET search_path = public, extensions;
+ALTER FUNCTION public.admin_delete_review SET search_path = public, extensions;
+ALTER FUNCTION public.admin_get_item_reviews SET search_path = public, extensions;

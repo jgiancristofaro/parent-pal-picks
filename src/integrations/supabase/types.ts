@@ -907,26 +907,6 @@ export type Database = {
         Args: { profile_owner_user_id: string; item_type: string }
         Returns: Json
       }
-      gtrgm_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_decompress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_in: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_options: {
-        Args: { "": unknown }
-        Returns: undefined
-      }
-      gtrgm_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
       mark_alerts_as_viewed: {
         Args: { user_id: string }
         Returns: undefined
@@ -984,18 +964,6 @@ export type Database = {
           created_at: string
           updated_at: string
         }[]
-      }
-      set_limit: {
-        Args: { "": number }
-        Returns: number
-      }
-      show_limit: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      show_trgm: {
-        Args: { "": string }
-        Returns: string[]
       }
       update_activity_feed_view: {
         Args: Record<PropertyKey, never>
