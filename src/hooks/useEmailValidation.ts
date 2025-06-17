@@ -14,10 +14,12 @@ export const useEmailValidation = () => {
 
   const checkEmailExists = useCallback(async (email: string) => {
     if (!email || !email.includes('@')) {
+      console.log('useEmailValidation: Invalid email, skipping check');
       setEmailExists(null);
       return;
     }
 
+    console.log('useEmailValidation: Starting check for email:', email);
     setIsChecking(true);
     
     try {
@@ -25,8 +27,10 @@ export const useEmailValidation = () => {
         p_email: email.toLowerCase().trim()
       });
 
+      console.log('useEmailValidation: RPC response - data:', data, 'error:', error);
+
       if (error) {
-        console.error('Email validation error:', error);
+        console.error('useEmailValidation: RPC error:', error);
         toast({
           title: "Validation error",
           description: "Unable to validate email. Please try again.",
@@ -36,18 +40,41 @@ export const useEmailValidation = () => {
         return;
       }
 
-      // Safely type and access the response
-      const response = data as unknown as EmailExistsResponse;
-      setEmailExists(response?.exists || false);
+      // Improved response parsing with better error handling
+      let response: EmailExistsResponse;
+      
+      if (typeof data === 'object' && data !== null && 'exists' in data) {
+        response = data as unknown as EmailExistsResponse;
+      } else {
+        console.error('useEmailValidation: Unexpected response format:', data);
+        setEmailExists(null);
+        toast({
+          title: "Validation error",
+          description: "Unexpected response format. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log('useEmailValidation: Email exists:', response.exists);
+      setEmailExists(response.exists || false);
+      
     } catch (error) {
-      console.error('Email validation error:', error);
+      console.error('useEmailValidation: Catch block error:', error);
       setEmailExists(null);
+      toast({
+        title: "Validation error",
+        description: "Network error. Please check your connection and try again.",
+        variant: "destructive",
+      });
     } finally {
+      console.log('useEmailValidation: Setting isChecking to false');
       setIsChecking(false);
     }
   }, [toast]);
 
   const resetValidation = useCallback(() => {
+    console.log('useEmailValidation: Resetting validation state');
     setEmailExists(null);
     setIsChecking(false);
   }, []);
