@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -31,7 +32,7 @@ const AuthStep = ({
   onUpdate 
 }: AuthStepProps) => {
   const [emailValidation, setEmailValidation] = useState({ 
-    status: 'idle' as 'idle' | 'checking' | 'exists' | 'available', 
+    status: 'idle' as 'idle' | 'checking' | 'exists' | 'available' | 'error', 
     message: '' 
   });
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ const AuthStep = ({
     }
   };
 
-  const handleEmailValidationChange = (status: 'idle' | 'checking' | 'exists' | 'available', message: string = '') => {
+  const handleEmailValidationChange = (status: 'idle' | 'checking' | 'exists' | 'available' | 'error', message: string = '') => {
     setEmailValidation({ status, message });
   };
 
@@ -90,6 +91,10 @@ const AuthStep = ({
 
           {emailValidation.status === 'available' && (
             <p className="text-sm text-green-600">Email is available!</p>
+          )}
+
+          {emailValidation.status === 'error' && (
+            <p className="text-sm text-red-500">{emailValidation.message}</p>
           )}
         </div>
         
