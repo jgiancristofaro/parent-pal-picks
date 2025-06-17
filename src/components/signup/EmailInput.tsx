@@ -13,7 +13,7 @@ interface EmailInputProps {
 
 const EmailInput = ({ email, onEmailChange, onValidationChange, disabled = false }: EmailInputProps) => {
   const { checkEmailExists, isChecking, emailExists, resetValidation } = useEmailValidation();
-  const debouncedEmail = useDebounce(email, 800); // Increased debounce time
+  const debouncedEmail = useDebounce(email, 800);
 
   // Basic email validation regex
   const isValidEmailFormat = (email: string) => {
@@ -41,27 +41,14 @@ const EmailInput = ({ email, onEmailChange, onValidationChange, disabled = false
 
     console.log('EmailInput: Starting email validation for:', debouncedEmail);
     onValidationChange?.('checking');
-    
-    // Add timeout to prevent infinite checking
-    const timeoutId = setTimeout(() => {
-      console.log('EmailInput: Validation timeout, resetting to idle');
-      resetValidation();
-      onValidationChange?.('idle', 'Validation timeout. Please try again.');
-    }, 10000); // 10 second timeout
-
-    checkEmailExists(debouncedEmail).finally(() => {
-      clearTimeout(timeoutId);
-    });
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
+    checkEmailExists(debouncedEmail);
   }, [debouncedEmail, checkEmailExists, onValidationChange, resetValidation]);
 
-  // Effect to handle validation results
+  // Separate effect to handle validation state changes (UI updates only, no validation triggers)
   useEffect(() => {
     console.log('EmailInput: Validation state changed - isChecking:', isChecking, 'emailExists:', emailExists);
     
+    // Only update UI if we have a valid email format
     if (!email || !isValidEmailFormat(email)) {
       onValidationChange?.('idle');
       return;
@@ -75,8 +62,11 @@ const EmailInput = ({ email, onEmailChange, onValidationChange, disabled = false
     } else if (emailExists === false) {
       console.log('EmailInput: Email available');
       onValidationChange?.('available');
+    } else {
+      // emailExists is null - this means validation was reset or failed
+      onValidationChange?.('idle');
     }
-  }, [isChecking, emailExists, email, onValidationChange]);
+  }, [isChecking, emailExists]); // Removed email and onValidationChange from dependencies to prevent loops
 
   return (
     <Input

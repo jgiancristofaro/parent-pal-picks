@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -11,15 +11,25 @@ export const useEmailValidation = () => {
   const [isChecking, setIsChecking] = useState(false);
   const [emailExists, setEmailExists] = useState<boolean | null>(null);
   const { toast } = useToast();
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const checkEmailExists = useCallback(async (email: string) => {
+    // Cancel any ongoing request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
     if (!email || !email.includes('@')) {
       console.log('useEmailValidation: Invalid email, skipping check');
       setEmailExists(null);
+      setIsChecking(false);
       return;
     }
 
     console.log('useEmailValidation: Starting check for email:', email);
+    
+    // Create new abort controller for this request
+    abortControllerRef.current = new AbortController();
     setIsChecking(true);
     
     try {
@@ -27,27 +37,36 @@ export const useEmailValidation = () => {
         p_email: email.toLowerCase().trim()
       });
 
+      // Check if request was aborted
+      if (abortControllerRef.current?.signal.aborted) {
+        console.log('useEmailValidation: Request was aborted');
+        return;
+      }
+
       console.log('useEmailValidation: RPC response - data:', data, 'error:', error);
 
       if (error) {
         console.error('useEmailValidation: RPC error:', error);
+        setEmailExists(null);
+        setIsChecking(false);
         toast({
           title: "Validation error",
           description: "Unable to validate email. Please try again.",
           variant: "destructive",
         });
-        setEmailExists(null);
         return;
       }
 
-      // Improved response parsing with better error handling
-      let response: EmailExistsResponse;
-      
+      // Parse response
+      let exists = false;
       if (typeof data === 'object' && data !== null && 'exists' in data) {
-        response = data as unknown as EmailExistsResponse;
+        exists = Boolean(data.exists);
+      } else if (typeof data === 'boolean') {
+        exists = data;
       } else {
         console.error('useEmailValidation: Unexpected response format:', data);
         setEmailExists(null);
+        setIsChecking(false);
         toast({
           title: "Validation error",
           description: "Unexpected response format. Please try again.",
@@ -56,10 +75,16 @@ export const useEmailValidation = () => {
         return;
       }
 
-      console.log('useEmailValidation: Email exists:', response.exists);
-      setEmailExists(response.exists || false);
+      console.log('useEmailValidation: Email exists:', exists);
+      setEmailExists(exists);
       
     } catch (error) {
+      // Don't log errors for aborted requests
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('useEmailValidation: Request aborted');
+        return;
+      }
+      
       console.error('useEmailValidation: Catch block error:', error);
       setEmailExists(null);
       toast({
@@ -68,13 +93,22 @@ export const useEmailValidation = () => {
         variant: "destructive",
       });
     } finally {
-      console.log('useEmailValidation: Setting isChecking to false');
-      setIsChecking(false);
+      // Only update state if this request wasn't aborted
+      if (!abortControllerRef.current?.signal.aborted) {
+        console.log('useEmailValidation: Setting isChecking to false');
+        setIsChecking(false);
+      }
     }
   }, [toast]);
 
   const resetValidation = useCallback(() => {
     console.log('useEmailValidation: Resetting validation state');
+    
+    // Cancel any ongoing request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
     setEmailExists(null);
     setIsChecking(false);
   }, []);
