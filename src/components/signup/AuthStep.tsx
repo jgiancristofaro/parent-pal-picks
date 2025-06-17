@@ -1,7 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import PrivacySettingsCard from '@/components/auth/PrivacySettingsCard';
 import EmailInput from './EmailInput';
 
@@ -29,11 +31,27 @@ const AuthStep = ({
   onPrev, 
   onUpdate 
 }: AuthStepProps) => {
+  const [emailValidation, setEmailValidation] = useState({ 
+    status: 'idle' as 'idle' | 'checking' | 'exists' | 'available', 
+    message: '' 
+  });
+  const navigate = useNavigate();
+
   const handleNext = () => {
-    if (email.trim() && password.trim() && phoneNumber.trim()) {
+    if (email.trim() && password.trim() && phoneNumber.trim() && emailValidation.status !== 'checking' && emailValidation.status !== 'exists') {
       onNext();
     }
   };
+
+  const handleEmailValidationChange = (status: 'idle' | 'checking' | 'exists' | 'available', message: string = '') => {
+    setEmailValidation({ status, message });
+  };
+
+  const handleLoginRedirect = () => {
+    navigate('/login');
+  };
+
+  const isNextDisabled = !email.trim() || !password.trim() || !phoneNumber.trim() || emailValidation.status === 'checking' || emailValidation.status === 'exists';
 
   return (
     <div className="space-y-6">
@@ -43,10 +61,32 @@ const AuthStep = ({
       </div>
 
       <div className="space-y-4">
-        <EmailInput
-          email={email}
-          onEmailChange={(value) => onUpdate({ email: value })}
-        />
+        <div className="space-y-2">
+          <EmailInput
+            email={email}
+            onEmailChange={(value) => onUpdate({ email: value })}
+            onValidationChange={handleEmailValidationChange}
+          />
+          
+          {emailValidation.status === 'checking' && (
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Checking email availability...</span>
+            </div>
+          )}
+          
+          {emailValidation.status === 'exists' && (
+            <div className="space-y-1">
+              <p className="text-sm text-red-500">{emailValidation.message}</p>
+              <button
+                onClick={handleLoginRedirect}
+                className="text-sm text-blue-600 hover:text-blue-800 underline"
+              >
+                Log in instead
+              </button>
+            </div>
+          )}
+        </div>
         
         <Input
           type="password"
@@ -81,8 +121,8 @@ const AuthStep = ({
         
         <Button
           onClick={handleNext}
-          disabled={!email.trim() || !password.trim() || !phoneNumber.trim()}
-          className="flex-1 py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-lg"
+          disabled={isNextDisabled}
+          className="flex-1 py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Continue
         </Button>

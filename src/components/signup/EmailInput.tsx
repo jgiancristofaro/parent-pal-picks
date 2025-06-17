@@ -1,82 +1,72 @@
 
 import React, { useEffect } from 'react';
 import { Input } from '@/components/ui/input';
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { useDebounce } from '@/hooks/useDebounce';
 
 interface EmailInputProps {
   email: string;
   onEmailChange: (email: string) => void;
+  onValidationChange?: (status: 'idle' | 'checking' | 'exists' | 'available', message?: string) => void;
   disabled?: boolean;
 }
 
-const EmailInput = ({ email, onEmailChange, disabled = false }: EmailInputProps) => {
+const EmailInput = ({ email, onEmailChange, onValidationChange, disabled = false }: EmailInputProps) => {
   const { checkEmailExists, isChecking, emailExists } = useEmailValidation();
   const debouncedEmail = useDebounce(email, 500);
 
+  // Basic email validation regex
+  const isValidEmailFormat = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleEmailBlur = async () => {
+    if (!email || !isValidEmailFormat(email)) {
+      onValidationChange?.('idle');
+      return;
+    }
+
+    onValidationChange?.('checking');
+    await checkEmailExists(email);
+  };
+
+  // Effect to handle real-time validation as user types (debounced)
   useEffect(() => {
-    if (debouncedEmail && debouncedEmail.includes('@')) {
+    if (debouncedEmail && isValidEmailFormat(debouncedEmail)) {
+      onValidationChange?.('checking');
       checkEmailExists(debouncedEmail);
+    } else if (debouncedEmail && !isValidEmailFormat(debouncedEmail)) {
+      onValidationChange?.('idle');
     }
-  }, [debouncedEmail, checkEmailExists]);
+  }, [debouncedEmail, checkEmailExists, onValidationChange]);
 
-  const getValidationIcon = () => {
-    if (!email || !email.includes('@')) return null;
-    
-    if (isChecking) {
-      return <Loader2 className="h-4 w-4 animate-spin text-gray-400" />;
+  // Effect to update parent component when validation status changes
+  useEffect(() => {
+    if (!email || !isValidEmailFormat(email)) {
+      onValidationChange?.('idle');
+      return;
     }
-    
-    if (emailExists === true) {
-      return <XCircle className="h-4 w-4 text-red-500" />;
-    }
-    
-    if (emailExists === false) {
-      return <CheckCircle className="h-4 w-4 text-green-500" />;
-    }
-    
-    return null;
-  };
 
-  const getValidationMessage = () => {
-    if (!email || !email.includes('@')) return null;
-    
     if (isChecking) {
-      return <span className="text-sm text-gray-500">Checking availability...</span>;
+      onValidationChange?.('checking');
+    } else if (emailExists === true) {
+      onValidationChange?.('exists', 'An account with this email already exists.');
+    } else if (emailExists === false) {
+      onValidationChange?.('available');
     }
-    
-    if (emailExists === true) {
-      return <span className="text-sm text-red-500">This email is already registered</span>;
-    }
-    
-    if (emailExists === false) {
-      return <span className="text-sm text-green-500">Email is available</span>;
-    }
-    
-    return null;
-  };
+  }, [isChecking, emailExists, email, onValidationChange]);
 
   return (
-    <div className="space-y-2">
-      <div className="relative">
-        <Input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => onEmailChange(e.target.value)}
-          disabled={disabled}
-          className={`w-full py-3 pr-10 text-lg ${
-            emailExists === true ? 'border-red-500 focus:border-red-500' : 
-            emailExists === false ? 'border-green-500 focus:border-green-500' : ''
-          }`}
-        />
-        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-          {getValidationIcon()}
-        </div>
-      </div>
-      {getValidationMessage()}
-    </div>
+    <Input
+      type="email"
+      placeholder="Email"
+      value={email}
+      onChange={(e) => onEmailChange(e.target.value)}
+      onBlur={handleEmailBlur}
+      disabled={disabled}
+      className="w-full py-3 text-lg"
+    />
   );
 };
 
