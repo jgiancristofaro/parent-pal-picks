@@ -12,7 +12,7 @@ interface EmailInputProps {
 }
 
 const EmailInput = ({ email, onEmailChange, onValidationChange, disabled = false }: EmailInputProps) => {
-  const { checkEmailExists, isChecking, emailExists, resetValidation } = useEmailValidation();
+  const { validationState, checkEmailExists, resetValidation } = useEmailValidation();
   const debouncedEmail = useDebounce(email, 800);
 
   // Basic email validation regex
@@ -21,52 +21,31 @@ const EmailInput = ({ email, onEmailChange, onValidationChange, disabled = false
     return emailRegex.test(email);
   };
 
-  // Single validation trigger - only on debounced email change
+  // Single effect to handle validation based on debounced email
   useEffect(() => {
     console.log('EmailInput: debouncedEmail changed:', debouncedEmail);
     
     if (!debouncedEmail || debouncedEmail.trim() === '') {
       console.log('EmailInput: Empty email, resetting validation');
       resetValidation();
-      onValidationChange?.('idle');
       return;
     }
 
     if (!isValidEmailFormat(debouncedEmail)) {
       console.log('EmailInput: Invalid email format');
       resetValidation();
-      onValidationChange?.('idle');
       return;
     }
 
     console.log('EmailInput: Starting email validation for:', debouncedEmail);
-    onValidationChange?.('checking');
     checkEmailExists(debouncedEmail);
-  }, [debouncedEmail, checkEmailExists, onValidationChange, resetValidation]);
+  }, [debouncedEmail, checkEmailExists, resetValidation]);
 
-  // Separate effect to handle validation state changes (UI updates only, no validation triggers)
+  // Effect to notify parent component of validation changes
   useEffect(() => {
-    console.log('EmailInput: Validation state changed - isChecking:', isChecking, 'emailExists:', emailExists);
-    
-    // Only update UI if we have a valid email format
-    if (!email || !isValidEmailFormat(email)) {
-      onValidationChange?.('idle');
-      return;
-    }
-
-    if (isChecking) {
-      onValidationChange?.('checking');
-    } else if (emailExists === true) {
-      console.log('EmailInput: Email exists');
-      onValidationChange?.('exists', 'An account with this email already exists.');
-    } else if (emailExists === false) {
-      console.log('EmailInput: Email available');
-      onValidationChange?.('available');
-    } else {
-      // emailExists is null - this means validation was reset or failed
-      onValidationChange?.('idle');
-    }
-  }, [isChecking, emailExists]); // Removed email and onValidationChange from dependencies to prevent loops
+    console.log('EmailInput: Validation state changed:', validationState);
+    onValidationChange?.(validationState.status, validationState.message);
+  }, [validationState, onValidationChange]);
 
   return (
     <Input

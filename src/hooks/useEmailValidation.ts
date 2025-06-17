@@ -3,15 +3,39 @@ import { useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 
-interface EmailExistsResponse {
-  exists: boolean;
+export type ValidationStatus = 'idle' | 'checking' | 'exists' | 'available' | 'error';
+
+interface EmailValidationState {
+  status: ValidationStatus;
+  message: string;
 }
 
 export const useEmailValidation = () => {
-  const [isChecking, setIsChecking] = useState(false);
-  const [emailExists, setEmailExists] = useState<boolean | null>(null);
+  const [validationState, setValidationState] = useState<EmailValidationState>({
+    status: 'idle',
+    message: ''
+  });
   const { toast } = useToast();
   const abortControllerRef = useRef<AbortController | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const resetValidation = useCallback(() => {
+    console.log('useEmailValidation: Resetting validation state');
+    
+    // Cancel any ongoing request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    
+    // Clear timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    
+    setValidationState({ status: 'idle', message: '' });
+  }, []);
 
   const checkEmailExists = useCallback(async (email: string) => {
     // Cancel any ongoing request
@@ -19,10 +43,14 @@ export const useEmailValidation = () => {
       abortControllerRef.current.abort();
     }
 
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
     if (!email || !email.includes('@')) {
-      console.log('useEmailValidation: Invalid email, skipping check');
-      setEmailExists(null);
-      setIsChecking(false);
+      console.log('useEmailValidation: Invalid email, resetting');
+      setValidationState({ status: 'idle', message: '' });
       return;
     }
 
@@ -30,7 +58,19 @@ export const useEmailValidation = () => {
     
     // Create new abort controller for this request
     abortControllerRef.current = new AbortController();
-    setIsChecking(true);
+    setValidationState({ status: 'checking', message: 'Checking email availability...' });
+    
+    // Set a timeout to prevent getting stuck in checking state
+    timeoutRef.current = setTimeout(() => {
+      console.log('useEmailValidation: Timeout reached, resetting validation');
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      setValidationState({ 
+        status: 'error', 
+        message: 'Validation timeout. Please try again.' 
+      });
+    }, 5000); // 5 second timeout
     
     try {
       const { data, error } = await supabase.rpc('check_if_email_exists', {
@@ -43,12 +83,20 @@ export const useEmailValidation = () => {
         return;
       }
 
+      // Clear timeout since we got a response
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+
       console.log('useEmailValidation: RPC response - data:', data, 'error:', error);
 
       if (error) {
         console.error('useEmailValidation: RPC error:', error);
-        setEmailExists(null);
-        setIsChecking(false);
+        setValidationState({ 
+          status: 'error', 
+          message: 'Unable to validate email. Please try again.' 
+        });
         toast({
           title: "Validation error",
           description: "Unable to validate email. Please try again.",
@@ -65,58 +113,61 @@ export const useEmailValidation = () => {
         exists = data;
       } else {
         console.error('useEmailValidation: Unexpected response format:', data);
-        setEmailExists(null);
-        setIsChecking(false);
-        toast({
-          title: "Validation error",
-          description: "Unexpected response format. Please try again.",
-          variant: "destructive",
+        setValidationState({ 
+          status: 'error', 
+          message: 'Unexpected response format. Please try again.' 
         });
         return;
       }
 
       console.log('useEmailValidation: Email exists:', exists);
-      setEmailExists(exists);
+      
+      if (exists) {
+        setValidationState({ 
+          status: 'exists', 
+          message: 'An account with this email already exists.' 
+        });
+      } else {
+        setValidationState({ 
+          status: 'available', 
+          message: 'Email is available' 
+        });
+      }
       
     } catch (error) {
-      // Don't log errors for aborted requests
+      // Don't process errors for aborted requests
       if (error instanceof Error && error.name === 'AbortError') {
         console.log('useEmailValidation: Request aborted');
         return;
       }
       
       console.error('useEmailValidation: Catch block error:', error);
-      setEmailExists(null);
+      
+      // Clear timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      
+      setValidationState({ 
+        status: 'error', 
+        message: 'Network error. Please check your connection and try again.' 
+      });
+      
       toast({
         title: "Validation error",
         description: "Network error. Please check your connection and try again.",
         variant: "destructive",
       });
     } finally {
-      // Only update state if this request wasn't aborted
-      if (!abortControllerRef.current?.signal.aborted) {
-        console.log('useEmailValidation: Setting isChecking to false');
-        setIsChecking(false);
-      }
+      // Clean up abort controller
+      abortControllerRef.current = null;
     }
   }, [toast]);
 
-  const resetValidation = useCallback(() => {
-    console.log('useEmailValidation: Resetting validation state');
-    
-    // Cancel any ongoing request
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    
-    setEmailExists(null);
-    setIsChecking(false);
-  }, []);
-
   return {
+    validationState,
     checkEmailExists,
     resetValidation,
-    isChecking,
-    emailExists,
   };
 };

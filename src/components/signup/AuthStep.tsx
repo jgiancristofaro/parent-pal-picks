@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -38,7 +37,8 @@ const AuthStep = ({
   const navigate = useNavigate();
 
   const handleNext = () => {
-    if (email.trim() && password.trim() && phoneNumber.trim() && emailValidation.status !== 'checking' && emailValidation.status !== 'exists') {
+    if (email.trim() && password.trim() && phoneNumber.trim() && 
+        emailValidation.status !== 'checking' && emailValidation.status !== 'exists') {
       onNext();
     }
   };
@@ -51,7 +51,8 @@ const AuthStep = ({
     navigate('/login');
   };
 
-  const isNextDisabled = !email.trim() || !password.trim() || !phoneNumber.trim() || emailValidation.status === 'checking' || emailValidation.status === 'exists';
+  const isNextDisabled = !email.trim() || !password.trim() || !phoneNumber.trim() || 
+                        emailValidation.status === 'checking' || emailValidation.status === 'exists';
 
   return (
     <div className="space-y-6">
@@ -85,6 +86,10 @@ const AuthStep = ({
                 Log in instead
               </button>
             </div>
+          )}
+
+          {emailValidation.status === 'available' && (
+            <p className="text-sm text-green-600">Email is available!</p>
           )}
         </div>
         
