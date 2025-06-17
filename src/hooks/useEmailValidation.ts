@@ -3,6 +3,10 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 
+interface EmailExistsResponse {
+  exists: boolean;
+}
+
 export const useEmailValidation = () => {
   const [isChecking, setIsChecking] = useState(false);
   const [emailExists, setEmailExists] = useState<boolean | null>(null);
@@ -32,7 +36,9 @@ export const useEmailValidation = () => {
         return;
       }
 
-      setEmailExists(data?.exists || false);
+      // Safely type and access the response
+      const response = data as EmailExistsResponse;
+      setEmailExists(response?.exists || false);
     } catch (error) {
       console.error('Email validation error:', error);
       setEmailExists(null);
