@@ -3,6 +3,7 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import PrivacySettingsCard from '@/components/auth/PrivacySettingsCard';
+import EmailInput from './EmailInput';
 
 interface AuthStepProps {
   email: string;
@@ -42,12 +43,9 @@ const AuthStep = ({
       </div>
 
       <div className="space-y-4">
-        <Input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => onUpdate({ email: e.target.value })}
-          className="w-full py-3 text-lg"
+        <EmailInput
+          email={email}
+          onEmailChange={(value) => onUpdate({ email: value })}
         />
         
         <Input

@@ -733,6 +733,10 @@ export type Database = {
         }
         Returns: Json
       }
+      check_if_email_exists: {
+        Args: { p_email: string }
+        Returns: Json
+      }
       check_rate_limit: {
         Args: {
           p_identifier: string
