@@ -37,7 +37,7 @@ export const useEmailValidation = () => {
       }
 
       // Safely type and access the response
-      const response = data as EmailExistsResponse;
+      const response = data as unknown as EmailExistsResponse;
       setEmailExists(response?.exists || false);
     } catch (error) {
       console.error('Email validation error:', error);
