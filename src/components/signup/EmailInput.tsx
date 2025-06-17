@@ -1,13 +1,13 @@
 
 import React, { useEffect } from 'react';
 import { Input } from '@/components/ui/input';
-import { useEmailValidation } from '@/hooks/useEmailValidation';
+import { useEmailValidation, ValidationStatus } from '@/hooks/useEmailValidation';
 import { useDebounce } from '@/hooks/useDebounce';
 
 interface EmailInputProps {
   email: string;
   onEmailChange: (email: string) => void;
-  onValidationChange?: (status: 'idle' | 'checking' | 'exists' | 'available', message?: string) => void;
+  onValidationChange?: (status: ValidationStatus, message?: string) => void;
   disabled?: boolean;
 }
 
