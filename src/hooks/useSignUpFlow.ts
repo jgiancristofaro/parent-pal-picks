@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
-import { useNavigate } from 'react-router-dom';
 
 interface SignUpData {
   firstName: string;
@@ -17,7 +16,6 @@ interface SignUpData {
 export const useSignUpFlow = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const signUp = async (signUpData: SignUpData) => {
     setIsLoading(true);
@@ -59,9 +57,7 @@ export const useSignUpFlow = () => {
         description: 'Welcome to ParentPal! Please check your email to verify your account.',
       });
 
-      // Navigate to home - the AuthContext will handle profile creation
-      navigate('/home');
-      
+      // Return success without navigating - let the calling component handle the flow
       return { success: true, data };
       
     } catch (error) {

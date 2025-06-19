@@ -80,7 +80,7 @@ const PhotoStep = ({ onNext, onPrev, onUpdate, signUpData }: PhotoStepProps) => 
     const result = await signUp(signUpData);
     
     if (result.success) {
-      // Account created successfully, proceed to next step
+      // Account created successfully, proceed to next step (Build Network)
       onNext();
     }
     // Error handling is done within the signUp function via toast

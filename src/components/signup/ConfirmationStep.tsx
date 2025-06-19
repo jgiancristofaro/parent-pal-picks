@@ -13,6 +13,7 @@ const ConfirmationStep = ({ onPrev }: ConfirmationStepProps) => {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
+    // This is where the final navigation to home happens
     navigate('/home');
   };
 
