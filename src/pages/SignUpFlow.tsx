@@ -4,6 +4,7 @@ import { Progress } from '@/components/ui/progress';
 import NameStep from '@/components/signup/NameStep';
 import AuthStep from '@/components/signup/AuthStep';
 import PhotoStep from '@/components/signup/PhotoStep';
+import BuildNetworkStep from '@/components/signup/BuildNetworkStep';
 import ConfirmationStep from '@/components/signup/ConfirmationStep';
 
 interface SignUpData {
@@ -27,7 +28,7 @@ const SignUpFlow = () => {
     profilePrivacySetting: 'private',
   });
 
-  const totalSteps = 4;
+  const totalSteps = 5; // Updated to include the new network building step
   const progressPercentage = (step / totalSteps) * 100;
 
   const nextStep = () => {
@@ -78,6 +79,13 @@ const SignUpFlow = () => {
           />
         );
       case 4:
+        return (
+          <BuildNetworkStep
+            onNext={nextStep}
+            onPrev={prevStep}
+          />
+        );
+      case 5:
         return (
           <ConfirmationStep
             signUpData={signUpData}
