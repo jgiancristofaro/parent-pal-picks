@@ -8,7 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { ArrowLeft, Save } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { ArrowLeft, Save, AlertTriangle } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,21 +32,47 @@ const AdminEditUser = () => {
   });
 
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showRoleChangeDialog, setShowRoleChangeDialog] = useState(false);
+  const [pendingRoleChange, setPendingRoleChange] = useState<string>('');
+  const [originalRole, setOriginalRole] = useState<string>('');
 
   React.useEffect(() => {
     if (profile) {
+      const profileRole = profile.role || 'USER';
       setFormData({
         full_name: profile.full_name || '',
         username: profile.username || '',
         bio: profile.bio || '',
         phone_number: profile.phone_number || '',
-        role: profile.role || 'USER',
+        role: profileRole,
         is_suspended: profile.is_suspended || false,
         phone_number_searchable: profile.phone_number_searchable || false,
         is_community_leader: profile.is_community_leader || false,
       });
+      setOriginalRole(profileRole);
     }
   }, [profile]);
+
+  const handleRoleChange = (newRole: string) => {
+    // If changing from ADMIN to USER, show confirmation dialog
+    if (originalRole === 'ADMIN' && newRole === 'USER') {
+      setPendingRoleChange(newRole);
+      setShowRoleChangeDialog(true);
+    } else {
+      setFormData({ ...formData, role: newRole });
+    }
+  };
+
+  const confirmRoleChange = () => {
+    setFormData({ ...formData, role: pendingRoleChange });
+    setShowRoleChangeDialog(false);
+    setPendingRoleChange('');
+  };
+
+  const cancelRoleChange = () => {
+    setShowRoleChangeDialog(false);
+    setPendingRoleChange('');
+  };
 
   const handleSave = async () => {
     if (!userId) return;
@@ -114,136 +141,176 @@ const AdminEditUser = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/admin/users')}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Users
+    <>
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-3xl mx-auto">
+          {/* Header */}
+          <div className="mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/admin/users')}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Users
+              </Button>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Edit User</h1>
+                <p className="text-gray-600">Modify user account details</p>
+              </div>
+            </div>
+            
+            <Button onClick={handleSave} disabled={isUpdating} className="flex items-center gap-2">
+              <Save className="w-4 h-4" />
+              {isUpdating ? 'Saving...' : 'Save Changes'}
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Edit User</h1>
-              <p className="text-gray-600">Modify user account details</p>
-            </div>
           </div>
-          
-          <Button onClick={handleSave} disabled={isUpdating} className="flex items-center gap-2">
-            <Save className="w-4 h-4" />
-            {isUpdating ? 'Saving...' : 'Save Changes'}
-          </Button>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>User Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Basic Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="full_name">Full Name</Label>
+                  <Input
+                    id="full_name"
+                    value={formData.full_name}
+                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                    placeholder="Enter full name"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                    placeholder="Enter username"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="bio">Bio</Label>
+                <Textarea
+                  id="bio"
+                  value={formData.bio}
+                  onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                  placeholder="Enter bio"
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone_number">Phone Number</Label>
+                <Input
+                  id="phone_number"
+                  value={formData.phone_number}
+                  onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                  placeholder="Enter phone number"
+                />
+              </div>
+
+              {/* Role Selection with Warning */}
+              <div className="space-y-2">
+                <Label htmlFor="role">Role</Label>
+                {originalRole === 'ADMIN' && (
+                  <div className="flex items-center gap-2 p-2 bg-amber-50 border border-amber-200 rounded-md">
+                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                    <span className="text-sm text-amber-700">
+                      Warning: This user is currently an Admin. Changing their role will remove admin privileges.
+                    </span>
+                  </div>
+                )}
+                <Select value={formData.role} onValueChange={handleRoleChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USER">User</SelectItem>
+                    <SelectItem value="ADMIN">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Switches */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="is_suspended">Account Suspended</Label>
+                    <p className="text-sm text-gray-500">Prevent user from accessing the application</p>
+                  </div>
+                  <Switch
+                    id="is_suspended"
+                    checked={formData.is_suspended}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_suspended: checked })}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="phone_number_searchable">Phone Number Searchable</Label>
+                    <p className="text-sm text-gray-500">Allow others to find this user by phone number</p>
+                  </div>
+                  <Switch
+                    id="phone_number_searchable"
+                    checked={formData.phone_number_searchable}
+                    onCheckedChange={(checked) => setFormData({ ...formData, phone_number_searchable: checked })}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="is_community_leader">Community Leader</Label>
+                    <p className="text-sm text-gray-500">Show this user as a suggested account to new users during onboarding</p>
+                  </div>
+                  <Switch
+                    id="is_community_leader"
+                    checked={formData.is_community_leader}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_community_leader: checked })}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>User Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="full_name">Full Name</Label>
-                <Input
-                  id="full_name"
-                  value={formData.full_name}
-                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                  placeholder="Enter full name"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  placeholder="Enter username"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea
-                id="bio"
-                value={formData.bio}
-                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                placeholder="Enter bio"
-                rows={3}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="phone_number">Phone Number</Label>
-              <Input
-                id="phone_number"
-                value={formData.phone_number}
-                onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
-                placeholder="Enter phone number"
-              />
-            </div>
-
-            {/* Role Selection */}
-            <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
-              <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="USER">User</SelectItem>
-                  <SelectItem value="ADMIN">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Switches */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="is_suspended">Account Suspended</Label>
-                  <p className="text-sm text-gray-500">Prevent user from accessing the application</p>
-                </div>
-                <Switch
-                  id="is_suspended"
-                  checked={formData.is_suspended}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_suspended: checked })}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="phone_number_searchable">Phone Number Searchable</Label>
-                  <p className="text-sm text-gray-500">Allow others to find this user by phone number</p>
-                </div>
-                <Switch
-                  id="phone_number_searchable"
-                  checked={formData.phone_number_searchable}
-                  onCheckedChange={(checked) => setFormData({ ...formData, phone_number_searchable: checked })}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="is_community_leader">Community Leader</Label>
-                  <p className="text-sm text-gray-500">Show this user as a suggested account to new users during onboarding</p>
-                </div>
-                <Switch
-                  id="is_community_leader"
-                  checked={formData.is_community_leader}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_community_leader: checked })}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
-    </div>
+
+      {/* Role Change Confirmation Dialog */}
+      <AlertDialog open={showRoleChangeDialog} onOpenChange={setShowRoleChangeDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-500" />
+              Confirm Admin Role Removal
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              You are about to remove admin privileges from this user. This action will:
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>Remove their access to the admin dashboard</li>
+                <li>Prevent them from managing users, content, and system settings</li>
+                <li>Change their role from Admin to User</li>
+              </ul>
+              <p className="mt-3 font-medium">Are you sure you want to proceed?</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelRoleChange}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmRoleChange}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Yes, Remove Admin Role
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
