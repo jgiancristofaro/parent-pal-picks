@@ -15,6 +15,7 @@ interface ProfileWithFollowStatus {
   identity_tag: string | null;
   role: string;
   is_suspended: boolean;
+  is_community_leader: boolean;
   created_at: string;
   updated_at: string;
   last_activity_feed_view_at: string | null;
