@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +5,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { ContactsList } from './ContactsList';
-import { Contacts, Shield, ArrowRight } from 'lucide-react';
+import { Contact, Shield, ArrowRight } from 'lucide-react';
 
 interface ContactMatchingSectionProps {
   onComplete: (followedCount: number) => void;
@@ -199,7 +198,7 @@ export const ContactMatchingSection = ({ onComplete, onSkip }: ContactMatchingSe
         <Card className="w-full">
           <CardContent className="pt-6 text-center space-y-4">
             <div className="mx-auto p-3 bg-gray-100 rounded-full w-fit">
-              <Contacts className="h-8 w-8 text-gray-600" />
+              <Contact className="h-8 w-8 text-gray-600" />
             </div>
             <div>
               <h3 className="font-semibold mb-2">No contacts found</h3>
@@ -221,7 +220,7 @@ export const ContactMatchingSection = ({ onComplete, onSkip }: ContactMatchingSe
     <Card className="w-full">
       <CardHeader className="text-center">
         <div className="mx-auto mb-4 p-3 bg-blue-100 rounded-full w-fit">
-          <Contacts className="h-8 w-8 text-blue-600" />
+          <Contact className="h-8 w-8 text-blue-600" />
         </div>
         <CardTitle className="text-xl">Find Friends from Your Contacts</CardTitle>
         <p className="text-gray-600 text-sm">
