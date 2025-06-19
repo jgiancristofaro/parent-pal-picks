@@ -27,6 +27,7 @@ const AdminEditUser = () => {
     role: 'USER',
     is_suspended: false,
     phone_number_searchable: false,
+    is_community_leader: false,
   });
 
   const [isUpdating, setIsUpdating] = useState(false);
@@ -41,6 +42,7 @@ const AdminEditUser = () => {
         role: profile.role || 'USER',
         is_suspended: profile.is_suspended || false,
         phone_number_searchable: profile.phone_number_searchable || false,
+        is_community_leader: profile.is_community_leader || false,
       });
     }
   }, [profile]);
@@ -60,6 +62,7 @@ const AdminEditUser = () => {
           role: formData.role,
           is_suspended: formData.is_suspended,
           phone_number_searchable: formData.phone_number_searchable,
+          is_community_leader: formData.is_community_leader,
           updated_at: new Date().toISOString(),
         })
         .eq('id', userId);
@@ -222,6 +225,18 @@ const AdminEditUser = () => {
                   id="phone_number_searchable"
                   checked={formData.phone_number_searchable}
                   onCheckedChange={(checked) => setFormData({ ...formData, phone_number_searchable: checked })}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="is_community_leader">Community Leader</Label>
+                  <p className="text-sm text-gray-500">Show this user as a suggested account to new users during onboarding</p>
+                </div>
+                <Switch
+                  id="is_community_leader"
+                  checked={formData.is_community_leader}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_community_leader: checked })}
                 />
               </div>
             </div>
