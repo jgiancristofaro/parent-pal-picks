@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProfile } from '@/hooks/useProfile';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 import AdminEditUserHeader from '@/components/admin/user-edit/AdminEditUserHeader';
 import UserBasicInfoForm from '@/components/admin/user-edit/UserBasicInfoForm';
 import UserRoleSelector from '@/components/admin/user-edit/UserRoleSelector';
@@ -14,7 +15,31 @@ import RoleChangeConfirmationDialog from '@/components/admin/user-edit/RoleChang
 const AdminEditUser = () => {
   const { userId } = useParams<{ userId: string }>();
   const { toast } = useToast();
-  const { data: profile, isLoading } = useProfile(userId);
+  
+  // Use direct query instead of useProfile to get fresh data
+  const { data: profile, isLoading, refetch } = useQuery({
+    queryKey: ['admin-user-profile', userId],
+    queryFn: async () => {
+      if (!userId) return null;
+      
+      console.log('Fetching user profile for admin edit:', userId);
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        throw error;
+      }
+
+      console.log('Fetched profile data:', data);
+      return data;
+    },
+    enabled: !!userId,
+  });
   
   const [formData, setFormData] = useState({
     full_name: '',
@@ -34,8 +59,9 @@ const AdminEditUser = () => {
 
   React.useEffect(() => {
     if (profile) {
+      console.log('Profile loaded, updating form data:', profile);
       const profileRole = profile.role || 'USER';
-      setFormData({
+      const newFormData = {
         full_name: profile.full_name || '',
         username: profile.username || '',
         bio: profile.bio || '',
@@ -44,28 +70,37 @@ const AdminEditUser = () => {
         is_suspended: profile.is_suspended || false,
         phone_number_searchable: profile.phone_number_searchable || false,
         is_community_leader: profile.is_community_leader || false,
-      });
+      };
+      
+      console.log('Setting form data:', newFormData);
+      setFormData(newFormData);
       setOriginalRole(profileRole);
     }
   }, [profile]);
 
   const handleRoleChange = (newRole: string) => {
+    console.log('Role change requested:', { from: originalRole, to: newRole });
+    
     // If changing from ADMIN to USER, show confirmation dialog
     if (originalRole === 'ADMIN' && newRole === 'USER') {
+      console.log('Admin demotion detected, showing confirmation dialog');
       setPendingRoleChange(newRole);
       setShowRoleChangeDialog(true);
     } else {
+      console.log('Regular role change, updating directly');
       setFormData({ ...formData, role: newRole });
     }
   };
 
   const confirmRoleChange = () => {
+    console.log('Role change confirmed, applying:', pendingRoleChange);
     setFormData({ ...formData, role: pendingRoleChange });
     setShowRoleChangeDialog(false);
     setPendingRoleChange('');
   };
 
   const cancelRoleChange = () => {
+    console.log('Role change cancelled');
     setShowRoleChangeDialog(false);
     setPendingRoleChange('');
   };
@@ -73,30 +108,59 @@ const AdminEditUser = () => {
   const handleSave = async () => {
     if (!userId) return;
 
+    console.log('Saving user data:', formData);
     setIsUpdating(true);
+    
     try {
+      const updateData = {
+        full_name: formData.full_name,
+        username: formData.username || null,
+        bio: formData.bio || null,
+        phone_number: formData.phone_number || null,
+        role: formData.role,
+        is_suspended: formData.is_suspended,
+        phone_number_searchable: formData.phone_number_searchable,
+        is_community_leader: formData.is_community_leader,
+        updated_at: new Date().toISOString(),
+      };
+
+      console.log('Sending update to database:', updateData);
+
       const { error } = await supabase
         .from('profiles')
-        .update({
-          full_name: formData.full_name,
-          username: formData.username || null,
-          bio: formData.bio || null,
-          phone_number: formData.phone_number || null,
-          role: formData.role,
-          is_suspended: formData.is_suspended,
-          phone_number_searchable: formData.phone_number_searchable,
-          is_community_leader: formData.is_community_leader,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('id', userId);
 
       if (error) {
+        console.error('Database update error:', error);
         throw error;
       }
 
+      console.log('Database update successful, refetching data');
+      
+      // Refetch the data to ensure we have the latest state
+      await refetch();
+
+      // Create detailed success message
+      const changedFields = [];
+      if (formData.full_name !== (profile?.full_name || '')) changedFields.push('name');
+      if (formData.username !== (profile?.username || '')) changedFields.push('username');
+      if (formData.bio !== (profile?.bio || '')) changedFields.push('bio');
+      if (formData.phone_number !== (profile?.phone_number || '')) changedFields.push('phone number');
+      if (formData.role !== (profile?.role || 'USER')) changedFields.push('role');
+      if (formData.is_suspended !== (profile?.is_suspended || false)) changedFields.push('suspension status');
+      if (formData.phone_number_searchable !== (profile?.phone_number_searchable || false)) changedFields.push('phone searchability');
+      if (formData.is_community_leader !== (profile?.is_community_leader || false)) changedFields.push('community leader status');
+
+      const successMessage = changedFields.length > 0 
+        ? `User profile updated successfully. Changed: ${changedFields.join(', ')}`
+        : 'User profile updated successfully';
+
+      console.log('Success:', successMessage);
+
       toast({
         title: "Success",
-        description: "User profile updated successfully",
+        description: successMessage,
       });
     } catch (error: any) {
       console.error('Error updating user:', error);

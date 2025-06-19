@@ -20,6 +20,21 @@ interface UserPermissionSwitchesProps {
 }
 
 const UserPermissionSwitches = ({ formData, setFormData }: UserPermissionSwitchesProps) => {
+  const handleSuspendedChange = (checked: boolean) => {
+    console.log('Suspension status changed:', checked);
+    setFormData({ ...formData, is_suspended: checked });
+  };
+
+  const handlePhoneSearchableChange = (checked: boolean) => {
+    console.log('Phone searchable changed:', checked);
+    setFormData({ ...formData, phone_number_searchable: checked });
+  };
+
+  const handleCommunityLeaderChange = (checked: boolean) => {
+    console.log('Community leader status changed:', checked);
+    setFormData({ ...formData, is_community_leader: checked });
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -30,7 +45,7 @@ const UserPermissionSwitches = ({ formData, setFormData }: UserPermissionSwitche
         <Switch
           id="is_suspended"
           checked={formData.is_suspended}
-          onCheckedChange={(checked) => setFormData({ ...formData, is_suspended: checked })}
+          onCheckedChange={handleSuspendedChange}
         />
       </div>
 
@@ -42,7 +57,7 @@ const UserPermissionSwitches = ({ formData, setFormData }: UserPermissionSwitche
         <Switch
           id="phone_number_searchable"
           checked={formData.phone_number_searchable}
-          onCheckedChange={(checked) => setFormData({ ...formData, phone_number_searchable: checked })}
+          onCheckedChange={handlePhoneSearchableChange}
         />
       </div>
 
@@ -54,7 +69,7 @@ const UserPermissionSwitches = ({ formData, setFormData }: UserPermissionSwitche
         <Switch
           id="is_community_leader"
           checked={formData.is_community_leader}
-          onCheckedChange={(checked) => setFormData({ ...formData, is_community_leader: checked })}
+          onCheckedChange={handleCommunityLeaderChange}
         />
       </div>
     </div>
