@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Camera, User } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Camera, User, Loader2 } from 'lucide-react';
 
 interface PhotoStepProps {
   onNext: () => void;
@@ -11,6 +12,58 @@ interface PhotoStepProps {
 }
 
 const PhotoStep = ({ onNext, onPrev, onUpdate }: PhotoStepProps) => {
+  const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB');
+      return;
+    }
+
+    setIsUploading(true);
+    
+    // Create preview URL
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    setSelectedFile(file);
+    
+    // Update parent component with the selected file
+    onUpdate({ profilePhoto: file });
+    
+    setIsUploading(false);
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleRemovePhoto = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl('');
+    setSelectedFile(null);
+    onUpdate({ profilePhoto: undefined });
+    
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
@@ -19,16 +72,64 @@ const PhotoStep = ({ onNext, onPrev, onUpdate }: PhotoStepProps) => {
       </div>
 
       <Card className="p-8 text-center">
-        <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-          <User className="w-12 h-12 text-gray-400" />
+        <div className="flex flex-col items-center space-y-4">
+          <Avatar className="w-24 h-24">
+            <AvatarImage 
+              src={previewUrl} 
+              alt="Profile preview" 
+              className="object-cover"
+            />
+            <AvatarFallback>
+              <User className="w-12 h-12 text-gray-400" />
+            </AvatarFallback>
+          </Avatar>
+          
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+          
+          {!selectedFile ? (
+            <Button 
+              variant="outline" 
+              onClick={handleUploadClick}
+              disabled={isUploading}
+              className="mb-4"
+            >
+              {isUploading ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Camera className="w-4 h-4 mr-2" />
+              )}
+              {isUploading ? 'Processing...' : 'Upload Photo'}
+            </Button>
+          ) : (
+            <div className="space-y-2">
+              <Button 
+                variant="outline" 
+                onClick={handleUploadClick}
+                disabled={isUploading}
+              >
+                <Camera className="w-4 h-4 mr-2" />
+                Change Photo
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={handleRemovePhoto}
+                className="text-red-600 hover:text-red-700"
+              >
+                Remove Photo
+              </Button>
+            </div>
+          )}
         </div>
         
-        <Button variant="outline" className="mb-4">
-          <Camera className="w-4 h-4 mr-2" />
-          Upload Photo
-        </Button>
-        
-        <p className="text-sm text-gray-500">Optional - you can skip this step</p>
+        <p className="text-sm text-gray-500 mt-4">
+          Optional - you can skip this step
+        </p>
       </Card>
 
       <div className="flex gap-4">
