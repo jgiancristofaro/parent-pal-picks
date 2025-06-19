@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { ContactsList } from './network/ContactsList';
 import { SuggestionsSection } from './network/SuggestionsSection';
-import { Users, ArrowRight, Shield, Contact } from 'lucide-react';
+import { Users, ArrowRight, Shield } from 'lucide-react';
 
 interface BuildNetworkStepProps {
   onNext: () => void;
@@ -28,7 +27,6 @@ const BuildNetworkStep = ({ onNext, onPrev }: BuildNetworkStepProps) => {
   const [currentSection, setCurrentSection] = useState<'intro' | 'contacts' | 'suggestions'>('intro');
   const [isLoading, setIsLoading] = useState(false);
   const [matchedContacts, setMatchedContacts] = useState<MatchedContact[]>([]);
-  const [hasRequestedContacts, setHasRequestedContacts] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -41,9 +39,7 @@ const BuildNetworkStep = ({ onNext, onPrev }: BuildNetworkStepProps) => {
   };
 
   const normalizePhoneNumber = (phone: string): string => {
-    // Remove all non-numeric characters
     const cleaned = phone.replace(/\D/g, '');
-    // Add country code if missing (assuming US)
     if (cleaned.length === 10) {
       return `+1${cleaned}`;
     }
@@ -58,15 +54,6 @@ const BuildNetworkStep = ({ onNext, onPrev }: BuildNetworkStepProps) => {
   };
 
   const requestContacts = async () => {
-    if (!user) {
-      toast({
-        title: 'Authentication required',
-        description: 'Please sign in to access contacts.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
     setIsLoading(true);
     
     try {
@@ -135,7 +122,6 @@ const BuildNetworkStep = ({ onNext, onPrev }: BuildNetworkStepProps) => {
 
           console.log('Contact matches:', matches);
           setMatchedContacts(matches || []);
-          setHasRequestedContacts(true);
 
           if (matches && matches.length > 0) {
             toast({

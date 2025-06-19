@@ -4,18 +4,29 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Camera, User, Loader2 } from 'lucide-react';
+import { useSignUpFlow } from '@/hooks/useSignUpFlow';
 
 interface PhotoStepProps {
   onNext: () => void;
   onPrev: () => void;
   onUpdate: (data: { profilePhoto?: File }) => void;
+  signUpData: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    phoneNumber: string;
+    profilePrivacySetting: 'public' | 'private';
+    profilePhoto?: File;
+  };
 }
 
-const PhotoStep = ({ onNext, onPrev, onUpdate }: PhotoStepProps) => {
+const PhotoStep = ({ onNext, onPrev, onUpdate, signUpData }: PhotoStepProps) => {
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { signUp, isLoading } = useSignUpFlow();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -62,6 +73,17 @@ const PhotoStep = ({ onNext, onPrev, onUpdate }: PhotoStepProps) => {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+  };
+
+  const handleContinue = async () => {
+    // Create the account now with all collected data
+    const result = await signUp(signUpData);
+    
+    if (result.success) {
+      // Account created successfully, proceed to next step
+      onNext();
+    }
+    // Error handling is done within the signUp function via toast
   };
 
   return (
@@ -137,15 +159,24 @@ const PhotoStep = ({ onNext, onPrev, onUpdate }: PhotoStepProps) => {
           onClick={onPrev}
           variant="outline"
           className="flex-1 py-6 text-lg"
+          disabled={isLoading}
         >
           Back
         </Button>
         
         <Button
-          onClick={onNext}
+          onClick={handleContinue}
+          disabled={isLoading}
           className="flex-1 py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-lg"
         >
-          Continue
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Creating Account...
+            </>
+          ) : (
+            'Continue'
+          )}
         </Button>
       </div>
     </div>

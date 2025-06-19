@@ -28,7 +28,7 @@ const SignUpFlow = () => {
     profilePrivacySetting: 'private',
   });
 
-  const totalSteps = 5; // Updated to include the new network building step
+  const totalSteps = 5;
   const progressPercentage = (step / totalSteps) * 100;
 
   const nextStep = () => {
@@ -76,6 +76,7 @@ const SignUpFlow = () => {
             onNext={nextStep}
             onPrev={prevStep}
             onUpdate={updateSignUpData}
+            signUpData={signUpData}
           />
         );
       case 4:
@@ -88,7 +89,6 @@ const SignUpFlow = () => {
       case 5:
         return (
           <ConfirmationStep
-            signUpData={signUpData}
             onPrev={prevStep}
           />
         );

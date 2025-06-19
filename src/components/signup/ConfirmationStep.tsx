@@ -2,58 +2,49 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { CheckCircle, Loader2 } from 'lucide-react';
-import { useSignUpFlow } from '@/hooks/useSignUpFlow';
-
-interface SignUpData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  phoneNumber: string;
-  profilePrivacySetting: 'public' | 'private';
-  profilePhoto?: File;
-}
+import { CheckCircle, Heart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface ConfirmationStepProps {
-  signUpData: SignUpData;
   onPrev: () => void;
 }
 
-const ConfirmationStep = ({ signUpData, onPrev }: ConfirmationStepProps) => {
-  const { signUp, isLoading } = useSignUpFlow();
+const ConfirmationStep = ({ onPrev }: ConfirmationStepProps) => {
+  const navigate = useNavigate();
 
-  const handleCreateAccount = async () => {
-    await signUp(signUpData);
+  const handleGetStarted = () => {
+    navigate('/home');
   };
 
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h2 className="text-3xl font-bold mb-4">Almost Done!</h2>
-        <p className="text-gray-600">Review your information and create your account</p>
+        <h2 className="text-3xl font-bold mb-4">Welcome to ParentPal!</h2>
+        <p className="text-gray-600">Your account has been created successfully</p>
       </div>
 
-      <Card className="p-6 space-y-4">
-        <div>
-          <h3 className="font-semibold text-gray-800">Name</h3>
-          <p className="text-gray-600">{signUpData.firstName} {signUpData.lastName}</p>
+      <Card className="p-8 text-center space-y-6">
+        <div className="space-y-4">
+          <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
+            <Heart className="w-8 h-8 text-purple-600" />
+          </div>
+          
+          <div>
+            <h3 className="text-xl font-semibold mb-2">You're all set!</h3>
+            <p className="text-gray-600">
+              Start exploring recommendations from parents in your community and discover trusted products and services.
+            </p>
+          </div>
         </div>
-        
-        <div>
-          <h3 className="font-semibold text-gray-800">Email</h3>
-          <p className="text-gray-600">{signUpData.email}</p>
-        </div>
-        
-        <div>
-          <h3 className="font-semibold text-gray-800">Phone</h3>
-          <p className="text-gray-600">{signUpData.phoneNumber}</p>
-        </div>
-        
-        <div>
-          <h3 className="font-semibold text-gray-800">Privacy Setting</h3>
-          <p className="text-gray-600 capitalize">{signUpData.profilePrivacySetting}</p>
+
+        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+          <h4 className="font-medium text-purple-800 mb-2">What's next?</h4>
+          <ul className="text-sm text-purple-700 space-y-1 text-left">
+            <li>• Browse personalized recommendations</li>
+            <li>• Connect with more parents in your area</li>
+            <li>• Share your own experiences and reviews</li>
+          </ul>
         </div>
       </Card>
 
@@ -62,24 +53,15 @@ const ConfirmationStep = ({ signUpData, onPrev }: ConfirmationStepProps) => {
           onClick={onPrev}
           variant="outline"
           className="flex-1 py-6 text-lg"
-          disabled={isLoading}
         >
           Back
         </Button>
         
         <Button
-          onClick={handleCreateAccount}
-          disabled={isLoading}
+          onClick={handleGetStarted}
           className="flex-1 py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-lg"
         >
-          {isLoading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Creating Account...
-            </>
-          ) : (
-            'Create Account'
-          )}
+          Get Started
         </Button>
       </div>
     </div>
