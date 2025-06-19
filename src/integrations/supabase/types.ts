@@ -181,6 +181,41 @@ export type Database = {
         }
         Relationships: []
       }
+      hashed_user_contacts: {
+        Row: {
+          created_at: string
+          hashed_identifier: string
+          id: string
+          identifier_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          hashed_identifier: string
+          id?: string
+          identifier_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          hashed_identifier?: string
+          id?: string
+          identifier_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hashed_user_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           average_rating: number | null
@@ -579,6 +614,10 @@ export type Database = {
         Args: { p_item_id: string; p_item_type: string }
         Returns: Json
       }
+      add_hashed_contacts: {
+        Args: { p_contacts: Json }
+        Returns: Json
+      }
       admin_delete_product: {
         Args: { target_product_id: string; deletion_reason?: string }
         Returns: Json
@@ -914,6 +953,17 @@ export type Database = {
       mark_alerts_as_viewed: {
         Args: { user_id: string }
         Returns: undefined
+      }
+      match_contacts: {
+        Args: { p_hashed_contacts: string[] }
+        Returns: {
+          user_id: string
+          full_name: string
+          username: string
+          avatar_url: string
+          profile_privacy_setting: Database["public"]["Enums"]["profile_privacy_enum"]
+          matched_identifier_count: number
+        }[]
       }
       remove_favorite: {
         Args: { p_item_id: string; p_item_type: string }
