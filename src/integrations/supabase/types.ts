@@ -290,6 +290,7 @@ export type Database = {
           full_name: string
           id: string
           identity_tag: string | null
+          is_community_leader: boolean
           is_suspended: boolean
           last_activity_feed_view_at: string | null
           last_alerts_viewed_at: string | null
@@ -310,6 +311,7 @@ export type Database = {
           full_name: string
           id: string
           identity_tag?: string | null
+          is_community_leader?: boolean
           is_suspended?: boolean
           last_activity_feed_view_at?: string | null
           last_alerts_viewed_at?: string | null
@@ -330,6 +332,7 @@ export type Database = {
           full_name?: string
           id?: string
           identity_tag?: string | null
+          is_community_leader?: boolean
           is_suspended?: boolean
           last_activity_feed_view_at?: string | null
           last_alerts_viewed_at?: string | null
@@ -889,6 +892,18 @@ export type Database = {
           recommender_full_name: string
           recommender_avatar_url: string
           recommendation_timestamp: string
+        }[]
+      }
+      get_onboarding_suggestions: {
+        Args: { p_user_id: string; p_limit?: number }
+        Returns: {
+          user_id: string
+          full_name: string
+          username: string
+          avatar_url: string
+          profile_privacy_setting: Database["public"]["Enums"]["profile_privacy_enum"]
+          suggestion_type: string
+          mutual_connections_count: number
         }[]
       }
       get_profile_followers: {
