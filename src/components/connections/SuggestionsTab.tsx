@@ -4,7 +4,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2, Search, Users, AlertCircle, Sparkles } from 'lucide-react';
+import { Loader2, Search, Users, AlertCircle, Sparkles, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useConnectionSuggestions } from '@/hooks/useConnectionSuggestions';
 import { useAdvancedProfileSearch } from '@/hooks/useAdvancedProfileSearch';
@@ -25,7 +25,9 @@ export const SuggestionsTab = () => {
   const { 
     data: suggestionsData, 
     isLoading: suggestionsLoading, 
-    error: suggestionsError 
+    error: suggestionsError,
+    refetch: refetchSuggestions,
+    isRefetching: isRefetchingSuggestions
   } = useConnectionSuggestions(1, 20);
   
   const { 
@@ -48,6 +50,57 @@ export const SuggestionsTab = () => {
   const handleFollowStatusChange = () => {
     // Refresh data when follow status changes
     console.log('Follow status changed, refreshing connection suggestions');
+    refetchSuggestions();
+  };
+
+  const handleRetryClick = () => {
+    console.log('🔄 Manual retry triggered by user');
+    refetchSuggestions();
+  };
+
+  // Enhanced error display with retry option
+  const renderError = () => {
+    if (!error) return null;
+
+    const isNetworkError = error.message?.includes('fetch') || error.message?.includes('network');
+    const isDatabaseError = error.message?.includes('column reference') || error.message?.includes('ambiguous');
+    
+    return (
+      <Alert variant="destructive" className="mb-4">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription className="flex items-center justify-between">
+          <div>
+            <div className="font-medium">
+              {isSearchActive ? 'Search Error' : 'Suggestions Error'}
+            </div>
+            <div className="text-sm mt-1">
+              {isDatabaseError 
+                ? 'Database query issue - our team has been notified'
+                : isNetworkError 
+                ? 'Connection issue - please check your internet'
+                : error.message
+              }
+            </div>
+          </div>
+          {!isSearchActive && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRetryClick}
+              disabled={isRefetchingSuggestions}
+              className="ml-4"
+            >
+              {isRefetchingSuggestions ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-1" />
+              ) : (
+                <RefreshCw className="h-4 w-4 mr-1" />
+              )}
+              Retry
+            </Button>
+          )}
+        </AlertDescription>
+      </Alert>
+    );
   };
 
   // Log debugging information
@@ -127,15 +180,8 @@ export const SuggestionsTab = () => {
           )}
         </CardHeader>
         <CardContent>
-          {/* Error handling */}
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                {isSearchActive ? 'Error loading search results' : 'Error loading suggestions'}: {error.message}
-              </AlertDescription>
-            </Alert>
-          )}
+          {/* Enhanced Error handling */}
+          {renderError()}
 
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
@@ -167,7 +213,7 @@ export const SuggestionsTab = () => {
                 </div>
               ))}
             </div>
-          ) : (
+          ) : !error ? (
             <div className="text-center py-8">
               <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 mb-2">
@@ -180,7 +226,7 @@ export const SuggestionsTab = () => {
                 }
               </p>
             </div>
-          )}
+          ) : null}
         </CardContent>
       </Card>
     </div>
