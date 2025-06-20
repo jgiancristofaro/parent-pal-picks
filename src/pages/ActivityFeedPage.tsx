@@ -1,7 +1,7 @@
 
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
-import { useFriendsActivityFeed } from "@/hooks/useFriendsActivityFeed";
+import { useNetworkActivityFeed } from "@/hooks/useNetworkActivityFeed";
 import { GenericActivityFeedItem } from "@/components/GenericActivityFeedItem";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -12,7 +12,7 @@ const ActivityFeedPage = () => {
     data: friendsActivity = [], 
     isLoading, 
     error 
-  } = useFriendsActivityFeed(user?.id);
+  } = useNetworkActivityFeed(user?.id);
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">

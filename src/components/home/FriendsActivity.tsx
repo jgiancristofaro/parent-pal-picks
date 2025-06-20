@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ArrowRight } from "lucide-react";
 import { GenericActivityFeedItem } from "@/components/GenericActivityFeedItem";
-import { useFriendsActivityFeed } from "@/hooks/useFriendsActivityFeed";
+import { useNetworkActivityFeed } from "@/hooks/useNetworkActivityFeed";
 
 interface FriendsActivityProps {
   currentUserId?: string;
 }
 
 export const FriendsActivity = ({ currentUserId }: FriendsActivityProps) => {
-  const { data: friendsActivity = [], isLoading, error } = useFriendsActivityFeed(currentUserId, 5);
+  const { data: friendsActivity = [], isLoading, error } = useNetworkActivityFeed(currentUserId, 5);
 
   if (isLoading) {
     return (

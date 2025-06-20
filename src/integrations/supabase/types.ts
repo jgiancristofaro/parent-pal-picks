@@ -64,6 +64,36 @@ export type Database = {
           },
         ]
       }
+      activity_log: {
+        Row: {
+          action_type: Database["public"]["Enums"]["activity_type_enum"]
+          actor_user_id: string
+          created_at: string
+          id: string
+          target_product_id: string | null
+          target_sitter_id: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action_type: Database["public"]["Enums"]["activity_type_enum"]
+          actor_user_id: string
+          created_at?: string
+          id?: string
+          target_product_id?: string | null
+          target_sitter_id?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action_type?: Database["public"]["Enums"]["activity_type_enum"]
+          actor_user_id?: string
+          created_at?: string
+          id?: string
+          target_product_id?: string | null
+          target_sitter_id?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       audit_log: {
         Row: {
           action_type: string
@@ -875,6 +905,27 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_network_activity: {
+        Args: {
+          p_user_id: string
+          p_page_number?: number
+          p_page_size?: number
+        }
+        Returns: {
+          activity_id: string
+          activity_type: string
+          actor_id: string
+          actor_full_name: string
+          actor_avatar_url: string
+          activity_timestamp: string
+          item_id: string
+          item_name: string
+          item_image_url: string
+          item_category: string
+          review_rating: number
+          review_title: string
+        }[]
+      }
       get_new_activity_count: {
         Args: { user_id: string }
         Returns: number
@@ -1085,6 +1136,10 @@ export type Database = {
       }
     }
     Enums: {
+      activity_type_enum:
+        | "FOLLOWED_USER"
+        | "REVIEWED_PRODUCT"
+        | "REVIEWED_SITTER"
       dwelling_type_enum:
         | "APARTMENT_BUILDING"
         | "SINGLE_FAMILY_HOME"
@@ -1206,6 +1261,11 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      activity_type_enum: [
+        "FOLLOWED_USER",
+        "REVIEWED_PRODUCT",
+        "REVIEWED_SITTER",
+      ],
       dwelling_type_enum: [
         "APARTMENT_BUILDING",
         "SINGLE_FAMILY_HOME",
