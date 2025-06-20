@@ -36,7 +36,9 @@ export const useSuggestedProfiles = () => {
         throw new Error('User not authenticated');
       }
 
-      console.log('📞 Calling get_onboarding_suggestions RPC function...');
+      console.log('📞 Calling get_onboarding_suggestions RPC function with user ID...');
+      
+      // First attempt with updated function signature
       const { data, error } = await supabase.rpc('get_onboarding_suggestions', {
         p_user_id: user.id,
         p_limit: 15
@@ -46,6 +48,37 @@ export const useSuggestedProfiles = () => {
 
       if (error) {
         console.error('❌ Onboarding suggestions RPC error:', error);
+        
+        // If it's an authentication error, retry once after a short delay
+        if (error.message?.includes('Authentication') || error.message?.includes('auth')) {
+          console.log('🔄 Authentication error detected, retrying after delay...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          const { data: retryData, error: retryError } = await supabase.rpc('get_onboarding_suggestions', {
+            p_user_id: user.id,
+            p_limit: 15
+          });
+          
+          if (retryError) {
+            console.error('❌ Retry also failed:', retryError);
+            throw retryError;
+          }
+          
+          console.log('✅ Retry successful:', retryData);
+          const transformedRetryData = retryData?.map((profile: any) => ({
+            id: profile.user_id,
+            full_name: profile.full_name,
+            username: profile.username,
+            avatar_url: profile.avatar_url,
+            profile_privacy_setting: profile.profile_privacy_setting,
+            follow_status: 'not_following' as const,
+            mutual_connections_count: profile.mutual_connections_count || 0,
+            suggestion_type: profile.suggestion_type
+          })) || [];
+          
+          return transformedRetryData as SuggestedProfile[];
+        }
+        
         throw error;
       }
 
@@ -77,8 +110,14 @@ export const useSuggestedProfiles = () => {
     enabled: !!user?.id && !authLoading,
     retry: (failureCount, error) => {
       console.log('🔄 Query retry attempt:', failureCount, error);
-      return failureCount < 3;
+      // Allow up to 3 retries for authentication-related errors
+      if (error?.message?.includes('Authentication') || error?.message?.includes('auth')) {
+        return failureCount < 3;
+      }
+      // For other errors, retry once
+      return failureCount < 1;
     },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
     meta: {
       onError: (error: any) => {
         console.error('❌ Query error in meta:', error);

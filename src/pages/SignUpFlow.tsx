@@ -54,19 +54,32 @@ const SignUpFlow = () => {
   const totalSteps = 7; // Updated from 6 to 7 to include referral step
   const progressPercentage = (step / totalSteps) * 100;
 
-  // Handle step resumption after email verification
+  // Enhanced step resumption handling after email verification
   useEffect(() => {
     const urlStep = searchParams.get('step');
     const verified = searchParams.get('verified');
     
     if (urlStep && verified === 'true' && user && session) {
-      // User has verified email and is authenticated, advance to the specified step
-      const targetStep = parseInt(urlStep, 10);
-      setStep(targetStep);
-      localStorage.setItem('signupStep', targetStep.toString());
+      console.log('📧 Email verification redirect detected:', {
+        urlStep,
+        userId: user.id,
+        hasSession: !!session,
+        emailConfirmed: !!user.email_confirmed_at
+      });
       
-      // Clean up URL params
-      setSearchParams({});
+      // Only proceed if email is actually confirmed
+      if (user.email_confirmed_at) {
+        const targetStep = parseInt(urlStep, 10);
+        console.log('✅ Email confirmed, advancing to step:', targetStep);
+        setStep(targetStep);
+        localStorage.setItem('signupStep', targetStep.toString());
+        
+        // Clean up URL params
+        setSearchParams({});
+      } else {
+        console.log('⚠️ Email not yet confirmed, staying on verification step');
+        setStep(4); // Stay on email verification step
+      }
     }
   }, [user, session, searchParams, setSearchParams]);
 
@@ -77,13 +90,17 @@ const SignUpFlow = () => {
 
   const nextStep = () => {
     if (step < totalSteps) {
-      setStep(step + 1);
+      const nextStepNum = step + 1;
+      console.log('➡️ Advancing to step:', nextStepNum);
+      setStep(nextStepNum);
     }
   };
 
   const prevStep = () => {
     if (step > 1) {
-      setStep(step - 1);
+      const prevStepNum = step - 1;
+      console.log('⬅️ Going back to step:', prevStepNum);
+      setStep(prevStepNum);
     }
   };
 
