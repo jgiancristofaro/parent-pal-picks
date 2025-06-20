@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Copy, Share2, Users, Award } from 'lucide-react';
+import { Copy, Share2, Users, Award, Construction } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 export const ReferralDashboard = () => {
@@ -54,13 +54,6 @@ export const ReferralDashboard = () => {
     }
   };
 
-  const getBadgeColor = (badgeType: string) => {
-    if (badgeType.includes('bronze')) return 'bg-amber-100 text-amber-800';
-    if (badgeType.includes('silver')) return 'bg-gray-100 text-gray-800';
-    if (badgeType.includes('gold')) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-blue-100 text-blue-800';
-  };
-
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto p-6">
@@ -82,6 +75,21 @@ export const ReferralDashboard = () => {
         <h1 className="text-3xl font-bold text-gray-900">Referral Dashboard</h1>
         <p className="text-gray-600 mt-2">Invite friends and earn rewards!</p>
       </div>
+
+      {/* Under Construction Notice */}
+      <Card className="border-orange-200 bg-orange-50">
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-3 text-orange-800">
+            <Construction className="w-5 h-5" />
+            <div>
+              <div className="font-medium">Referral System Coming Soon!</div>
+              <div className="text-sm text-orange-700">
+                We're currently setting up the referral system. Check back soon for your personal referral code and tracking!
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Referral Stats */}
@@ -107,7 +115,7 @@ export const ReferralDashboard = () => {
               <div className="text-sm font-medium">Your Referral Code</div>
               <div className="flex gap-2">
                 <Input 
-                  value={referralStats?.referral_code || ''} 
+                  value={referralStats?.referral_code || 'GENERATING...'} 
                   readOnly 
                   className="font-mono"
                 />
@@ -115,6 +123,7 @@ export const ReferralDashboard = () => {
                   variant="outline" 
                   size="sm"
                   onClick={handleCopyReferralCode}
+                  disabled={!referralStats?.referral_code}
                 >
                   <Copy className="w-4 h-4" />
                   {copied ? 'Copied!' : 'Copy'}
@@ -125,6 +134,7 @@ export const ReferralDashboard = () => {
             <Button 
               onClick={handleShareReferralLink}
               className="w-full"
+              disabled={!referralStats?.referral_code}
             >
               <Share2 className="w-4 h-4 mr-2" />
               Share Referral Link
@@ -144,32 +154,16 @@ export const ReferralDashboard = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {referralStats?.badges && referralStats.badges.length > 0 ? (
-              <div className="space-y-3">
-                {referralStats.badges.map((badge) => (
-                  <div key={badge.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <div className="font-medium">{badge.badge_name}</div>
-                      <div className="text-sm text-gray-600">{badge.description}</div>
-                    </div>
-                    <Badge className={getBadgeColor(badge.badge_type)}>
-                      {badge.badge_type.replace('_', ' ').toUpperCase()}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <Award className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <div className="text-sm">No badges yet</div>
-                <div className="text-xs">Refer 5 friends to earn your first badge!</div>
-              </div>
-            )}
+            <div className="text-center py-8 text-gray-500">
+              <Award className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <div className="text-sm">No badges yet</div>
+              <div className="text-xs">Refer 5 friends to earn your first badge!</div>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Progress towards next badge */}
+      {/* Progress towards badges */}
       <Card>
         <CardHeader>
           <CardTitle>Badge Progress</CardTitle>

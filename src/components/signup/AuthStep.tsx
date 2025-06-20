@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import SignUpForm from '@/components/auth/SignUpForm';
-import { PrivacySettingsCard } from '@/components/auth/PrivacySettingsCard';
+import PrivacySettingsCard from '@/components/auth/PrivacySettingsCard';
 import { useSignUpFlow } from '@/hooks/useSignUpFlow';
 
 interface AuthStepProps {
@@ -84,7 +84,7 @@ const AuthStep = ({
 
             <PrivacySettingsCard
               profilePrivacySetting={profilePrivacySetting}
-              onPrivacyChange={(value) => onUpdate({ profilePrivacySetting: value })}
+              setProfilePrivacySetting={(value) => onUpdate({ profilePrivacySetting: value })}
             />
 
             {referralCode && (
