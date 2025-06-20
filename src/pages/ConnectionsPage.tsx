@@ -2,12 +2,13 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, UserPlus, Mail } from 'lucide-react';
+import { Users, UserPlus, Mail, Send } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { BottomNavigation } from '@/components/BottomNavigation';
 import { MyConnectionsTab } from '@/components/connections/MyConnectionsTab';
 import { SuggestionsTab } from '@/components/connections/SuggestionsTab';
 import { InvitationsTab } from '@/components/connections/InvitationsTab';
+import { InviteFriendsButton } from '@/components/connections/InviteFriendsButton';
 
 const ConnectionsPage = () => {
   const [activeTab, setActiveTab] = useState('suggestions');
@@ -20,6 +21,11 @@ const ConnectionsPage = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Connections Hub</h1>
           <p className="text-gray-600">Discover, connect, and grow your network</p>
+        </div>
+
+        {/* Prominent Invite Friends Button */}
+        <div className="mb-6">
+          <InviteFriendsButton />
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

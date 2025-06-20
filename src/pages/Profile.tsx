@@ -5,11 +5,13 @@ import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileStats } from "@/components/profile/ProfileStats";
 import { RecommendationsTabs } from "@/components/profile/RecommendationsTabs";
 import { FavoritesTabs } from "@/components/profile/FavoritesTabs";
+import { BadgeDisplay } from "@/components/profile/BadgeDisplay";
 import { useProfile } from "@/hooks/useProfile";
 import { useProfileFollowers } from "@/hooks/useProfileFollowers";
 import { useProfileFollowing } from "@/hooks/useProfileFollowing";
 import { useUserRecommendations } from "@/hooks/useUserRecommendations";
 import { useUserFavorites } from "@/hooks/useUserFavorites";
+import { useUserBadges } from "@/hooks/useReferralSystem";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -29,6 +31,7 @@ const Profile = () => {
   const { data: sitterRecommendations = [] } = useUserRecommendations(profileUserId, 'sitter');
   const { data: productRecommendations = [] } = useUserRecommendations(profileUserId, 'product');
   const { data: favoritesData, isLoading: favoritesLoading } = useUserFavorites(profileUserId);
+  const { data: badges = [], isLoading: badgesLoading } = useUserBadges(profileUserId);
   
   const [isOwnProfile, setIsOwnProfile] = useState(false);
 
@@ -107,6 +110,17 @@ const Profile = () => {
         followersData={followers}
         followingData={following}
       />
+
+      {/* Badges Section */}
+      <div className="px-4 mb-6">
+        {badgesLoading ? (
+          <div className="animate-pulse">
+            <Skeleton className="h-32 w-full rounded-lg" />
+          </div>
+        ) : (
+          <BadgeDisplay badges={badges} isOwnProfile={isOwnProfile} />
+        )}
+      </div>
 
       {/* My Favorites Section - Only show for own profile */}
       {isOwnProfile && !favoritesLoading && (

@@ -10,15 +10,65 @@ export const useReferralStats = (userId?: string) => {
     queryFn: async () => {
       if (!userId) throw new Error('User ID is required');
 
-      // For now, return mock data since the schema isn't fully updated yet
       console.log('Getting referral stats for user:', userId);
       
-      // This will be updated once the database schema is fully migrated
+      // Get user's referral code from profile
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('referral_code')
+        .eq('id', userId)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        // Return mock data for now
+        return {
+          total_referrals: 0,
+          referral_code: 'DEMO1234',
+          badges: []
+        } as ReferralStats;
+      }
+
+      // Count successful referrals
+      const { count: referralCount, error: countError } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .eq('referred_by_user_id', userId);
+
+      if (countError) {
+        console.error('Error counting referrals:', countError);
+      }
+
       return {
-        total_referrals: 0,
-        referral_code: 'ABC12345', // Mock code for now
+        total_referrals: referralCount || 0,
+        referral_code: profile.referral_code || 'GENERATING...',
         badges: []
       } as ReferralStats;
+    },
+    enabled: !!userId,
+  });
+};
+
+export const useUserBadges = (userId?: string) => {
+  return useQuery({
+    queryKey: ['user-badges', userId],
+    queryFn: async () => {
+      if (!userId) throw new Error('User ID is required');
+
+      console.log('Getting badges for user:', userId);
+      
+      const { data: badges, error } = await supabase
+        .from('badges')
+        .select('*')
+        .eq('user_id', userId)
+        .order('awarded_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching badges:', error);
+        return [];
+      }
+
+      return badges as Badge[];
     },
     enabled: !!userId,
   });
@@ -29,13 +79,17 @@ export const useValidateReferralCode = () => {
     mutationFn: async (referralCode: string) => {
       console.log('Validating referral code:', referralCode);
       
-      // For now, return mock validation
-      // This will be updated once the database schema is fully migrated
-      if (referralCode === 'DEMO1234') {
-        return { id: 'demo-user', full_name: 'Demo User' };
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .eq('referral_code', referralCode)
+        .single();
+
+      if (error || !profile) {
+        throw new Error('Invalid referral code');
       }
-      
-      throw new Error('Invalid referral code');
+
+      return profile;
     },
   });
 };
@@ -47,14 +101,21 @@ export const useAwardBadges = () => {
   return useMutation({
     mutationFn: async () => {
       console.log('Awarding badges...');
-      // This will be implemented once the RPC function is available
-      throw new Error('Badge awarding function not yet available');
+      
+      const { data, error } = await supabase.rpc('award_connector_badges');
+      
+      if (error) {
+        throw error;
+      }
+      
+      return data;
     },
     onSuccess: () => {
       toast({
         title: 'Success',
         description: 'Badges have been awarded successfully!',
       });
+      queryClient.invalidateQueries({ queryKey: ['user-badges'] });
       queryClient.invalidateQueries({ queryKey: ['referral-stats'] });
     },
     onError: (error) => {

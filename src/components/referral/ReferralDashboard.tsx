@@ -1,18 +1,20 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useReferralStats } from '@/hooks/useReferralSystem';
+import { useReferralStats, useUserBadges } from '@/hooks/useReferralSystem';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Copy, Share2, Users, Award, Construction } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { BadgeDisplay } from '@/components/profile/BadgeDisplay';
 
 export const ReferralDashboard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { data: referralStats, isLoading } = useReferralStats(user?.id);
+  const { data: badges = [] } = useUserBadges(user?.id);
   const [copied, setCopied] = useState(false);
 
   const referralUrl = `${window.location.origin}/signup?ref=${referralStats?.referral_code}`;
@@ -30,23 +32,25 @@ export const ReferralDashboard = () => {
   };
 
   const handleShareReferralLink = async () => {
+    const shareText = `Join me on ParentPal - the parent community app! Use my referral code: ${referralStats?.referral_code}`;
+    
     if (navigator.share) {
       try {
         await navigator.share({
           title: 'Join ParentPal',
-          text: 'Join me on ParentPal - the parent community app!',
+          text: shareText,
           url: referralUrl,
         });
       } catch (error) {
         // Fallback to clipboard
-        await navigator.clipboard.writeText(referralUrl);
+        await navigator.clipboard.writeText(`${shareText}\n\n${referralUrl}`);
         toast({
           title: 'Link copied!',
           description: 'Referral link copied to clipboard',
         });
       }
     } else {
-      await navigator.clipboard.writeText(referralUrl);
+      await navigator.clipboard.writeText(`${shareText}\n\n${referralUrl}`);
       toast({
         title: 'Link copied!',
         description: 'Referral link copied to clipboard',
@@ -75,21 +79,6 @@ export const ReferralDashboard = () => {
         <h1 className="text-3xl font-bold text-gray-900">Referral Dashboard</h1>
         <p className="text-gray-600 mt-2">Invite friends and earn rewards!</p>
       </div>
-
-      {/* Under Construction Notice */}
-      <Card className="border-orange-200 bg-orange-50">
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-3 text-orange-800">
-            <Construction className="w-5 h-5" />
-            <div>
-              <div className="font-medium">Referral System Coming Soon!</div>
-              <div className="text-sm text-orange-700">
-                We're currently setting up the referral system. Check back soon for your personal referral code and tracking!
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Referral Stats */}
@@ -142,23 +131,46 @@ export const ReferralDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Badges */}
+        {/* Badges Preview */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Award className="w-5 h-5" />
-              Your Badges
+              Your Badges ({badges.length})
             </CardTitle>
             <CardDescription>
               Badges you've earned through referrals
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-8 text-gray-500">
-              <Award className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <div className="text-sm">No badges yet</div>
-              <div className="text-xs">Refer 5 friends to earn your first badge!</div>
-            </div>
+            {badges.length > 0 ? (
+              <div className="space-y-3">
+                {badges.slice(0, 2).map((badge) => (
+                  <div key={badge.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Award className="w-8 h-8 text-purple-600" />
+                    <div>
+                      <div className="font-medium">{badge.badge_name}</div>
+                      <div className="text-sm text-gray-600">
+                        Earned {new Date(badge.awarded_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {badges.length > 2 && (
+                  <div className="text-center pt-2">
+                    <span className="text-sm text-gray-500">
+                      +{badges.length - 2} more badge{badges.length - 2 !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Award className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <div className="text-sm">No badges yet</div>
+                <div className="text-xs">Refer 5 friends to earn your first badge!</div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
