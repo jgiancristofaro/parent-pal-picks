@@ -863,6 +863,20 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: string
       }
+      get_friend_reviews: {
+        Args: { p_user_id: string; p_item_type: string; p_item_id: string }
+        Returns: {
+          review_id: string
+          reviewer_id: string
+          reviewer_full_name: string
+          reviewer_avatar_url: string
+          rating: number
+          title: string
+          content: string
+          created_at: string
+          has_verified_experience: boolean
+        }[]
+      }
       get_friends_activity_feed: {
         Args: { p_current_user_id: string; p_limit?: number; p_offset?: number }
         Returns: {

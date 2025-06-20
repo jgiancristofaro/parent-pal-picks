@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Header } from "@/components/Header";
@@ -5,6 +6,7 @@ import { BottomNavigation } from "@/components/BottomNavigation";
 import { ProductImageGallery } from "@/components/product/ProductImageGallery";
 import { ProductInfo } from "@/components/product/ProductInfo";
 import { ProductReviews } from "@/components/product/ProductReviews";
+import { FriendReviews } from "@/components/FriendReviews";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -116,6 +118,9 @@ const ProductPage = () => {
             <ProductInfo product={product} />
           </div>
         </div>
+
+        {/* Friend Reviews Section */}
+        <FriendReviews itemType="product" itemId={product.id} />
 
         {/* Reviews Section */}
         <ProductReviews productId={product.id} />

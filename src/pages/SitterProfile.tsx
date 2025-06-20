@@ -11,6 +11,7 @@ import { ExperienceSection } from "@/components/sitter/ExperienceSection";
 import { CertificationsSection } from "@/components/sitter/CertificationsSection";
 import { RatesSection } from "@/components/sitter/RatesSection";
 import { ReviewsSection } from "@/components/sitter/ReviewsSection";
+import { FriendReviews } from "@/components/FriendReviews";
 import { ContactSitterModal } from "@/components/modals/ContactSitterModal";
 import { AddOrEditReviewButton } from "@/components/buttons/AddOrEditReviewButton";
 import { useSitterProfile } from "@/hooks/useSitterProfile";
@@ -103,7 +104,10 @@ const SitterProfile = () => {
         )}
         {sitter.hourly_rate && <RatesSection rate={`$${sitter.hourly_rate}/hour`} />}
         
-        <ReviewsSection reviews={reviews} renderStars={renderStars} />
+        {/* Friend Reviews Section */}
+        <FriendReviews itemType="sitter" itemId={sitter.id} />
+        
+        <ReviewsSection reviews={reviews} renderStars={renderStars} sitterId={sitter.id} />
 
         {/* Action Buttons Section */}
         <div className="space-y-3">

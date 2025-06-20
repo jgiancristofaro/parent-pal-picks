@@ -13,8 +13,8 @@ interface FriendsActivityItem {
   item_name: string;
   item_image_url: string | null;
   item_category: string | null;
-  review_rating: number;
-  review_title: string;
+  review_rating: number | null;
+  review_title: string | null;
 }
 
 export const useFriendsActivity = (
@@ -30,10 +30,10 @@ export const useFriendsActivity = (
       console.log('Fetching friends activity for user:', currentUserId);
 
       const { data, error } = await supabase
-        .rpc('get_friends_activity_feed', {
-          p_current_user_id: currentUserId,
-          p_limit: limit,
-          p_offset: 0
+        .rpc('get_network_activity', {
+          p_user_id: currentUserId,
+          p_page_number: 1,
+          p_page_size: limit
         });
 
       if (error) {
