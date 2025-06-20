@@ -103,7 +103,7 @@ export const SitterCard = ({
             />
           </div>
           <div className="flex-grow p-3">
-            <h3 className="font-semibold text-gray-800 text-sm mb-1">{name}</h3>
+            <h3 className="font-semibold text-gray-800 text-sm mb-1 leading-tight break-words">{name}</h3>
             
             {/* Updated star display to match ProductCard */}
             {displayRating > 0 && (
@@ -115,7 +115,7 @@ export const SitterCard = ({
               </div>
             )}
             
-            {experience && <p className="text-xs text-gray-500 mb-1">{experience}</p>}
+            {experience && <p className="text-xs text-gray-500 mb-1 break-words">{experience}</p>}
             
             {/* Local recommendation badge */}
             {renderLocalRecommendationBadge()}
@@ -124,7 +124,7 @@ export const SitterCard = ({
             {workedInUserLocationNickname && (
               <div className="flex items-center mb-1">
                 <Building2 className="w-3 h-3 text-purple-600 mr-1" />
-                <span className="text-xs text-purple-600 font-medium">
+                <span className="text-xs text-purple-600 font-medium leading-relaxed break-words">
                   Worked in your {workedInUserLocationNickname} building
                 </span>
               </div>
@@ -132,11 +132,11 @@ export const SitterCard = ({
             
             {/* Show review snippet if provided, otherwise show friend recommendations */}
             {reviewSnippet ? (
-              <p className="text-xs text-gray-600 italic">"{reviewSnippet}..."</p>
+              <p className="text-xs text-gray-600 italic leading-relaxed break-words">"{reviewSnippet}..."</p>
             ) : recommendedBy ? (
-              <p className="text-xs text-gray-600">Recommended by {recommendedBy}</p>
+              <p className="text-xs text-gray-600 leading-relaxed break-words">Recommended by {recommendedBy}</p>
             ) : (
-              <p className="text-xs text-gray-600">{formatFriendRecommendation(friendRecommendationCount)}</p>
+              <p className="text-xs text-gray-600 leading-relaxed break-words">{formatFriendRecommendation(friendRecommendationCount)}</p>
             )}
           </div>
         </div>

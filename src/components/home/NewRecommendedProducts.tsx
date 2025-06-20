@@ -59,7 +59,7 @@ export const NewRecommendedProducts = ({ currentUserId }: NewRecommendedProducts
         <ScrollArea className="w-full whitespace-nowrap no-scrollbar">
           <div className="flex w-max space-x-3 px-4">
             {newlyRecommendedProducts.map((product) => (
-              <div key={`${product.product_id}-${product.recommender_user_id}`} className="flex-none w-40">
+              <div key={`${product.product_id}-${product.recommender_user_id}`} className="flex-none w-48">
                 <ProductCard
                   id={product.product_id}
                   name={product.product_name}

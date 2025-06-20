@@ -62,7 +62,7 @@ export const NewRecommendedSitters = ({ currentUserId }: NewRecommendedSittersPr
         <ScrollArea className="w-full whitespace-nowrap no-scrollbar">
           <div className="flex w-max space-x-3 px-4">
             {newlyRecommendedSitters.map((sitter) => (
-              <div key={`${sitter.sitter_id}-${sitter.recommender_user_id}`} className="flex-none w-40">
+              <div key={`${sitter.sitter_id}-${sitter.recommender_user_id}`} className="flex-none w-48">
                 <SitterCard
                   id={sitter.sitter_id}
                   name={sitter.sitter_name}
