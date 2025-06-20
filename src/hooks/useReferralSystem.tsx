@@ -127,7 +127,9 @@ export const useAwardBadges = () => {
       return data;
     },
     onSuccess: (data, userId) => {
-      if (data.badge_awarded) {
+      // Type the response properly to handle the JSON response
+      const result = data as { badge_awarded?: boolean; success?: boolean };
+      if (result.badge_awarded) {
         toast({
           title: 'Congratulations!',
           description: 'You\'ve earned a new Connector badge for your referrals!',

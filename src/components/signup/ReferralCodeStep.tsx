@@ -58,7 +58,7 @@ export const ReferralCodeStep = ({
                 setValidationResult(null);
               }}
               className="text-center font-mono text-lg"
-              maxLength={8}
+              maxLength={9}
             />
             
             {referralCode.trim() && !validationResult && (
