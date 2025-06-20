@@ -124,6 +124,47 @@ export type Database = {
         }
         Relationships: []
       }
+      badges: {
+        Row: {
+          awarded_at: string
+          badge_name: string
+          badge_type: string
+          created_at: string
+          criteria_met: Json | null
+          description: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          awarded_at?: string
+          badge_name: string
+          badge_type: string
+          created_at?: string
+          criteria_met?: Json | null
+          description?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          awarded_at?: string
+          badge_name?: string
+          badge_type?: string
+          created_at?: string
+          criteria_met?: Json | null
+          description?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string
@@ -329,6 +370,8 @@ export type Database = {
           phone_number: string | null
           phone_number_searchable: boolean
           profile_privacy_setting: Database["public"]["Enums"]["profile_privacy_enum"]
+          referral_code: string | null
+          referred_by_user_id: string | null
           role: string
           updated_at: string
           username: string | null
@@ -350,6 +393,8 @@ export type Database = {
           phone_number?: string | null
           phone_number_searchable?: boolean
           profile_privacy_setting?: Database["public"]["Enums"]["profile_privacy_enum"]
+          referral_code?: string | null
+          referred_by_user_id?: string | null
           role?: string
           updated_at?: string
           username?: string | null
@@ -371,11 +416,21 @@ export type Database = {
           phone_number?: string | null
           phone_number_searchable?: boolean
           profile_privacy_setting?: Database["public"]["Enums"]["profile_privacy_enum"]
+          referral_code?: string | null
+          referred_by_user_id?: string | null
           role?: string
           updated_at?: string
           username?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_user_id_fkey"
+            columns: ["referred_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       rate_limits: {
         Row: {
@@ -638,6 +693,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_referrals: {
+        Row: {
+          created_at: string
+          id: string
+          referred_id: string
+          referrer_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referred_id: string
+          referrer_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referred_id?: string
+          referrer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -805,6 +896,10 @@ export type Database = {
         }
         Returns: Json
       }
+      award_connector_badges: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
       check_if_email_exists: {
         Args: { p_email: string }
         Returns: Json
@@ -842,6 +937,10 @@ export type Database = {
       flag_content: {
         Args: { p_content_type: string; p_content_id: string; p_reason: string }
         Returns: Json
+      }
+      generate_referral_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       get_connection_suggestions: {
         Args: {
@@ -1147,6 +1246,13 @@ export type Database = {
           p_new_content: string
         }
         Returns: Json
+      }
+      validate_referral_code: {
+        Args: { p_referral_code: string }
+        Returns: {
+          user_id: string
+          full_name: string
+        }[]
       }
     }
     Enums: {

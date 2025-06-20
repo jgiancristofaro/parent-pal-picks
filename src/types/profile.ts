@@ -15,8 +15,8 @@ export interface Profile {
   bio: string | null;
   identity_tag: string | null;
   role: string;
-  referral_code?: string; // Optional for now until schema is updated
-  referred_by_user_id?: string | null; // Optional for now until schema is updated
+  referral_code: string | null; // Now properly supported
+  referred_by_user_id: string | null; // Now properly supported
   created_at: string;
   updated_at: string;
 }

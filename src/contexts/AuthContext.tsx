@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const createUserProfile = async (userId: string, metadata: any) => {
     try {
-      const { first_name, last_name, phone_number, profile_privacy_setting, phone_number_searchable } = metadata;
+      const { first_name, last_name, phone_number, profile_privacy_setting, phone_number_searchable, referral_code } = metadata;
       
       const { error: profileError } = await supabase
         .from('profiles')
@@ -65,6 +65,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           phone_number: phone_number || null,
           profile_privacy_setting: profile_privacy_setting || 'private',
           phone_number_searchable: phone_number_searchable || false,
+          referral_code: referral_code || null,
         });
 
       if (profileError) {
