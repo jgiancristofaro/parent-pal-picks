@@ -114,6 +114,7 @@ const SignUpFlow = () => {
             firstName={signUpData.firstName}
             lastName={signUpData.lastName}
             onNext={nextStep}
+            onPrev={prevStep}
             onUpdate={updateSignUpData}
           />
         );

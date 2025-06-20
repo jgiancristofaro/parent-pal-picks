@@ -7,10 +7,11 @@ interface NameStepProps {
   firstName: string;
   lastName: string;
   onNext: () => void;
+  onPrev: () => void;
   onUpdate: (data: { firstName?: string; lastName?: string }) => void;
 }
 
-const NameStep = ({ firstName, lastName, onNext, onUpdate }: NameStepProps) => {
+const NameStep = ({ firstName, lastName, onNext, onPrev, onUpdate }: NameStepProps) => {
   const handleNext = () => {
     if (firstName.trim() && lastName.trim()) {
       onNext();
@@ -42,13 +43,23 @@ const NameStep = ({ firstName, lastName, onNext, onUpdate }: NameStepProps) => {
         />
       </div>
 
-      <Button
-        onClick={handleNext}
-        disabled={!firstName.trim() || !lastName.trim()}
-        className="w-full py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-lg"
-      >
-        Continue
-      </Button>
+      <div className="flex gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onPrev}
+          className="flex-1 py-6 text-lg"
+        >
+          Back
+        </Button>
+        <Button
+          onClick={handleNext}
+          disabled={!firstName.trim() || !lastName.trim()}
+          className="flex-1 py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-lg"
+        >
+          Continue
+        </Button>
+      </div>
     </div>
   );
 };
