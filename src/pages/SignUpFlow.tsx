@@ -8,6 +8,7 @@ import EmailVerificationStep from '@/components/signup/EmailVerificationStep';
 import PhotoStep from '@/components/signup/PhotoStep';
 import BuildNetworkStep from '@/components/signup/BuildNetworkStep';
 import ConfirmationStep from '@/components/signup/ConfirmationStep';
+import { ReferralCodeStep } from '@/components/signup/ReferralCodeStep';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface SignUpData {
@@ -18,6 +19,7 @@ interface SignUpData {
   phoneNumber: string;
   profilePrivacySetting: 'public' | 'private';
   profilePhoto?: File;
+  referralCode?: string;
 }
 
 const SignUpFlow = () => {
@@ -46,9 +48,10 @@ const SignUpFlow = () => {
     password: '',
     phoneNumber: '',
     profilePrivacySetting: 'private',
+    referralCode: searchParams.get('ref') || '',
   });
 
-  const totalSteps = 6; // Updated from 5 to 6
+  const totalSteps = 7; // Updated from 6 to 7 to include referral step
   const progressPercentage = (step / totalSteps) * 100;
 
   // Handle step resumption after email verification
@@ -98,6 +101,15 @@ const SignUpFlow = () => {
     switch (step) {
       case 1:
         return (
+          <ReferralCodeStep
+            referralCode={signUpData.referralCode || ''}
+            setReferralCode={(code) => updateSignUpData({ referralCode: code })}
+            onNext={nextStep}
+            onSkip={nextStep}
+          />
+        );
+      case 2:
+        return (
           <NameStep
             firstName={signUpData.firstName}
             lastName={signUpData.lastName}
@@ -105,7 +117,7 @@ const SignUpFlow = () => {
             onUpdate={updateSignUpData}
           />
         );
-      case 2:
+      case 3:
         return (
           <AuthStep
             email={signUpData.email}
@@ -114,12 +126,13 @@ const SignUpFlow = () => {
             profilePrivacySetting={signUpData.profilePrivacySetting}
             firstName={signUpData.firstName}
             lastName={signUpData.lastName}
+            referralCode={signUpData.referralCode}
             onNext={nextStep}
             onPrev={prevStep}
             onUpdate={updateSignUpData}
           />
         );
-      case 3:
+      case 4:
         return (
           <EmailVerificationStep
             email={signUpData.email}
@@ -127,7 +140,7 @@ const SignUpFlow = () => {
             onPrev={prevStep}
           />
         );
-      case 4:
+      case 5:
         return (
           <PhotoStep
             onNext={nextStep}
@@ -135,14 +148,14 @@ const SignUpFlow = () => {
             onUpdate={updateSignUpData}
           />
         );
-      case 5:
+      case 6:
         return (
           <BuildNetworkStep
             onNext={nextStep}
             onPrev={prevStep}
           />
         );
-      case 6:
+      case 7:
         return (
           <ConfirmationStep
             onPrev={prevStep}

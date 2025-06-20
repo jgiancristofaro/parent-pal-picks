@@ -1,11 +1,9 @@
 
 import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import PrivacySettingsCard from '@/components/auth/PrivacySettingsCard';
-import EmailInput from './EmailInput';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import SignUpForm from '@/components/auth/SignUpForm';
+import { PrivacySettingsCard } from '@/components/auth/PrivacySettingsCard';
 import { useSignUpFlow } from '@/hooks/useSignUpFlow';
 
 interface AuthStepProps {
@@ -15,162 +13,108 @@ interface AuthStepProps {
   profilePrivacySetting: 'public' | 'private';
   firstName: string;
   lastName: string;
+  referralCode?: string;
   onNext: () => void;
   onPrev: () => void;
-  onUpdate: (data: { 
-    email?: string; 
-    password?: string; 
-    phoneNumber?: string; 
-    profilePrivacySetting?: 'public' | 'private' 
-  }) => void;
+  onUpdate: (data: any) => void;
 }
 
-const AuthStep = ({ 
-  email, 
-  password, 
-  phoneNumber, 
+const AuthStep = ({
+  email,
+  password,
+  phoneNumber,
   profilePrivacySetting,
   firstName,
   lastName,
-  onNext, 
-  onPrev, 
-  onUpdate 
+  referralCode,
+  onNext,
+  onPrev,
+  onUpdate
 }: AuthStepProps) => {
-  const [emailValidation, setEmailValidation] = useState({ 
-    status: 'idle' as 'idle' | 'checking' | 'exists' | 'available' | 'error', 
-    message: '' 
-  });
-  const navigate = useNavigate();
   const { signUp, isLoading } = useSignUpFlow();
 
-  const handleNext = async () => {
-    if (email.trim() && password.trim() && phoneNumber.trim() && 
-        emailValidation.status !== 'checking' && emailValidation.status !== 'exists') {
-      
-      // Create the account here with updated redirect URL
-      const signUpData = {
-        firstName,
-        lastName,
-        email,
-        password,
-        phoneNumber,
-        profilePrivacySetting,
-      };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !password || !firstName || !lastName || !phoneNumber) {
+      return;
+    }
 
-      const result = await signUp(signUpData);
-      
-      if (result.success) {
-        // Account created successfully, proceed to email verification step
-        onNext();
-      }
-      // Error handling is done within the signUp function via toast
+    const signUpData = {
+      firstName,
+      lastName,
+      email,
+      password,
+      phoneNumber,
+      profilePrivacySetting,
+      referralCode
+    };
+
+    const result = await signUp(signUpData);
+    
+    if (result.success) {
+      onNext();
     }
   };
 
-  const handleEmailValidationChange = (status: 'idle' | 'checking' | 'exists' | 'available' | 'error', message: string = '') => {
-    setEmailValidation({ status, message });
-  };
-
-  const handleLoginRedirect = () => {
-    navigate('/login');
-  };
-
-  const isNextDisabled = !email.trim() || !password.trim() || !phoneNumber.trim() || 
-                        emailValidation.status === 'checking' || emailValidation.status === 'exists' ||
-                        isLoading;
-
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold mb-4">Account Details</h2>
-        <p className="text-gray-600">Create your secure account</p>
-      </div>
+    <div className="w-full max-w-md mx-auto">
+      <Card>
+        <CardHeader className="text-center">
+          <CardTitle>Create your account</CardTitle>
+          <CardDescription>
+            Enter your details to join ParentPal
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <SignUpForm
+              firstName={firstName}
+              setFirstName={(value) => onUpdate({ firstName: value })}
+              lastName={lastName}
+              setLastName={(value) => onUpdate({ lastName: value })}
+              email={email}
+              setEmail={(value) => onUpdate({ email: value })}
+              password={password}
+              setPassword={(value) => onUpdate({ password: value })}
+              phoneNumber={phoneNumber}
+              setPhoneNumber={(value) => onUpdate({ phoneNumber: value })}
+              isLoading={isLoading}
+            />
 
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <EmailInput
-            email={email}
-            onEmailChange={(value) => onUpdate({ email: value })}
-            onValidationChange={handleEmailValidationChange}
-          />
-          
-          {emailValidation.status === 'checking' && (
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Checking email availability...</span>
-            </div>
-          )}
-          
-          {emailValidation.status === 'exists' && (
-            <div className="space-y-1">
-              <p className="text-sm text-red-500">{emailValidation.message}</p>
-              <button
-                onClick={handleLoginRedirect}
-                className="text-sm text-blue-600 hover:text-blue-800 underline"
+            <PrivacySettingsCard
+              profilePrivacySetting={profilePrivacySetting}
+              onPrivacyChange={(value) => onUpdate({ profilePrivacySetting: value })}
+            />
+
+            {referralCode && (
+              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="text-sm text-green-700">
+                  ✓ Using referral code: <strong>{referralCode}</strong>
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onPrev}
+                className="flex-1"
               >
-                Log in instead
-              </button>
+                Back
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="flex-1"
+              >
+                {isLoading ? 'Creating Account...' : 'Create Account'}
+              </Button>
             </div>
-          )}
-
-          {emailValidation.status === 'available' && (
-            <p className="text-sm text-green-600">Email is available!</p>
-          )}
-
-          {emailValidation.status === 'error' && (
-            <p className="text-sm text-red-500">{emailValidation.message}</p>
-          )}
-        </div>
-        
-        <Input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => onUpdate({ password: e.target.value })}
-          className="w-full py-3 text-lg"
-          disabled={isLoading}
-        />
-
-        <Input
-          type="tel"
-          placeholder="Phone Number"
-          value={phoneNumber}
-          onChange={(e) => onUpdate({ phoneNumber: e.target.value })}
-          className="w-full py-3 text-lg"
-          disabled={isLoading}
-        />
-      </div>
-
-      <PrivacySettingsCard
-        profilePrivacySetting={profilePrivacySetting}
-        setProfilePrivacySetting={(value) => onUpdate({ profilePrivacySetting: value })}
-      />
-
-      <div className="flex gap-4">
-        <Button
-          onClick={onPrev}
-          variant="outline"
-          className="flex-1 py-6 text-lg"
-          disabled={isLoading}
-        >
-          Back
-        </Button>
-        
-        <Button
-          onClick={handleNext}
-          disabled={isNextDisabled}
-          className="flex-1 py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="w-4 w-4 mr-2 animate-spin" />
-              Creating Account...
-            </>
-          ) : (
-            'Create Account'
-          )}
-        </Button>
-      </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };

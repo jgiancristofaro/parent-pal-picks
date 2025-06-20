@@ -11,6 +11,7 @@ interface SignUpData {
   phoneNumber: string;
   profilePrivacySetting: 'public' | 'private';
   profilePhoto?: File;
+  referralCode?: string;
 }
 
 export const useSignUpFlow = () => {
@@ -23,8 +24,8 @@ export const useSignUpFlow = () => {
     try {
       console.log('Starting sign up process with data:', signUpData);
       
-      // Updated redirect URL to go to step 4 after email verification
-      const redirectUrl = `${window.location.origin}/signup?step=4&verified=true`;
+      // Updated redirect URL to go to step 5 after email verification (since we added referral step)
+      const redirectUrl = `${window.location.origin}/signup?step=5&verified=true`;
       
       const { data, error } = await supabase.auth.signUp({
         email: signUpData.email,
@@ -37,6 +38,7 @@ export const useSignUpFlow = () => {
             phone_number: signUpData.phoneNumber,
             profile_privacy_setting: signUpData.profilePrivacySetting,
             phone_number_searchable: false,
+            referral_code: signUpData.referralCode || null,
           }
         }
       });

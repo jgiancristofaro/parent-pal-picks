@@ -15,6 +15,8 @@ export interface Profile {
   bio: string | null;
   identity_tag: string | null;
   role: string;
+  referral_code: string;
+  referred_by_user_id: string | null;
   created_at: string;
   updated_at: string;
 }
