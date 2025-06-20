@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSuggestedProfiles } from '@/hooks/useSuggestedProfiles';
@@ -10,6 +9,30 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 interface SuggestionsSectionProps {
   onComplete: (followedCount: number) => void;
 }
+
+const getSuggestionTypeDisplayName = (suggestionType: string): string => {
+  switch (suggestionType) {
+    case 'global_community_leader':
+      return 'Community Leader';
+    case 'mutual_connections':
+      return 'Mutual Connections';
+    case 'location_based':
+      return 'Near You';
+    case 'similar_interests':
+      return 'Similar Interests';
+    default:
+      return suggestionType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  }
+};
+
+const getSuggestionTypeStyles = (suggestionType: string): string => {
+  switch (suggestionType) {
+    case 'global_community_leader':
+      return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
+    default:
+      return 'bg-blue-100 text-blue-700';
+  }
+};
 
 export const SuggestionsSection = ({ onComplete }: SuggestionsSectionProps) => {
   const { suggestedProfiles, isLoading, error } = useSuggestedProfiles();
@@ -92,8 +115,8 @@ export const SuggestionsSection = ({ onComplete }: SuggestionsSectionProps) => {
                     onFollowStatusChange={handleFollowStatusChange}
                   />
                   {profile.suggestion_type && (
-                    <div className="absolute top-2 right-2 bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">
-                      {profile.suggestion_type}
+                    <div className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full font-medium ${getSuggestionTypeStyles(profile.suggestion_type)}`}>
+                      {getSuggestionTypeDisplayName(profile.suggestion_type)}
                     </div>
                   )}
                 </div>
