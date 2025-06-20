@@ -1,6 +1,5 @@
-
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useMemo } from "react";
+import { useNetworkActivityFeed } from "./useNetworkActivityFeed";
 
 interface NewlyRecommendedProduct {
   product_id: string;
@@ -19,28 +18,43 @@ export const useNewlyRecommendedProducts = (
   limit: number = 10,
   enabled: boolean = true
 ) => {
-  return useQuery({
-    queryKey: ['newly-recommended-products', currentUserId, limit],
-    queryFn: async () => {
-      if (!currentUserId) return [];
+  const { data: networkActivity = [], isLoading, error } = useNetworkActivityFeed(
+    currentUserId,
+    50, // Get more activities to filter from
+    enabled
+  );
 
-      console.log('Fetching newly recommended products for user:', currentUserId);
+  const productRecommendations = useMemo(() => {
+    const productActivities = networkActivity
+      .filter(activity => activity.activity_type === 'product_review')
+      .slice(0, limit)
+      .map(activity => ({
+        product_id: activity.item_id,
+        product_name: activity.item_name,
+        product_image_url: activity.item_image_url,
+        product_category: activity.item_category,
+        recommendation_rating: activity.review_rating || 0,
+        recommender_user_id: activity.actor_id,
+        recommender_full_name: activity.actor_full_name,
+        recommender_avatar_url: activity.actor_avatar_url,
+        recommendation_timestamp: activity.activity_timestamp,
+      }));
 
-      const { data, error } = await supabase
-        .rpc('get_newly_recommended_products_from_followed_users', {
-          p_current_user_id: currentUserId,
-          p_limit: limit,
-          p_offset: 0
-        });
-
-      if (error) {
-        console.error('Error fetching newly recommended products:', error);
-        throw error;
+    // Remove duplicates by product_id, keeping the most recent
+    const uniqueProducts = new Map();
+    productActivities.forEach(product => {
+      const existing = uniqueProducts.get(product.product_id);
+      if (!existing || new Date(product.recommendation_timestamp) > new Date(existing.recommendation_timestamp)) {
+        uniqueProducts.set(product.product_id, product);
       }
+    });
 
-      console.log('Newly recommended products found:', data?.length || 0);
-      return (data || []) as NewlyRecommendedProduct[];
-    },
-    enabled: enabled && !!currentUserId,
-  });
+    return Array.from(uniqueProducts.values()) as NewlyRecommendedProduct[];
+  }, [networkActivity, limit]);
+
+  return {
+    data: productRecommendations,
+    isLoading,
+    error
+  };
 };

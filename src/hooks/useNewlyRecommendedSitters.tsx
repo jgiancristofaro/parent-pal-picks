@@ -1,6 +1,5 @@
-
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useMemo } from "react";
+import { useNetworkActivityFeed } from "./useNetworkActivityFeed";
 
 interface NewlyRecommendedSitter {
   sitter_id: string;
@@ -18,28 +17,42 @@ export const useNewlyRecommendedSitters = (
   limit: number = 10,
   enabled: boolean = true
 ) => {
-  return useQuery({
-    queryKey: ['newly-recommended-sitters', currentUserId, limit],
-    queryFn: async () => {
-      if (!currentUserId) return [];
+  const { data: networkActivity = [], isLoading, error } = useNetworkActivityFeed(
+    currentUserId,
+    50, // Get more activities to filter from
+    enabled
+  );
 
-      console.log('Fetching newly recommended sitters for user:', currentUserId);
+  const sitterRecommendations = useMemo(() => {
+    const sitterActivities = networkActivity
+      .filter(activity => activity.activity_type === 'sitter_review')
+      .slice(0, limit)
+      .map(activity => ({
+        sitter_id: activity.item_id,
+        sitter_name: activity.item_name,
+        sitter_profile_image_url: activity.item_image_url,
+        sitter_rating: activity.review_rating,
+        recommender_user_id: activity.actor_id,
+        recommender_full_name: activity.actor_full_name,
+        recommender_avatar_url: activity.actor_avatar_url,
+        recommendation_timestamp: activity.activity_timestamp,
+      }));
 
-      const { data, error } = await supabase
-        .rpc('get_newly_recommended_sitters_from_followed_users', {
-          p_current_user_id: currentUserId,
-          p_limit: limit,
-          p_offset: 0
-        });
-
-      if (error) {
-        console.error('Error fetching newly recommended sitters:', error);
-        throw error;
+    // Remove duplicates by sitter_id, keeping the most recent
+    const uniqueSitters = new Map();
+    sitterActivities.forEach(sitter => {
+      const existing = uniqueSitters.get(sitter.sitter_id);
+      if (!existing || new Date(sitter.recommendation_timestamp) > new Date(existing.recommendation_timestamp)) {
+        uniqueSitters.set(sitter.sitter_id, sitter);
       }
+    });
 
-      console.log('Newly recommended sitters found:', data?.length || 0);
-      return (data || []) as NewlyRecommendedSitter[];
-    },
-    enabled: enabled && !!currentUserId,
-  });
+    return Array.from(uniqueSitters.values()) as NewlyRecommendedSitter[];
+  }, [networkActivity, limit]);
+
+  return {
+    data: sitterRecommendations,
+    isLoading,
+    error
+  };
 };
