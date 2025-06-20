@@ -77,8 +77,8 @@ export const ProductCard = ({
             />
           </div>
           <div className="p-3">
-            <h3 className="font-semibold text-gray-800 leading-tight break-words">{name}</h3>
-            {category && <p className="text-sm text-gray-500 break-words">{category}</p>}
+            <h3 className="font-semibold text-gray-800 leading-tight break-words whitespace-normal">{name}</h3>
+            {category && <p className="text-sm text-gray-500 break-words whitespace-normal">{category}</p>}
             
             {displayRating && (
               <div className="flex items-center mt-1">
@@ -91,21 +91,21 @@ export const ProductCard = ({
             
             {/* Show review snippet if provided, otherwise show recommendation counts */}
             {reviewSnippet ? (
-              <p className={`text-xs mt-1 italic leading-relaxed break-words ${textColorClass}`}>"{reviewSnippet}..."</p>
+              <p className={`text-xs mt-1 italic leading-relaxed break-words whitespace-normal ${textColorClass}`}>"{reviewSnippet}..."</p>
             ) : (
               <>
                 {uniqueRecommenderCount !== undefined && uniqueRecommenderCount > 0 && (
-                  <p className={`text-xs mt-1 leading-relaxed break-words ${textColorClass}`}>
+                  <p className={`text-xs mt-1 leading-relaxed break-words whitespace-normal ${textColorClass}`}>
                     {formatUniqueRecommenderText(uniqueRecommenderCount)}
                   </p>
                 )}
                 
                 {recommendedBy && (
-                  <p className={`text-xs mt-1 leading-relaxed break-words ${textColorClass}`}>Recommended by {recommendedBy}</p>
+                  <p className={`text-xs mt-1 leading-relaxed break-words whitespace-normal ${textColorClass}`}>Recommended by {recommendedBy}</p>
                 )}
                 
                 {friendRecommendationCount !== undefined && friendRecommendationCount > 0 && (
-                  <p className={`text-xs mt-1 leading-relaxed break-words ${textColorClass}`}>
+                  <p className={`text-xs mt-1 leading-relaxed break-words whitespace-normal ${textColorClass}`}>
                     {formatRecommendationText(friendRecommendationCount)}
                   </p>
                 )}
