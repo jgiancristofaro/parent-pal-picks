@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +19,7 @@ import Home from "./pages/Home";
 import Search from "./pages/Search";
 import SearchSelection from "./pages/SearchSelection";
 import FindParents from "./pages/FindParents";
+import ConnectionsPage from "./pages/ConnectionsPage";
 import Profile from "./pages/Profile";
 import SitterProfile from "./pages/SitterProfile";
 import ProductSearchPage from "./pages/ProductSearchPage";
@@ -71,6 +73,7 @@ const App = () => (
             <Route path="/search" element={<ProtectedRoute><SearchSelection /></ProtectedRoute>} />
             <Route path="/find-sitter" element={<ProtectedRoute><EntitySearchPage type="sitter" mode="discovery" /></ProtectedRoute>} />
             <Route path="/find-parents" element={<ProtectedRoute><FindParents /></ProtectedRoute>} />
+            <Route path="/connections" element={<ProtectedRoute><ConnectionsPage /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
