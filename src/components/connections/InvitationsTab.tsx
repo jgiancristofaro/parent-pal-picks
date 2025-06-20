@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Mail, CheckCircle, Clock, X } from 'lucide-react';
+import { Loader2, Mail, CheckCircle, Clock, X, AlertTriangle } from 'lucide-react';
 import { useFollowRequests } from '@/hooks/useFollowRequests';
 import { FollowRequestItem } from './FollowRequestItem';
 
@@ -12,9 +12,13 @@ export const InvitationsTab = () => {
     outgoingRequests = [],
     isLoadingIncoming,
     isLoadingOutgoing,
+    outgoingError,
     cancelFollowRequest,
     isCancellingRequest
   } = useFollowRequests();
+
+  console.log('InvitationsTab render - outgoingRequests:', outgoingRequests);
+  console.log('InvitationsTab render - outgoingError:', outgoingError);
 
   const pendingOutgoingRequests = outgoingRequests.filter(req => req.status === 'pending');
   const approvedRequests = outgoingRequests.filter(req => req.status === 'approved');
@@ -59,6 +63,17 @@ export const InvitationsTab = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Error State */}
+          {outgoingError && (
+            <div className="flex items-center gap-3 p-4 bg-red-50 rounded-lg border border-red-200 mb-4">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
+              <div>
+                <h4 className="font-medium text-red-900">Error loading sent requests</h4>
+                <p className="text-sm text-red-700">{outgoingError.message}</p>
+              </div>
+            </div>
+          )}
+
           {isLoadingOutgoing ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
@@ -87,6 +102,9 @@ export const InvitationsTab = () => {
                       <p className="text-sm text-gray-600">
                         @{request.requestee?.username || 'unknown'}
                       </p>
+                      <p className="text-xs text-gray-500">
+                        Sent {new Date(request.created_at).toLocaleDateString()}
+                      </p>
                     </div>
                   </div>
                   <Button
@@ -105,6 +123,11 @@ export const InvitationsTab = () => {
             <div className="text-center py-8">
               <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600">No pending sent requests</p>
+              {outgoingRequests.length > 0 && (
+                <p className="text-sm text-gray-500 mt-2">
+                  Total requests in system: {outgoingRequests.length}
+                </p>
+              )}
             </div>
           )}
         </CardContent>
@@ -129,6 +152,9 @@ export const InvitationsTab = () => {
                       {request.requestee?.full_name || 'Unknown User'}
                     </h4>
                     <p className="text-sm text-gray-600">Connection approved</p>
+                    <p className="text-xs text-gray-500">
+                      Connected {new Date(request.updated_at).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
               ))}

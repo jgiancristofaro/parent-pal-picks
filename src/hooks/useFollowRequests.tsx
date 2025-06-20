@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { FollowRequest, FollowRequestStatus } from '@/types/profile';
@@ -49,30 +50,79 @@ export const useFollowRequests = () => {
     }
   }));
 
-  // Get outgoing follow requests (keep existing implementation)
-  const { data: outgoingRequests = [], isLoading: isLoadingOutgoing } = useQuery({
+  // Get outgoing follow requests with simplified query
+  const { data: outgoingRequests = [], isLoading: isLoadingOutgoing, error: outgoingError } = useQuery({
     queryKey: ['follow-requests', 'outgoing'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
-        .from('follow_requests')
-        .select(`
-          *,
-          requestee:requestee_id (
-            id,
-            full_name,
-            username,
-            avatar_url
-          )
-        `)
-        .eq('requester_id', user.id);
+      console.log('Fetching outgoing requests for user:', user.id);
 
-      if (error) throw error;
-      return data as (FollowRequest & { requestee: any })[];
+      // First get the follow requests
+      const { data: requests, error: requestsError } = await supabase
+        .from('follow_requests')
+        .select('*')
+        .eq('requester_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (requestsError) {
+        console.error('Error fetching follow requests:', requestsError);
+        throw requestsError;
+      }
+
+      console.log('Raw follow requests:', requests);
+
+      if (!requests || requests.length === 0) {
+        console.log('No follow requests found');
+        return [];
+      }
+
+      // Get the requestee IDs to fetch profile information
+      const requesteeIds = requests.map(req => req.requestee_id);
+      console.log('Requestee IDs:', requesteeIds);
+
+      // Fetch requestee profiles separately
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, username, avatar_url')
+        .in('id', requesteeIds);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
+      }
+
+      console.log('Requestee profiles:', profiles);
+
+      // Create a map for easy lookup
+      const profilesMap = new Map();
+      (profiles || []).forEach(profile => {
+        profilesMap.set(profile.id, profile);
+      });
+
+      // Combine the data
+      const combinedData = requests.map(request => ({
+        ...request,
+        requestee: profilesMap.get(request.requestee_id) || {
+          id: request.requestee_id,
+          full_name: 'Unknown User',
+          username: 'unknown',
+          avatar_url: null
+        }
+      }));
+
+      console.log('Combined outgoing requests data:', combinedData);
+      return combinedData as (FollowRequest & { requestee: any })[];
     },
+    retry: 2,
+    staleTime: 30000, // 30 seconds
   });
+
+  // Log any errors
+  if (outgoingError) {
+    console.error('Outgoing requests query error:', outgoingError);
+  }
 
   // Send follow request
   const sendFollowRequestMutation = useMutation({
@@ -162,6 +212,7 @@ export const useFollowRequests = () => {
     outgoingRequests,
     isLoadingIncoming,
     isLoadingOutgoing,
+    outgoingError,
     sendFollowRequest: sendFollowRequestMutation.mutate,
     isSendingRequest: sendFollowRequestMutation.isPending,
     cancelFollowRequest: cancelFollowRequestMutation.mutate,
