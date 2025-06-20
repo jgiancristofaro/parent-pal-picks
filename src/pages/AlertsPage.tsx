@@ -1,16 +1,13 @@
 
-import { useEffect, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAlertsContext } from "@/contexts/AlertsContext";
-import { Check, X, UserPlus } from "lucide-react";
+import { FollowRequestItem } from "@/components/connections/FollowRequestItem";
 
 interface PendingFollowRequest {
   request_id: string;
@@ -23,11 +20,6 @@ interface PendingFollowRequest {
 const AlertsPage = () => {
   const { user } = useAuth();
   const { refreshAlerts } = useAlertsContext();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  
-  // Local state to track which requests should show Follow Back button
-  const [showFollowBack, setShowFollowBack] = useState<Set<string>>(new Set());
 
   // Mark alerts as viewed when user visits the page
   useEffect(() => {
@@ -65,84 +57,16 @@ const AlertsPage = () => {
     },
   });
 
-  const respondToRequestMutation = useMutation({
-    mutationFn: async ({ requestId, action }: { requestId: string; action: 'approve' | 'deny' }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase.functions.invoke('respond_to_follow_request', {
-        body: {
-          request_id: requestId,
-          current_user_id: user.id,
-          response_action: action
-        }
-      });
-
-      if (error) throw error;
-      return { data, requestId, action };
+  // Transform data to match FollowRequestItem expected format
+  const transformedRequests = pendingRequests.map(request => ({
+    id: request.request_id,
+    requester_id: request.requester_id,
+    requester: {
+      full_name: request.requester_full_name,
+      avatar_url: request.requester_avatar_url
     },
-    onSuccess: ({ data, requestId, action }) => {
-      if (action === 'approve' && data.follow_back_status === 'not_following') {
-        // Add to Follow Back state, don't invalidate queries yet
-        setShowFollowBack(prev => new Set(prev).add(requestId));
-        toast({
-          title: 'Follow request approved',
-          description: 'The user can now follow you and see your activity.',
-        });
-      } else {
-        // For deny or when already following, invalidate immediately
-        queryClient.invalidateQueries({ queryKey: ['pending-follow-requests'] });
-        refreshAlerts();
-        toast({
-          title: action === 'approve' ? 'Follow request approved' : 'Follow request denied',
-          description: action === 'approve' 
-            ? 'The user can now follow you and see your activity.' 
-            : 'The follow request has been denied.',
-        });
-      }
-    },
-    onError: (error) => {
-      toast({
-        title: 'Error',
-        description: 'Failed to respond to follow request.',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  const followBackMutation = useMutation({
-    mutationFn: async (targetUserId: string) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase.functions.invoke('request_follow', {
-        body: {
-          current_user_id: user.id,
-          target_user_id: targetUserId,
-        }
-      });
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      // Now invalidate the pending requests query to remove the item
-      queryClient.invalidateQueries({ queryKey: ['pending-follow-requests'] });
-      queryClient.invalidateQueries({ queryKey: ['user-follows'] });
-      refreshAlerts();
-      toast({
-        title: 'Follow back successful',
-        description: 'You are now following each other!',
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: 'Error following back',
-        description: 'Failed to follow back. Please try again.',
-        variant: 'destructive',
-      });
-    },
-  });
+    created_at: request.created_at
+  }));
 
   const hasAnyAlerts = pendingRequests.length > 0;
 
@@ -184,65 +108,8 @@ const AlertsPage = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {pendingRequests.map((request) => (
-                  <div key={request.request_id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={request.requester_avatar_url || undefined} />
-                        <AvatarFallback>
-                          {request.requester_full_name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h4 className="font-medium">{request.requester_full_name}</h4>
-                        <p className="text-sm text-gray-500">
-                          {new Date(request.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex space-x-2">
-                      {showFollowBack.has(request.request_id) ? (
-                        // Show Follow Back button
-                        <Button
-                          size="sm"
-                          onClick={() => followBackMutation.mutate(request.requester_id)}
-                          disabled={followBackMutation.isPending}
-                          className="bg-blue-600 hover:bg-blue-700"
-                        >
-                          <UserPlus size={16} />
-                          Follow Back
-                        </Button>
-                      ) : (
-                        // Show Approve/Deny buttons
-                        <>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => respondToRequestMutation.mutate({ 
-                              requestId: request.request_id, 
-                              action: 'deny' 
-                            })}
-                            disabled={respondToRequestMutation.isPending}
-                          >
-                            <X size={16} />
-                            Deny
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => respondToRequestMutation.mutate({ 
-                              requestId: request.request_id, 
-                              action: 'approve' 
-                            })}
-                            disabled={respondToRequestMutation.isPending}
-                          >
-                            <Check size={16} />
-                            Approve
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </div>
+                {transformedRequests.map((request) => (
+                  <FollowRequestItem key={request.id} request={request} />
                 ))}
               </div>
             )}

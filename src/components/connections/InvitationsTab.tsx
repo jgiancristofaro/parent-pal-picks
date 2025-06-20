@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, Mail, CheckCircle, Clock, X } from 'lucide-react';
 import { useFollowRequests } from '@/hooks/useFollowRequests';
+import { FollowRequestItem } from './FollowRequestItem';
 
 export const InvitationsTab = () => {
   const {
@@ -11,8 +12,6 @@ export const InvitationsTab = () => {
     outgoingRequests = [],
     isLoadingIncoming,
     isLoadingOutgoing,
-    respondToFollowRequest,
-    isRespondingToRequest,
     cancelFollowRequest,
     isCancellingRequest
   } = useFollowRequests();
@@ -39,46 +38,7 @@ export const InvitationsTab = () => {
           ) : incomingRequests.length > 0 ? (
             <div className="space-y-4">
               {incomingRequests.map((request) => (
-                <div key={request.id} className="flex items-center justify-between p-4 bg-white rounded-lg border">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                      {request.requester?.avatar_url ? (
-                        <img
-                          src={request.requester.avatar_url}
-                          alt={request.requester.full_name}
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                      ) : (
-                        <Mail className="w-5 h-5 text-purple-600" />
-                      )}
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">
-                        {request.requester?.full_name || 'Unknown User'}
-                      </h4>
-                      <p className="text-sm text-gray-600">
-                        @{request.requester?.username || 'unknown'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={() => respondToFollowRequest({ requestId: request.id, status: 'approved' })}
-                      disabled={isRespondingToRequest}
-                    >
-                      Accept
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => respondToFollowRequest({ requestId: request.id, status: 'denied' })}
-                      disabled={isRespondingToRequest}
-                    >
-                      Decline
-                    </Button>
-                  </div>
-                </div>
+                <FollowRequestItem key={request.id} request={request} />
               ))}
             </div>
           ) : (

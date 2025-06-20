@@ -115,43 +115,6 @@ export const useFollowRequests = () => {
     },
   });
 
-  // Respond to follow request (approve/deny)
-  const respondToFollowRequestMutation = useMutation({
-    mutationFn: async ({ requestId, status }: { requestId: string; status: 'approved' | 'denied' }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase.functions.invoke('respond_to_follow_request', {
-        body: {
-          request_id: requestId,
-          current_user_id: user.id,
-          response_action: status === 'approved' ? 'approve' : 'deny',
-        }
-      });
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: (_, { status }) => {
-      queryClient.invalidateQueries({ queryKey: ['follow-requests'] });
-      queryClient.invalidateQueries({ queryKey: ['user-follows'] });
-      queryClient.invalidateQueries({ queryKey: ['pending-follow-requests'] }); // Also invalidate alerts query
-      toast({
-        title: status === 'approved' ? 'Follow request approved' : 'Follow request denied',
-        description: status === 'approved' 
-          ? 'You are now following each other!' 
-          : 'Follow request has been denied.',
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: 'Error responding to follow request',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
-  });
-
   // Cancel follow request
   const cancelFollowRequestMutation = useMutation({
     mutationFn: async (requesteeId: string) => {
@@ -201,8 +164,6 @@ export const useFollowRequests = () => {
     isLoadingOutgoing,
     sendFollowRequest: sendFollowRequestMutation.mutate,
     isSendingRequest: sendFollowRequestMutation.isPending,
-    respondToFollowRequest: respondToFollowRequestMutation.mutate,
-    isRespondingToRequest: respondToFollowRequestMutation.isPending,
     cancelFollowRequest: cancelFollowRequestMutation.mutate,
     isCancellingRequest: cancelFollowRequestMutation.isPending,
   };
