@@ -1,15 +1,16 @@
+
 import { Link } from "react-router-dom";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ArrowRight } from "lucide-react";
 import { SitterCard } from "@/components/SitterCard";
-import { useNewlyRecommendedSitters } from "@/hooks/useNewlyRecommendedSitters";
+import { useNewSitterRecommendations } from "@/hooks/useNewSitterRecommendations";
 
 interface NewRecommendedSittersProps {
   currentUserId?: string;
 }
 
 export const NewRecommendedSitters = ({ currentUserId }: NewRecommendedSittersProps) => {
-  const { data: newlyRecommendedSitters = [], isLoading, error } = useNewlyRecommendedSitters(
+  const { data: newlyRecommendedSitters = [], isLoading, error } = useNewSitterRecommendations(
     currentUserId,
     5 // Limit to 5 recommendations for the preview
   );

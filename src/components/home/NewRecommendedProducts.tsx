@@ -3,14 +3,14 @@ import { Link } from "react-router-dom";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ArrowRight } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
-import { useNewlyRecommendedProducts } from "@/hooks/useNewlyRecommendedProducts";
+import { useNewProductRecommendations } from "@/hooks/useNewProductRecommendations";
 
 interface NewRecommendedProductsProps {
   currentUserId?: string;
 }
 
 export const NewRecommendedProducts = ({ currentUserId }: NewRecommendedProductsProps) => {
-  const { data: newlyRecommendedProducts = [], isLoading, error } = useNewlyRecommendedProducts(currentUserId, 5);
+  const { data: newlyRecommendedProducts = [], isLoading, error } = useNewProductRecommendations(currentUserId, 5);
 
   if (isLoading) {
     return (
