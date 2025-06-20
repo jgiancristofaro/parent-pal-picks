@@ -17,6 +17,7 @@ interface SignUpFormProps {
   phoneNumber: string;
   setPhoneNumber: (value: string) => void;
   isLoading: boolean;
+  onEmailValidationChange?: (status: ValidationStatus, message?: string) => void;
 }
 
 const SignUpForm = ({
@@ -30,7 +31,8 @@ const SignUpForm = ({
   setPassword,
   phoneNumber,
   setPhoneNumber,
-  isLoading
+  isLoading,
+  onEmailValidationChange
 }: SignUpFormProps) => {
   const [emailValidationStatus, setEmailValidationStatus] = useState<ValidationStatus>('idle');
   const [emailValidationMessage, setEmailValidationMessage] = useState<string>('');
@@ -38,10 +40,11 @@ const SignUpForm = ({
   const handleEmailValidationChange = (status: ValidationStatus, message?: string) => {
     setEmailValidationStatus(status);
     setEmailValidationMessage(message || '');
+    onEmailValidationChange?.(status, message);
   };
 
-  const isEmailValid = emailValidationStatus === 'valid';
-  const hasEmailError = emailValidationStatus === 'error';
+  const isEmailAvailable = emailValidationStatus === 'available';
+  const hasEmailError = emailValidationStatus === 'exists' || emailValidationStatus === 'error';
 
   return (
     <div className="space-y-4">
@@ -79,7 +82,7 @@ const SignUpForm = ({
           </div>
         )}
         
-        {isEmailValid && (
+        {isEmailAvailable && (
           <div className="text-sm text-green-600 flex items-center gap-2">
             <span>✓</span>
             <span>Email is available</span>

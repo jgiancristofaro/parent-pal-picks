@@ -43,8 +43,8 @@ const AuthStep = ({
     // Check if all required fields are filled
     const hasRequiredFields = email && password && firstName && lastName && phoneNumber;
     
-    // Check if email validation is either valid or idle (not error)
-    const isEmailOk = emailValidationStatus === 'valid' || 
+    // Check if email validation is either available or idle (not error or exists)
+    const isEmailOk = emailValidationStatus === 'available' || 
                       (emailValidationStatus === 'idle' && email.trim() === '');
     
     return hasRequiredFields && isEmailOk && !isLoading;
@@ -53,8 +53,8 @@ const AuthStep = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Prevent submission if email validation shows an error
-    if (emailValidationStatus === 'error') {
+    // Prevent submission if email validation shows an error or exists
+    if (emailValidationStatus === 'error' || emailValidationStatus === 'exists') {
       return;
     }
     
@@ -102,6 +102,7 @@ const AuthStep = ({
               phoneNumber={phoneNumber}
               setPhoneNumber={(value) => onUpdate({ phoneNumber: value })}
               isLoading={isLoading}
+              onEmailValidationChange={handleEmailValidationChange}
             />
 
             <PrivacySettingsCard
