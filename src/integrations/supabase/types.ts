@@ -813,6 +813,22 @@ export type Database = {
         Args: { p_content_type: string; p_content_id: string; p_reason: string }
         Returns: Json
       }
+      get_connection_suggestions: {
+        Args: {
+          p_user_id: string
+          p_page_number?: number
+          p_page_size?: number
+        }
+        Returns: {
+          user_id: string
+          full_name: string
+          username: string
+          avatar_url: string
+          profile_privacy_setting: Database["public"]["Enums"]["profile_privacy_enum"]
+          mutual_connections_count: number
+          follow_status: string
+        }[]
+      }
       get_follow_status: {
         Args: { target_user_id: string }
         Returns: string
@@ -1014,6 +1030,26 @@ export type Database = {
           username: string
           avatar_url: string
           profile_privacy_setting: Database["public"]["Enums"]["profile_privacy_enum"]
+        }[]
+      }
+      search_profiles_advanced: {
+        Args: {
+          p_search_term: string
+          p_city?: string
+          p_workplace?: string
+          p_page_number?: number
+          p_page_size?: number
+        }
+        Returns: {
+          user_id: string
+          full_name: string
+          username: string
+          avatar_url: string
+          profile_privacy_setting: Database["public"]["Enums"]["profile_privacy_enum"]
+          follow_status: string
+          similarity_score: number
+          city: string
+          workplace: string
         }[]
       }
       search_sitters: {
