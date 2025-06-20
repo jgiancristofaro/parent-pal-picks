@@ -57,9 +57,9 @@ BEGIN
   -- Strategy 1: Friends of Friends (2nd degree connections)
   INSERT INTO temp_connection_suggestions
   WITH user_follows AS (
-    SELECT following_id as friend_id
-    FROM public.user_follows
-    WHERE follower_id = p_user_id
+    SELECT uf.following_id as friend_id
+    FROM public.user_follows uf
+    WHERE uf.follower_id = p_user_id
   ),
   friends_of_friends AS (
     SELECT 
@@ -70,9 +70,9 @@ BEGIN
     WHERE uf2.following_id != p_user_id  -- Exclude current user
       AND uf2.following_id NOT IN (
         -- Exclude users already followed by current user
-        SELECT following_id 
-        FROM public.user_follows 
-        WHERE follower_id = p_user_id
+        SELECT uf3.following_id 
+        FROM public.user_follows uf3
+        WHERE uf3.follower_id = p_user_id
       )
     GROUP BY uf2.following_id
   )
@@ -123,12 +123,12 @@ BEGIN
       AND p.is_suspended = false
       AND p.id != p_user_id
       AND NOT EXISTS (
-        SELECT 1 FROM public.user_follows 
-        WHERE follower_id = p_user_id AND following_id = p.id
+        SELECT 1 FROM public.user_follows uf
+        WHERE uf.follower_id = p_user_id AND uf.following_id = p.id
       )
       AND NOT EXISTS (
-        SELECT 1 FROM temp_connection_suggestions 
-        WHERE user_id = p.id
+        SELECT 1 FROM temp_connection_suggestions tcs
+        WHERE tcs.user_id = p.id
       )
     ORDER BY p.full_name ASC
     LIMIT (p_page_size - v_results_count);
@@ -162,12 +162,12 @@ BEGIN
       AND p.is_suspended = false
       AND p.id != p_user_id
       AND NOT EXISTS (
-        SELECT 1 FROM public.user_follows 
-        WHERE follower_id = p_user_id AND following_id = p.id
+        SELECT 1 FROM public.user_follows uf
+        WHERE uf.follower_id = p_user_id AND uf.following_id = p.id
       )
       AND NOT EXISTS (
-        SELECT 1 FROM temp_connection_suggestions 
-        WHERE user_id = p.id
+        SELECT 1 FROM temp_connection_suggestions tcs
+        WHERE tcs.user_id = p.id
       )
     ORDER BY p.full_name ASC
     LIMIT (p_page_size - v_results_count);
@@ -196,19 +196,19 @@ BEGIN
       AND fr.requester_id = p_user_id 
       AND fr.status = 'pending'
     LEFT JOIN (
-      SELECT following_id, COUNT(*) as follower_count
-      FROM public.user_follows
-      GROUP BY following_id
+      SELECT uf.following_id, COUNT(*) as follower_count
+      FROM public.user_follows uf
+      GROUP BY uf.following_id
     ) fc ON p.id = fc.following_id
     WHERE p.is_suspended = false
       AND p.id != p_user_id
       AND NOT EXISTS (
-        SELECT 1 FROM public.user_follows 
-        WHERE follower_id = p_user_id AND following_id = p.id
+        SELECT 1 FROM public.user_follows uf
+        WHERE uf.follower_id = p_user_id AND uf.following_id = p.id
       )
       AND NOT EXISTS (
-        SELECT 1 FROM temp_connection_suggestions 
-        WHERE user_id = p.id
+        SELECT 1 FROM temp_connection_suggestions tcs
+        WHERE tcs.user_id = p.id
       )
     ORDER BY COALESCE(fc.follower_count, 0) DESC, p.full_name ASC
     LIMIT (p_page_size - v_results_count);
