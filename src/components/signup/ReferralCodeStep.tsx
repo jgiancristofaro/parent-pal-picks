@@ -27,7 +27,7 @@ export const ReferralCodeStep = ({
 
     try {
       const result = await validateMutation.mutateAsync(referralCode.trim());
-      setValidationResult({ valid: true, referrerName: result.full_name });
+      setValidationResult({ valid: true, referrerName: result.first_name || result.full_name });
     } catch (error) {
       setValidationResult({ valid: false });
     }

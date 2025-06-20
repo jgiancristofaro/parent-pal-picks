@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import SignUpForm from '@/components/auth/SignUpForm';
 import PrivacySettingsCard from '@/components/auth/PrivacySettingsCard';
 import { useSignUpFlow } from '@/hooks/useSignUpFlow';
+import { ValidationStatus } from '@/hooks/useEmailValidation';
 
 interface AuthStepProps {
   email: string;
@@ -32,11 +33,32 @@ const AuthStep = ({
   onUpdate
 }: AuthStepProps) => {
   const { signUp, isLoading } = useSignUpFlow();
+  const [emailValidationStatus, setEmailValidationStatus] = useState<ValidationStatus>('idle');
+
+  const handleEmailValidationChange = (status: ValidationStatus) => {
+    setEmailValidationStatus(status);
+  };
+
+  const canSubmit = () => {
+    // Check if all required fields are filled
+    const hasRequiredFields = email && password && firstName && lastName && phoneNumber;
+    
+    // Check if email validation is either valid or idle (not error)
+    const isEmailOk = emailValidationStatus === 'valid' || 
+                      (emailValidationStatus === 'idle' && email.trim() === '');
+    
+    return hasRequiredFields && isEmailOk && !isLoading;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password || !firstName || !lastName || !phoneNumber) {
+    // Prevent submission if email validation shows an error
+    if (emailValidationStatus === 'error') {
+      return;
+    }
+    
+    if (!canSubmit()) {
       return;
     }
 
@@ -106,7 +128,7 @@ const AuthStep = ({
               </Button>
               <Button
                 type="submit"
-                disabled={isLoading}
+                disabled={!canSubmit()}
                 className="flex-1"
               >
                 {isLoading ? 'Creating Account...' : 'Create Account'}

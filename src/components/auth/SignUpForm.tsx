@@ -1,5 +1,9 @@
 
-import { Input } from "@/components/ui/input";
+import React, { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import EmailInput from '@/components/signup/EmailInput';
+import { ValidationStatus } from '@/hooks/useEmailValidation';
 
 interface SignUpFormProps {
   firstName: string;
@@ -12,7 +16,7 @@ interface SignUpFormProps {
   setPassword: (value: string) => void;
   phoneNumber: string;
   setPhoneNumber: (value: string) => void;
-  isLoading?: boolean;
+  isLoading: boolean;
 }
 
 const SignUpForm = ({
@@ -26,70 +30,80 @@ const SignUpForm = ({
   setPassword,
   phoneNumber,
   setPhoneNumber,
-  isLoading = false
+  isLoading
 }: SignUpFormProps) => {
+  const [emailValidationStatus, setEmailValidationStatus] = useState<ValidationStatus>('idle');
+  const [emailValidationMessage, setEmailValidationMessage] = useState<string>('');
+
+  const handleEmailValidationChange = (status: ValidationStatus, message?: string) => {
+    setEmailValidationStatus(status);
+    setEmailValidationMessage(message || '');
+  };
+
+  const isEmailValid = emailValidationStatus === 'valid';
+  const hasEmailError = emailValidationStatus === 'error';
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Input
-            type="text"
-            placeholder="First Name"
-            className="input-field"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            disabled={isLoading}
-            required
-          />
-        </div>
-        <div>
-          <Input
-            type="text"
-            placeholder="Last Name"
-            className="input-field"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            disabled={isLoading}
-            required
-          />
-        </div>
-      </div>
-
-      <div>
         <Input
-          type="email"
-          placeholder="Email"
-          className="input-field"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="First Name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
           disabled={isLoading}
-          required
+          className="py-3 text-lg"
         />
-      </div>
-      
-      <div>
         <Input
-          type="password"
-          placeholder="Password"
-          className="input-field"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          type="text"
+          placeholder="Last Name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
           disabled={isLoading}
-          required
+          className="py-3 text-lg"
         />
       </div>
 
-      <div>
-        <Input
-          type="tel"
-          placeholder="Phone Number"
-          className="input-field"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
+      <div className="space-y-2">
+        <EmailInput
+          email={email}
+          onEmailChange={setEmail}
+          onValidationChange={handleEmailValidationChange}
           disabled={isLoading}
-          required
         />
+        
+        {hasEmailError && emailValidationMessage && (
+          <div className="text-sm text-red-600 flex items-center gap-2">
+            <span>⚠️</span>
+            <span>{emailValidationMessage}</span>
+          </div>
+        )}
+        
+        {isEmailValid && (
+          <div className="text-sm text-green-600 flex items-center gap-2">
+            <span>✓</span>
+            <span>Email is available</span>
+          </div>
+        )}
       </div>
+
+      <Input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        disabled={isLoading}
+        className="py-3 text-lg"
+      />
+
+      <Input
+        type="tel"
+        placeholder="Phone Number"
+        value={phoneNumber}
+        onChange={(e) => setPhoneNumber(e.target.value)}
+        disabled={isLoading}
+        className="py-3 text-lg"
+      />
     </div>
   );
 };

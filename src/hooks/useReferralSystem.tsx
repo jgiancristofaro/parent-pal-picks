@@ -101,7 +101,8 @@ export const useValidateReferralCode = () => {
 
       return {
         id: data[0].user_id,
-        full_name: data[0].full_name
+        full_name: data[0].full_name,
+        first_name: data[0].first_name
       };
     },
   });
