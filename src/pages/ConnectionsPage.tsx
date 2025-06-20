@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, UserPlus, Mail } from 'lucide-react';
+import { Header } from '@/components/Header';
+import { BottomNavigation } from '@/components/BottomNavigation';
 import { MyConnectionsTab } from '@/components/connections/MyConnectionsTab';
 import { SuggestionsTab } from '@/components/connections/SuggestionsTab';
 import { InvitationsTab } from '@/components/connections/InvitationsTab';
@@ -11,7 +13,9 @@ const ConnectionsPage = () => {
   const [activeTab, setActiveTab] = useState('suggestions');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
+      <Header title="Connections" showBack={true} showSettings={false} />
+      
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Connections Hub</h1>
@@ -47,6 +51,8 @@ const ConnectionsPage = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <BottomNavigation />
     </div>
   );
 };
