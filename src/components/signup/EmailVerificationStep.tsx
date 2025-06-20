@@ -19,19 +19,6 @@ const EmailVerificationStep = ({ email, onNext, onPrev }: EmailVerificationStepP
   const { user, session } = useAuth();
   const { toast } = useToast();
 
-  // Check if user is verified every few seconds
-  useEffect(() => {
-    const checkVerification = setInterval(async () => {
-      if (user && session) {
-        // User is authenticated and verified, proceed to next step
-        onNext();
-        clearInterval(checkVerification);
-      }
-    }, 3000);
-
-    return () => clearInterval(checkVerification);
-  }, [user, session, onNext]);
-
   // Handle resend cooldown
   useEffect(() => {
     if (resendCooldown > 0) {
@@ -48,7 +35,7 @@ const EmailVerificationStep = ({ email, onNext, onPrev }: EmailVerificationStepP
     setIsResending(true);
     
     try {
-      const redirectUrl = `${window.location.origin}/signup?step=4&verified=true`;
+      const redirectUrl = `${window.location.origin}/signup?step=5&verified=true`;
       
       const { error } = await supabase.auth.resend({
         type: 'signup',
@@ -84,16 +71,20 @@ const EmailVerificationStep = ({ email, onNext, onPrev }: EmailVerificationStepP
   };
 
   const handleManualContinue = () => {
-    if (user && session) {
+    // Only allow continuation if user is authenticated AND email is verified
+    if (user && session && user.email_confirmed_at) {
       onNext();
     } else {
       toast({
         title: 'Email not verified',
-        description: 'Please verify your email before continuing.',
+        description: 'Please verify your email by clicking the link in your inbox before continuing.',
         variant: 'destructive',
       });
     }
   };
+
+  // Check if user has verified their email
+  const isEmailVerified = user && user.email_confirmed_at;
 
   return (
     <div className="space-y-6">
@@ -115,6 +106,15 @@ const EmailVerificationStep = ({ email, onNext, onPrev }: EmailVerificationStepP
             </p>
             <p className="font-medium text-purple-600">{email}</p>
           </div>
+
+          {isEmailVerified && (
+            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center gap-2 text-green-700">
+                <CheckCircle className="w-5 h-5" />
+                <span className="text-sm font-medium">Email verified! You can now continue.</span>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-4 text-sm text-gray-500">
             <div className="flex items-center justify-center gap-2">
@@ -148,14 +148,15 @@ const EmailVerificationStep = ({ email, onNext, onPrev }: EmailVerificationStepP
               )}
             </Button>
 
-            <Button
-              variant="ghost"
-              onClick={handleManualContinue}
-              className="text-sm text-purple-600 hover:text-purple-700"
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Already verified? Continue
-            </Button>
+            {isEmailVerified && (
+              <Button
+                onClick={handleManualContinue}
+                className="w-full bg-green-600 hover:bg-green-700"
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Continue to Next Step
+              </Button>
+            )}
           </div>
         </div>
       </Card>
@@ -171,7 +172,7 @@ const EmailVerificationStep = ({ email, onNext, onPrev }: EmailVerificationStepP
         
         <Button
           onClick={handleManualContinue}
-          disabled={!user || !session}
+          disabled={!isEmailVerified}
           className="flex-1 py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Continue
