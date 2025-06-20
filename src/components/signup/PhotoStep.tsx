@@ -3,30 +3,18 @@ import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Camera, User, Loader2 } from 'lucide-react';
-import { useSignUpFlow } from '@/hooks/useSignUpFlow';
+import { Camera, User } from 'lucide-react';
 
 interface PhotoStepProps {
   onNext: () => void;
   onPrev: () => void;
   onUpdate: (data: { profilePhoto?: File }) => void;
-  signUpData: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    phoneNumber: string;
-    profilePrivacySetting: 'public' | 'private';
-    profilePhoto?: File;
-  };
 }
 
-const PhotoStep = ({ onNext, onPrev, onUpdate, signUpData }: PhotoStepProps) => {
+const PhotoStep = ({ onNext, onPrev, onUpdate }: PhotoStepProps) => {
   const [previewUrl, setPreviewUrl] = useState<string>('');
-  const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { signUp, isLoading } = useSignUpFlow();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -43,8 +31,6 @@ const PhotoStep = ({ onNext, onPrev, onUpdate, signUpData }: PhotoStepProps) => 
       alert('File size must be less than 5MB');
       return;
     }
-
-    setIsUploading(true);
     
     // Create preview URL
     const url = URL.createObjectURL(file);
@@ -53,8 +39,6 @@ const PhotoStep = ({ onNext, onPrev, onUpdate, signUpData }: PhotoStepProps) => 
     
     // Update parent component with the selected file
     onUpdate({ profilePhoto: file });
-    
-    setIsUploading(false);
   };
 
   const handleUploadClick = () => {
@@ -75,15 +59,10 @@ const PhotoStep = ({ onNext, onPrev, onUpdate, signUpData }: PhotoStepProps) => 
     }
   };
 
-  const handleContinue = async () => {
-    // Create the account now with all collected data
-    const result = await signUp(signUpData);
-    
-    if (result.success) {
-      // Account created successfully, proceed to next step (Build Network)
-      onNext();
-    }
-    // Error handling is done within the signUp function via toast
+  const handleContinue = () => {
+    // No need to create account here anymore - it was created in AuthStep
+    // Just proceed to next step (Build Network)
+    onNext();
   };
 
   return (
@@ -118,22 +97,16 @@ const PhotoStep = ({ onNext, onPrev, onUpdate, signUpData }: PhotoStepProps) => 
             <Button 
               variant="outline" 
               onClick={handleUploadClick}
-              disabled={isUploading}
               className="mb-4"
             >
-              {isUploading ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Camera className="w-4 h-4 mr-2" />
-              )}
-              {isUploading ? 'Processing...' : 'Upload Photo'}
+              <Camera className="w-4 h-4 mr-2" />
+              Upload Photo
             </Button>
           ) : (
             <div className="space-y-2">
               <Button 
                 variant="outline" 
                 onClick={handleUploadClick}
-                disabled={isUploading}
               >
                 <Camera className="w-4 h-4 mr-2" />
                 Change Photo
@@ -159,24 +132,15 @@ const PhotoStep = ({ onNext, onPrev, onUpdate, signUpData }: PhotoStepProps) => 
           onClick={onPrev}
           variant="outline"
           className="flex-1 py-6 text-lg"
-          disabled={isLoading}
         >
           Back
         </Button>
         
         <Button
           onClick={handleContinue}
-          disabled={isLoading}
           className="flex-1 py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-lg"
         >
-          {isLoading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Creating Account...
-            </>
-          ) : (
-            'Continue'
-          )}
+          Continue
         </Button>
       </div>
     </div>

@@ -6,12 +6,15 @@ import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import PrivacySettingsCard from '@/components/auth/PrivacySettingsCard';
 import EmailInput from './EmailInput';
+import { useSignUpFlow } from '@/hooks/useSignUpFlow';
 
 interface AuthStepProps {
   email: string;
   password: string;
   phoneNumber: string;
   profilePrivacySetting: 'public' | 'private';
+  firstName: string;
+  lastName: string;
   onNext: () => void;
   onPrev: () => void;
   onUpdate: (data: { 
@@ -26,7 +29,9 @@ const AuthStep = ({
   email, 
   password, 
   phoneNumber, 
-  profilePrivacySetting, 
+  profilePrivacySetting,
+  firstName,
+  lastName,
   onNext, 
   onPrev, 
   onUpdate 
@@ -36,11 +41,29 @@ const AuthStep = ({
     message: '' 
   });
   const navigate = useNavigate();
+  const { signUp, isLoading } = useSignUpFlow();
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (email.trim() && password.trim() && phoneNumber.trim() && 
         emailValidation.status !== 'checking' && emailValidation.status !== 'exists') {
-      onNext();
+      
+      // Create the account here with all collected data
+      const signUpData = {
+        firstName,
+        lastName,
+        email,
+        password,
+        phoneNumber,
+        profilePrivacySetting,
+      };
+
+      const result = await signUp(signUpData);
+      
+      if (result.success) {
+        // Account created successfully, proceed to next step (Photo)
+        onNext();
+      }
+      // Error handling is done within the signUp function via toast
     }
   };
 
@@ -53,7 +76,8 @@ const AuthStep = ({
   };
 
   const isNextDisabled = !email.trim() || !password.trim() || !phoneNumber.trim() || 
-                        emailValidation.status === 'checking' || emailValidation.status === 'exists';
+                        emailValidation.status === 'checking' || emailValidation.status === 'exists' ||
+                        isLoading;
 
   return (
     <div className="space-y-6">
@@ -104,6 +128,7 @@ const AuthStep = ({
           value={password}
           onChange={(e) => onUpdate({ password: e.target.value })}
           className="w-full py-3 text-lg"
+          disabled={isLoading}
         />
 
         <Input
@@ -112,6 +137,7 @@ const AuthStep = ({
           value={phoneNumber}
           onChange={(e) => onUpdate({ phoneNumber: e.target.value })}
           className="w-full py-3 text-lg"
+          disabled={isLoading}
         />
       </div>
 
@@ -125,6 +151,7 @@ const AuthStep = ({
           onClick={onPrev}
           variant="outline"
           className="flex-1 py-6 text-lg"
+          disabled={isLoading}
         >
           Back
         </Button>
@@ -134,7 +161,14 @@ const AuthStep = ({
           disabled={isNextDisabled}
           className="flex-1 py-6 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Continue
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 w-4 mr-2 animate-spin" />
+              Creating Account...
+            </>
+          ) : (
+            'Continue'
+          )}
         </Button>
       </div>
     </div>

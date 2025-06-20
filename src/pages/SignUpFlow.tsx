@@ -65,6 +65,8 @@ const SignUpFlow = () => {
             password={signUpData.password}
             phoneNumber={signUpData.phoneNumber}
             profilePrivacySetting={signUpData.profilePrivacySetting}
+            firstName={signUpData.firstName}
+            lastName={signUpData.lastName}
             onNext={nextStep}
             onPrev={prevStep}
             onUpdate={updateSignUpData}
@@ -76,7 +78,6 @@ const SignUpFlow = () => {
             onNext={nextStep}
             onPrev={prevStep}
             onUpdate={updateSignUpData}
-            signUpData={signUpData}
           />
         );
       case 4:
