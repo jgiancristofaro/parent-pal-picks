@@ -21,7 +21,7 @@ export const useConnectionSuggestions = (pageNumber: number = 1, pageSize: numbe
     queryFn: async (): Promise<ConnectionSuggestion[]> => {
       if (!user?.id) return [];
       
-      console.log('Fetching connection suggestions for user:', user.id, 'page:', pageNumber);
+      console.log('🔍 Fetching connection suggestions for user:', user.id, 'page:', pageNumber);
       
       const { data, error } = await supabase
         .rpc('get_connection_suggestions', {
@@ -31,11 +31,12 @@ export const useConnectionSuggestions = (pageNumber: number = 1, pageSize: numbe
         });
 
       if (error) {
-        console.error('Error fetching connection suggestions:', error);
+        console.error('❌ Error fetching connection suggestions:', error);
         throw error;
       }
 
-      console.log('Connection suggestions found:', data?.length || 0);
+      console.log('✅ Connection suggestions found:', data?.length || 0);
+      console.log('📊 Suggestions data sample:', data?.slice(0, 2));
       
       // Type cast the follow_status to ensure it matches our interface
       return (data || []).map(item => ({
@@ -44,5 +45,15 @@ export const useConnectionSuggestions = (pageNumber: number = 1, pageSize: numbe
       }));
     },
     enabled: !!user?.id,
+    retry: (failureCount, error) => {
+      console.log('🔄 Retrying connection suggestions query:', failureCount, error);
+      return failureCount < 2;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    meta: {
+      onError: (error: any) => {
+        console.error('❌ Connection suggestions query error:', error);
+      }
+    }
   });
 };
