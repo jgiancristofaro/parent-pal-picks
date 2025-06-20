@@ -92,9 +92,9 @@ export const SitterCard = ({
   const displayRating = userSpecificRating !== undefined ? userSpecificRating : rating;
 
   return (
-    <div className="relative">
+    <div className="relative h-full">
       <Link to={`/sitter/${id}`}>
-        <div className="flex flex-col bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+        <div className="flex flex-col h-full bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
           <div className="w-full aspect-square overflow-hidden">
             <img 
               src={image} 
@@ -102,7 +102,7 @@ export const SitterCard = ({
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="flex-grow p-3">
+          <div className="flex-grow p-3 flex flex-col">
             <h3 className="font-semibold text-gray-800 text-sm mb-1 leading-tight break-words whitespace-normal">{name}</h3>
             
             {/* Updated star display to match ProductCard */}
@@ -130,14 +130,16 @@ export const SitterCard = ({
               </div>
             )}
             
-            {/* Show review snippet if provided, otherwise show friend recommendations */}
-            {reviewSnippet ? (
-              <p className="text-xs text-gray-600 italic leading-relaxed break-words whitespace-normal">"{reviewSnippet}..."</p>
-            ) : recommendedBy ? (
-              <p className="text-xs text-gray-600 leading-relaxed break-words whitespace-normal">Recommended by {recommendedBy}</p>
-            ) : (
-              <p className="text-xs text-gray-600 leading-relaxed break-words whitespace-normal">{formatFriendRecommendation(friendRecommendationCount)}</p>
-            )}
+            <div className="flex-grow">
+              {/* Show review snippet if provided, otherwise show friend recommendations */}
+              {reviewSnippet ? (
+                <p className="text-xs text-gray-600 italic leading-relaxed break-words whitespace-normal">"{reviewSnippet}..."</p>
+              ) : recommendedBy ? (
+                <p className="text-xs text-gray-600 leading-relaxed break-words whitespace-normal">Recommended by {recommendedBy}</p>
+              ) : (
+                <p className="text-xs text-gray-600 leading-relaxed break-words whitespace-normal">{formatFriendRecommendation(friendRecommendationCount)}</p>
+              )}
+            </div>
           </div>
         </div>
       </Link>

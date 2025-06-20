@@ -53,7 +53,7 @@ export const TopCommunityPicks = () => {
         </div>
       ) : (
         <ScrollArea className="w-full whitespace-nowrap no-scrollbar">
-          <div className="flex w-max space-x-3 px-4 pb-2">
+          <div className="flex w-max space-x-3 px-4 pb-2 items-stretch">
             {topPicks.slice(0, 5).map((pick) => (
               <div key={pick.product_id} className="flex-none w-48">
                 <ProductCard

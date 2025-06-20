@@ -65,9 +65,9 @@ export const ProductCard = ({
   const displayRating = userSpecificRating !== undefined ? userSpecificRating : rating;
 
   return (
-    <div className="relative">
+    <div className="relative h-full">
       <Link to={`/product/${id}`}>
-        <div className="rounded-lg overflow-hidden bg-white shadow-md hover:shadow-lg transition-shadow duration-200">
+        <div className="flex flex-col h-full rounded-lg overflow-hidden bg-white shadow-md hover:shadow-lg transition-shadow duration-200">
           <div className="aspect-square overflow-hidden">
             <ProductImage 
               imageUrl={image}
@@ -76,7 +76,7 @@ export const ProductCard = ({
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="p-3">
+          <div className="flex-grow p-3 flex flex-col">
             <h3 className="font-semibold text-gray-800 leading-tight break-words whitespace-normal">{name}</h3>
             {category && <p className="text-sm text-gray-500 break-words whitespace-normal">{category}</p>}
             
@@ -89,28 +89,30 @@ export const ProductCard = ({
               </div>
             )}
             
-            {/* Show review snippet if provided, otherwise show recommendation counts */}
-            {reviewSnippet ? (
-              <p className={`text-xs mt-1 italic leading-relaxed break-words whitespace-normal ${textColorClass}`}>"{reviewSnippet}..."</p>
-            ) : (
-              <>
-                {uniqueRecommenderCount !== undefined && uniqueRecommenderCount > 0 && (
-                  <p className={`text-xs mt-1 leading-relaxed break-words whitespace-normal ${textColorClass}`}>
-                    {formatUniqueRecommenderText(uniqueRecommenderCount)}
-                  </p>
-                )}
-                
-                {recommendedBy && (
-                  <p className={`text-xs mt-1 leading-relaxed break-words whitespace-normal ${textColorClass}`}>Recommended by {recommendedBy}</p>
-                )}
-                
-                {friendRecommendationCount !== undefined && friendRecommendationCount > 0 && (
-                  <p className={`text-xs mt-1 leading-relaxed break-words whitespace-normal ${textColorClass}`}>
-                    {formatRecommendationText(friendRecommendationCount)}
-                  </p>
-                )}
-              </>
-            )}
+            <div className="flex-grow">
+              {/* Show review snippet if provided, otherwise show recommendation counts */}
+              {reviewSnippet ? (
+                <p className={`text-xs mt-1 italic leading-relaxed break-words whitespace-normal ${textColorClass}`}>"{reviewSnippet}..."</p>
+              ) : (
+                <>
+                  {uniqueRecommenderCount !== undefined && uniqueRecommenderCount > 0 && (
+                    <p className={`text-xs mt-1 leading-relaxed break-words whitespace-normal ${textColorClass}`}>
+                      {formatUniqueRecommenderText(uniqueRecommenderCount)}
+                    </p>
+                  )}
+                  
+                  {recommendedBy && (
+                    <p className={`text-xs mt-1 leading-relaxed break-words whitespace-normal ${textColorClass}`}>Recommended by {recommendedBy}</p>
+                  )}
+                  
+                  {friendRecommendationCount !== undefined && friendRecommendationCount > 0 && (
+                    <p className={`text-xs mt-1 leading-relaxed break-words whitespace-normal ${textColorClass}`}>
+                      {formatRecommendationText(friendRecommendationCount)}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </Link>
