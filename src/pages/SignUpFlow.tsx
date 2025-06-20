@@ -1,11 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Progress } from '@/components/ui/progress';
+import { useSearchParams } from 'react-router-dom';
 import NameStep from '@/components/signup/NameStep';
 import AuthStep from '@/components/signup/AuthStep';
+import EmailVerificationStep from '@/components/signup/EmailVerificationStep';
 import PhotoStep from '@/components/signup/PhotoStep';
 import BuildNetworkStep from '@/components/signup/BuildNetworkStep';
 import ConfirmationStep from '@/components/signup/ConfirmationStep';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SignUpData {
   firstName: string;
@@ -18,7 +21,24 @@ interface SignUpData {
 }
 
 const SignUpFlow = () => {
-  const [step, setStep] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { user, session } = useAuth();
+  
+  // Initialize step from URL params or localStorage, default to 1
+  const getInitialStep = () => {
+    const urlStep = searchParams.get('step');
+    const savedStep = localStorage.getItem('signupStep');
+    
+    if (urlStep) {
+      return parseInt(urlStep, 10);
+    }
+    if (savedStep) {
+      return parseInt(savedStep, 10);
+    }
+    return 1;
+  };
+
+  const [step, setStep] = useState(getInitialStep);
   const [signUpData, setSignUpData] = useState<SignUpData>({
     firstName: '',
     lastName: '',
@@ -28,8 +48,29 @@ const SignUpFlow = () => {
     profilePrivacySetting: 'private',
   });
 
-  const totalSteps = 5;
+  const totalSteps = 6; // Updated from 5 to 6
   const progressPercentage = (step / totalSteps) * 100;
+
+  // Handle step resumption after email verification
+  useEffect(() => {
+    const urlStep = searchParams.get('step');
+    const verified = searchParams.get('verified');
+    
+    if (urlStep && verified === 'true' && user && session) {
+      // User has verified email and is authenticated, advance to the specified step
+      const targetStep = parseInt(urlStep, 10);
+      setStep(targetStep);
+      localStorage.setItem('signupStep', targetStep.toString());
+      
+      // Clean up URL params
+      setSearchParams({});
+    }
+  }, [user, session, searchParams, setSearchParams]);
+
+  // Save current step to localStorage
+  useEffect(() => {
+    localStorage.setItem('signupStep', step.toString());
+  }, [step]);
 
   const nextStep = () => {
     if (step < totalSteps) {
@@ -45,6 +86,12 @@ const SignUpFlow = () => {
 
   const updateSignUpData = (data: Partial<SignUpData>) => {
     setSignUpData(prev => ({ ...prev, ...data }));
+  };
+
+  const handleSignUpComplete = () => {
+    // Clear signup progress when complete
+    localStorage.removeItem('signupStep');
+    nextStep();
   };
 
   const renderStep = () => {
@@ -74,20 +121,28 @@ const SignUpFlow = () => {
         );
       case 3:
         return (
+          <EmailVerificationStep
+            email={signUpData.email}
+            onNext={nextStep}
+            onPrev={prevStep}
+          />
+        );
+      case 4:
+        return (
           <PhotoStep
             onNext={nextStep}
             onPrev={prevStep}
             onUpdate={updateSignUpData}
           />
         );
-      case 4:
+      case 5:
         return (
           <BuildNetworkStep
             onNext={nextStep}
             onPrev={prevStep}
           />
         );
-      case 5:
+      case 6:
         return (
           <ConfirmationStep
             onPrev={prevStep}

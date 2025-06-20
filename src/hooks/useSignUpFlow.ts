@@ -23,7 +23,8 @@ export const useSignUpFlow = () => {
     try {
       console.log('Starting sign up process with data:', signUpData);
       
-      const redirectUrl = `${window.location.origin}/home`;
+      // Updated redirect URL to go to step 4 after email verification
+      const redirectUrl = `${window.location.origin}/signup?step=4&verified=true`;
       
       const { data, error } = await supabase.auth.signUp({
         email: signUpData.email,
@@ -54,7 +55,7 @@ export const useSignUpFlow = () => {
       
       toast({
         title: 'Account created successfully!',
-        description: 'Welcome to ParentPal! Please check your email to verify your account.',
+        description: 'Please check your email to verify your account before continuing.',
       });
 
       // Return success without navigating - let the calling component handle the flow

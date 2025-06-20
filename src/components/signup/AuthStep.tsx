@@ -47,7 +47,7 @@ const AuthStep = ({
     if (email.trim() && password.trim() && phoneNumber.trim() && 
         emailValidation.status !== 'checking' && emailValidation.status !== 'exists') {
       
-      // Create the account here with all collected data
+      // Create the account here with updated redirect URL
       const signUpData = {
         firstName,
         lastName,
@@ -60,7 +60,7 @@ const AuthStep = ({
       const result = await signUp(signUpData);
       
       if (result.success) {
-        // Account created successfully, proceed to next step (Photo)
+        // Account created successfully, proceed to email verification step
         onNext();
       }
       // Error handling is done within the signUp function via toast
@@ -167,7 +167,7 @@ const AuthStep = ({
               Creating Account...
             </>
           ) : (
-            'Continue'
+            'Create Account'
           )}
         </Button>
       </div>
