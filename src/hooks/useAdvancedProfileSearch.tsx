@@ -56,7 +56,12 @@ export const useAdvancedProfileSearch = ({
       }
 
       console.log('Advanced search results found:', data?.length || 0);
-      return data || [];
+      
+      // Type cast the follow_status to ensure it matches our interface
+      return (data || []).map(item => ({
+        ...item,
+        follow_status: item.follow_status as 'following' | 'not_following' | 'request_pending'
+      }));
     },
     enabled: !!searchTerm.trim(),
   });

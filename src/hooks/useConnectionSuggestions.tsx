@@ -36,7 +36,12 @@ export const useConnectionSuggestions = (pageNumber: number = 1, pageSize: numbe
       }
 
       console.log('Connection suggestions found:', data?.length || 0);
-      return data || [];
+      
+      // Type cast the follow_status to ensure it matches our interface
+      return (data || []).map(item => ({
+        ...item,
+        follow_status: item.follow_status as 'following' | 'not_following' | 'request_pending'
+      }));
     },
     enabled: !!user?.id,
   });
