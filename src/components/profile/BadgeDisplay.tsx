@@ -100,7 +100,7 @@ export const BadgeDisplay = ({ badges, isOwnProfile = false }: BadgeDisplayProps
                   </div>
                   {badge.criteria_met && (
                     <div className="text-xs text-gray-600 mt-1">
-                      {JSON.parse(badge.criteria_met).referral_count} referral{JSON.parse(badge.criteria_met).referral_count !== 1 ? 's' : ''}
+                      {badge.criteria_met.referral_count} referral{badge.criteria_met.referral_count !== 1 ? 's' : ''}
                     </div>
                   )}
                 </div>
