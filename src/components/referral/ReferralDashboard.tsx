@@ -168,7 +168,7 @@ export const ReferralDashboard = () => {
               <div className="text-center py-8 text-gray-500">
                 <Award className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <div className="text-sm">No badges yet</div>
-                <div className="text-xs">Refer 5 friends to earn your first badge!</div>
+                <div className="text-xs">Refer 1 friend to earn your first badge!</div>
               </div>
             )}
           </CardContent>
@@ -184,6 +184,7 @@ export const ReferralDashboard = () => {
         <CardContent>
           <div className="space-y-4">
             {[
+              { name: 'First Referral', threshold: 1, description: '1 referral' },
               { name: 'Bronze Connector', threshold: 5, description: '5 referrals' },
               { name: 'Silver Connector', threshold: 20, description: '20 referrals' },
               { name: 'Gold Connector', threshold: 50, description: '50 referrals' },

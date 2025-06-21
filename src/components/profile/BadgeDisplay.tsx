@@ -2,7 +2,7 @@
 import { Badge } from '@/types/referral';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge as UIBadge } from '@/components/ui/badge';
-import { Award, Star, Crown, Medal } from 'lucide-react';
+import { Award, Star, Crown, Medal, Users } from 'lucide-react';
 
 interface BadgeDisplayProps {
   badges: Badge[];
@@ -27,7 +27,7 @@ export const BadgeDisplay = ({ badges, isOwnProfile = false }: BadgeDisplayProps
             </div>
             {isOwnProfile && (
               <div className="text-xs">
-                Refer friends to earn your first Connector badge!
+                Refer friends to earn your first badge!
               </div>
             )}
           </div>
@@ -38,6 +38,8 @@ export const BadgeDisplay = ({ badges, isOwnProfile = false }: BadgeDisplayProps
 
   const getBadgeIcon = (badgeType: string) => {
     switch (badgeType) {
+      case 'connector_first':
+        return <Users className="w-6 h-6 text-blue-600" />;
       case 'connector_bronze':
         return <Medal className="w-6 h-6 text-orange-600" />;
       case 'connector_silver':
@@ -51,6 +53,8 @@ export const BadgeDisplay = ({ badges, isOwnProfile = false }: BadgeDisplayProps
 
   const getBadgeColor = (badgeType: string) => {
     switch (badgeType) {
+      case 'connector_first':
+        return 'bg-blue-50 border-blue-200';
       case 'connector_bronze':
         return 'bg-orange-50 border-orange-200';
       case 'connector_silver':
@@ -96,7 +100,7 @@ export const BadgeDisplay = ({ badges, isOwnProfile = false }: BadgeDisplayProps
                   </div>
                   {badge.criteria_met && (
                     <div className="text-xs text-gray-600 mt-1">
-                      {JSON.parse(badge.criteria_met).referral_count} referrals
+                      {JSON.parse(badge.criteria_met).referral_count} referral{JSON.parse(badge.criteria_met).referral_count !== 1 ? 's' : ''}
                     </div>
                   )}
                 </div>
