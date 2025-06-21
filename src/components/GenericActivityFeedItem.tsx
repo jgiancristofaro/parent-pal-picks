@@ -67,7 +67,7 @@ export const GenericActivityFeedItem = ({
   const getActivityContent = () => {
     if (activityType === 'follow_user') {
       return {
-        actionText: 'followed',
+        actionText: 'started following',
         icon: <Users className="w-4 h-4 text-purple-500" />,
         showRating: false
       };
@@ -112,19 +112,17 @@ export const GenericActivityFeedItem = ({
             </div>
             
             {/* Activity description with clickable item name */}
-            <div className="flex items-start justify-between">
-              <div className="flex flex-col space-y-1 flex-grow min-w-0 mr-2">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-600 leading-tight">
-                    {activityContent.actionText}
-                  </span>
-                </div>
-                <Link to={itemDetailPath} className="text-sm text-gray-800 hover:text-purple-600 transition-colors leading-tight font-medium whitespace-normal break-words">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 flex-grow min-w-0">
+                <span className="text-sm text-gray-600 leading-tight">
+                  {activityContent.actionText}
+                </span>
+                <Link to={itemDetailPath} className="text-sm text-gray-800 hover:text-purple-600 transition-colors truncate leading-tight font-medium">
                   {itemName}
                 </Link>
               </div>
               {activityContent.showRating && reviewRating && (
-                <div className="flex items-center space-x-1 flex-shrink-0">
+                <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
                   {activityContent.icon}
                   <span className="text-sm font-medium text-gray-700">
                     {reviewRating}
@@ -132,7 +130,7 @@ export const GenericActivityFeedItem = ({
                 </div>
               )}
               {!activityContent.showRating && (
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 ml-2">
                   {activityContent.icon}
                 </div>
               )}
