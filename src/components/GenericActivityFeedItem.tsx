@@ -35,7 +35,27 @@ export const GenericActivityFeedItem = ({
   displayMode = 'full'
 }: GenericActivityFeedItemProps) => {
   const timeAgo = formatDistanceToNowStrict(new Date(activityTimestamp), { addSuffix: false });
-  const itemDetailPath = activityType === 'product_review' ? `/product/${itemId}` : `/sitter/${itemId}`;
+  
+  // Determine the correct navigation path based on activity type and category
+  const getItemDetailPath = () => {
+    if (activityType === 'product_review') {
+      return `/product/${itemId}`;
+    }
+    
+    // For sitter_review, check if it's actually a user profile or a sitter business
+    if (activityType === 'sitter_review') {
+      // If item_category is 'user', it's a user-to-user connection, route to profile
+      if (itemCategory === 'user') {
+        return `/profile/${itemId}`;
+      }
+      // Otherwise, it's an actual sitter business profile
+      return `/sitter/${itemId}`;
+    }
+    
+    return `/sitter/${itemId}`;
+  };
+
+  const itemDetailPath = getItemDetailPath();
 
   if (displayMode === 'preview') {
     return (
