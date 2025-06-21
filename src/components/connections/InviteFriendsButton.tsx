@@ -67,26 +67,28 @@ export const InviteFriendsButton = () => {
   };
 
   return (
-    <Card className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
+    <Card className="bg-purple-50 border-purple-200">
       <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <h3 className="text-xl font-bold mb-2">Invite Friends to ParentPal</h3>
-            <p className="text-purple-100 mb-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex-1 space-y-3">
+            <h3 className="text-xl font-bold text-gray-900">Invite Friends to ParentPal</h3>
+            <p className="text-gray-700 text-sm md:text-base">
               Share ParentPal with friends and earn Connector badges when they join!
             </p>
             {referralStats?.referral_code && (
-              <p className="text-sm text-purple-200">
-                Your referral code: <span className="font-mono font-bold">{referralStats.referral_code}</span>
-              </p>
+              <div className="bg-white rounded-lg p-3 border border-purple-200">
+                <p className="text-sm text-gray-600 mb-1">Your referral code:</p>
+                <p className="font-mono font-bold text-purple-600 text-lg">
+                  {referralStats.referral_code}
+                </p>
+              </div>
             )}
           </div>
-          <div className="ml-4">
+          <div className="flex-shrink-0">
             <Button
               onClick={handleInviteFriends}
-              variant="secondary"
               size="lg"
-              className="bg-white text-purple-600 hover:bg-purple-50"
+              className="w-full md:w-auto bg-purple-600 hover:bg-purple-700 text-white"
               disabled={!referralStats?.referral_code}
             >
               <Send className="w-5 h-5 mr-2" />
