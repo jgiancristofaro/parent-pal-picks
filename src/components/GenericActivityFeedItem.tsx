@@ -16,8 +16,8 @@ interface GenericActivityFeedItemProps {
   itemName: string;
   itemImageUrl: string | null;
   itemCategory: string | null;
-  reviewRating: number;
-  reviewTitle: string;
+  reviewRating?: number | null;
+  reviewTitle?: string | null;
   displayMode?: 'preview' | 'full';
 }
 
@@ -32,8 +32,8 @@ export const GenericActivityFeedItem = ({
   itemName,
   itemImageUrl,
   itemCategory,
-  reviewRating,
-  reviewTitle,
+  reviewRating = null,
+  reviewTitle = null,
   displayMode = 'full'
 }: GenericActivityFeedItemProps) => {
   const timeAgo = formatDistanceToNowStrict(new Date(activityTimestamp), { addSuffix: false });
@@ -75,7 +75,7 @@ export const GenericActivityFeedItem = ({
     
     // Default to review content
     return {
-      actionText: `gave ${reviewRating} stars to`,
+      actionText: `gave ${reviewRating || 0} stars to`,
       icon: <StarIcon filled={true} className="w-4 h-4 text-yellow-400" />,
       showRating: true
     };
@@ -121,7 +121,7 @@ export const GenericActivityFeedItem = ({
                   {itemName}
                 </Link>
               </div>
-              {activityContent.showRating && (
+              {activityContent.showRating && reviewRating && (
                 <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
                   {activityContent.icon}
                   <span className="text-sm font-medium text-gray-700">
@@ -202,7 +202,7 @@ export const GenericActivityFeedItem = ({
                 <h4 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
                   {itemName}
                 </h4>
-                {activityContent.showRating && (
+                {activityContent.showRating && reviewRating && (
                   <div className="flex items-center space-x-1">
                     {activityContent.icon}
                     <span className="text-sm font-medium text-gray-700">

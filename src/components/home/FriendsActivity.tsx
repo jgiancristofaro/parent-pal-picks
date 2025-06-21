@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -78,25 +77,28 @@ export const FriendsActivity = ({ currentUserId }: FriendsActivityProps) => {
       ) : (
         <ScrollArea className="w-full whitespace-nowrap no-scrollbar">
           <div className="flex w-max space-x-4 px-4">
-            {friendsActivity.map((activity) => (
-              <div key={activity.activity_id} className="flex-none w-80 bg-white rounded-xl shadow-sm border border-gray-100">
-                <GenericActivityFeedItem
-                  activityId={activity.activity_id}
-                  activityType={mapActivityType(activity.activity_type)}
-                  actorId={activity.actor_id}
-                  actorFullName={activity.actor_full_name}
-                  actorAvatarUrl={activity.actor_avatar_url}
-                  activityTimestamp={activity.activity_timestamp}
-                  itemId={activity.item_id}
-                  itemName={activity.item_name}
-                  itemImageUrl={activity.item_image_url}
-                  itemCategory={activity.item_category}
-                  reviewRating={activity.review_rating || 0}
-                  reviewTitle={activity.review_title || ''}
-                  displayMode="preview"
-                />
-              </div>
-            ))}
+            {friendsActivity.map((activity) => {
+              const activityType = mapActivityType(activity.activity_type);
+              return (
+                <div key={activity.activity_id} className="flex-none w-80 bg-white rounded-xl shadow-sm border border-gray-100">
+                  <GenericActivityFeedItem
+                    activityId={activity.activity_id}
+                    activityType={activityType}
+                    actorId={activity.actor_id}
+                    actorFullName={activity.actor_full_name}
+                    actorAvatarUrl={activity.actor_avatar_url}
+                    activityTimestamp={activity.activity_timestamp}
+                    itemId={activity.item_id}
+                    itemName={activity.item_name}
+                    itemImageUrl={activity.item_image_url}
+                    itemCategory={activity.item_category}
+                    reviewRating={activityType === 'follow_user' ? null : activity.review_rating}
+                    reviewTitle={activityType === 'follow_user' ? null : activity.review_title}
+                    displayMode="preview"
+                  />
+                </div>
+              );
+            })}
           </div>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
