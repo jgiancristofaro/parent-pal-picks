@@ -1,11 +1,13 @@
+
 import { Link } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { StarIcon } from "@/components/StarIcon";
+import { Users, UserPlus } from "lucide-react";
 import { formatDistanceToNowStrict } from "date-fns";
 
 interface GenericActivityFeedItemProps {
   activityId: string;
-  activityType: 'product_review' | 'sitter_review';
+  activityType: 'product_review' | 'sitter_review' | 'follow_user';
   actorId: string;
   actorFullName: string;
   actorAvatarUrl: string | null;
@@ -42,6 +44,10 @@ export const GenericActivityFeedItem = ({
       return `/product/${itemId}`;
     }
     
+    if (activityType === 'follow_user') {
+      return `/profile/${itemId}`;
+    }
+    
     // For sitter_review, check if it's actually a user profile or a sitter business
     if (activityType === 'sitter_review') {
       // If item_category is 'user', it's a user-to-user connection, route to profile
@@ -56,6 +62,26 @@ export const GenericActivityFeedItem = ({
   };
 
   const itemDetailPath = getItemDetailPath();
+
+  // Get activity-specific content
+  const getActivityContent = () => {
+    if (activityType === 'follow_user') {
+      return {
+        actionText: 'started following',
+        icon: <Users className="w-4 h-4 text-purple-500" />,
+        showRating: false
+      };
+    }
+    
+    // Default to review content
+    return {
+      actionText: `gave ${reviewRating} stars to`,
+      icon: <StarIcon filled={true} className="w-4 h-4 text-yellow-400" />,
+      showRating: true
+    };
+  };
+
+  const activityContent = getActivityContent();
 
   if (displayMode === 'preview') {
     return (
@@ -85,20 +111,32 @@ export const GenericActivityFeedItem = ({
               <p className="text-xs text-gray-500 flex-shrink-0 ml-2">{timeAgo}</p>
             </div>
             
-            {/* Simplified activity with clickable item name */}
+            {/* Activity description with clickable item name */}
             <div className="flex items-center justify-between">
-              <Link to={itemDetailPath} className="text-sm text-gray-600 hover:text-purple-600 transition-colors truncate leading-tight">
-                {itemName}
-              </Link>
-              <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
-                <StarIcon filled={true} className="w-4 h-4 text-yellow-400" />
-                <span className="text-sm font-medium text-gray-700">
-                  {reviewRating}
+              <div className="flex items-center space-x-2 flex-grow min-w-0">
+                <span className="text-sm text-gray-600 leading-tight">
+                  {activityContent.actionText}
                 </span>
+                <Link to={itemDetailPath} className="text-sm text-gray-800 hover:text-purple-600 transition-colors truncate leading-tight font-medium">
+                  {itemName}
+                </Link>
               </div>
+              {activityContent.showRating && (
+                <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
+                  {activityContent.icon}
+                  <span className="text-sm font-medium text-gray-700">
+                    {reviewRating}
+                  </span>
+                </div>
+              )}
+              {!activityContent.showRating && (
+                <div className="flex-shrink-0 ml-2">
+                  {activityContent.icon}
+                </div>
+              )}
             </div>
             
-            {reviewTitle && (
+            {reviewTitle && activityType !== 'follow_user' && (
               <p className="text-sm text-gray-500 mt-0.5 truncate leading-tight">
                 "{reviewTitle}"
               </p>
@@ -137,11 +175,11 @@ export const GenericActivityFeedItem = ({
         
         {/* Activity Description */}
         <p className="text-sm text-gray-600 mt-1">
-          {actorFullName} gave {reviewRating} stars to {itemName}
-          {reviewTitle && ` - "${reviewTitle}"`}
+          {actorFullName} {activityContent.actionText} {itemName}
+          {reviewTitle && activityType !== 'follow_user' && ` - "${reviewTitle}"`}
         </p>
         
-        {/* Right Section / Main Content - Reviewed Item Info */}
+        {/* Right Section / Main Content - Item Info */}
         <Link to={itemDetailPath} className="block mt-2 group">
           <div className="flex items-center space-x-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all">
             {/* Item Image */}
@@ -164,14 +202,21 @@ export const GenericActivityFeedItem = ({
                 <h4 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
                   {itemName}
                 </h4>
-                <div className="flex items-center space-x-1">
-                  <StarIcon filled={true} className="w-4 h-4 text-yellow-400" />
-                  <span className="text-sm font-medium text-gray-700">
-                    {reviewRating}
-                  </span>
-                </div>
+                {activityContent.showRating && (
+                  <div className="flex items-center space-x-1">
+                    {activityContent.icon}
+                    <span className="text-sm font-medium text-gray-700">
+                      {reviewRating}
+                    </span>
+                  </div>
+                )}
+                {!activityContent.showRating && (
+                  <div className="flex items-center">
+                    {activityContent.icon}
+                  </div>
+                )}
               </div>
-              {itemCategory && (
+              {itemCategory && activityType !== 'follow_user' && (
                 <p className="text-sm text-gray-600 mt-1">
                   {itemCategory}
                 </p>
