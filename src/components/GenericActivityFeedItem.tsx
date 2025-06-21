@@ -19,6 +19,7 @@ interface GenericActivityFeedItemProps {
   reviewRating?: number | null;
   reviewTitle?: string | null;
   displayMode?: 'preview' | 'full';
+  isFriendsActivity?: boolean; // New prop to identify Friends' Activity context
 }
 
 export const GenericActivityFeedItem = ({
@@ -34,7 +35,8 @@ export const GenericActivityFeedItem = ({
   itemCategory,
   reviewRating = null,
   reviewTitle = null,
-  displayMode = 'full'
+  displayMode = 'full',
+  isFriendsActivity = false
 }: GenericActivityFeedItemProps) => {
   const timeAgo = formatDistanceToNowStrict(new Date(activityTimestamp), { addSuffix: false });
   
@@ -63,17 +65,26 @@ export const GenericActivityFeedItem = ({
 
   const itemDetailPath = getItemDetailPath();
 
-  // Get activity-specific content
+  // Get activity-specific content with Friends' Activity customizations
   const getActivityContent = () => {
     if (activityType === 'follow_user') {
       return {
-        actionText: 'started following',
+        actionText: isFriendsActivity ? 'followed' : 'started following',
         icon: <Users className="w-4 h-4 text-purple-500" />,
         showRating: false
       };
     }
     
-    // Default to review content
+    // For review activities in Friends' Activity, remove the "gave X stars to" text
+    if (isFriendsActivity && (activityType === 'product_review' || activityType === 'sitter_review')) {
+      return {
+        actionText: '', // Empty string to remove the "gave X stars to" text
+        icon: <StarIcon filled={true} className="w-4 h-4 text-yellow-400" />,
+        showRating: true
+      };
+    }
+    
+    // Default to review content (for non-Friends' Activity contexts)
     return {
       actionText: `gave ${reviewRating || 0} stars to`,
       icon: <StarIcon filled={true} className="w-4 h-4 text-yellow-400" />,
@@ -114,10 +125,12 @@ export const GenericActivityFeedItem = ({
             {/* Activity description with clickable item name */}
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2 flex-grow min-w-0">
-                <span className="text-sm text-gray-600 leading-tight">
-                  {activityContent.actionText}
-                </span>
-                <Link to={itemDetailPath} className="text-sm text-gray-800 hover:text-purple-600 transition-colors truncate leading-tight font-medium">
+                {activityContent.actionText && (
+                  <span className="text-sm text-gray-600 leading-tight">
+                    {activityContent.actionText}
+                  </span>
+                )}
+                <Link to={itemDetailPath} className="text-sm text-gray-800 hover:text-purple-600 transition-colors leading-tight font-medium whitespace-normal">
                   {itemName}
                 </Link>
               </div>

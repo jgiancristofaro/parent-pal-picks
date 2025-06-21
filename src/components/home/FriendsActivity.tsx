@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -129,6 +128,7 @@ export const FriendsActivity = ({ currentUserId }: FriendsActivityProps) => {
                     reviewRating={activityType === 'follow_user' ? null : activity.review_rating}
                     reviewTitle={activityType === 'follow_user' ? null : activity.review_title}
                     displayMode="preview"
+                    isFriendsActivity={true}
                   />
                 </div>
               );
