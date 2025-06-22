@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { StarIcon } from "@/components/StarIcon";
 import { ProductImage } from "@/components/ui/ProductImage";
@@ -68,7 +67,7 @@ export const ProductCard = ({
     <div className="relative h-full">
       <Link to={`/product/${id}`}>
         <div className="flex flex-col h-full rounded-lg overflow-hidden bg-white shadow-md hover:shadow-lg transition-shadow duration-200">
-          <div className="aspect-square overflow-hidden">
+          <div className="aspect-square overflow-hidden border border-gray-100">
             <ProductImage 
               imageUrl={image}
               category={category}
