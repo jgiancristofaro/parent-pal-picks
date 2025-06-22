@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -42,7 +41,7 @@ export const ProductImageGallery = ({
   return (
     <div className="space-y-4">
       {/* Main Image */}
-      <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
+      <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
         <ProductImage
           imageUrl={imagesToShow[currentImageIndex]}
           category={category}
