@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -8,29 +7,33 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Search, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import EntitySearchPage from "./EntitySearchPage";
-import { useOmniSearch } from "@/hooks/useOmniSearch";
 import { OmniSearchInput } from "@/components/search/OmniSearchInput";
 import { OmniSearchResults } from "@/components/search/OmniSearchResults";
+import { useOmniSearch } from "@/hooks/useOmniSearch";
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [omniSearchTerm, setOmniSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState<'all' | 'sitters' | 'products' | 'parents'>('all');
   const [showResults, setShowResults] = useState(false);
 
   // Omni search hook for the "All" tab
-  const {
-    searchTerm: omniSearchTerm,
-    setSearchTerm: setOmniSearchTerm,
-    searchResults: omniResults,
-    isSearching: isOmniSearching,
-    handleSearch: handleOmniSearch,
-    handleKeyPress: handleOmniKeyPress
-  } = useOmniSearch();
+  const { results: omniResults, isLoading: isOmniSearching } = useOmniSearch(omniSearchTerm);
+
+  const handleOmniSearch = () => {
+    setOmniSearchTerm(searchQuery);
+    setShowResults(true);
+  };
+
+  const handleOmniKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleOmniSearch();
+    }
+  };
 
   const handleSearch = () => {
     if (activeTab === 'all') {
       handleOmniSearch();
-      setShowResults(true);
     } else if (searchQuery.trim()) {
       setShowResults(true);
     }
@@ -85,13 +88,15 @@ const SearchPage = () => {
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Search Everything</h3>
                 <p className="text-gray-600 mb-6">Find parents, sitters, and products all in one place.</p>
                 <div className="max-w-md mx-auto">
-                  <OmniSearchInput
-                    searchTerm={omniSearchTerm}
-                    onSearchTermChange={setOmniSearchTerm}
+                  <Input
+                    type="text"
+                    placeholder="Search parents, sitters, and products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={handleOmniKeyPress}
-                    isLoading={isOmniSearching}
+                    className="h-12 text-base mb-4"
                   />
-                  <Button onClick={handleOmniSearch} disabled={!omniSearchTerm.trim()} className="w-full">
+                  <Button onClick={handleOmniSearch} disabled={!searchQuery.trim()} className="w-full">
                     Search All
                   </Button>
                 </div>
@@ -99,11 +104,13 @@ const SearchPage = () => {
             ) : (
               <div>
                 <div className="mb-4">
-                  <OmniSearchInput
-                    searchTerm={omniSearchTerm}
-                    onSearchTermChange={setOmniSearchTerm}
+                  <Input
+                    type="text"
+                    placeholder="Search parents, sitters, and products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={handleOmniKeyPress}
-                    isLoading={isOmniSearching}
+                    className="h-12 text-base mb-4"
                   />
                   <Button onClick={resetSearch} variant="outline" className="mb-4">
                     Back to Search
