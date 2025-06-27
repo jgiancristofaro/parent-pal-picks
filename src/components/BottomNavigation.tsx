@@ -1,5 +1,5 @@
 
-import { Home, Search, Plus, Users, User } from "lucide-react";
+import { Home, Search, Users, User, Plus } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 
@@ -18,22 +18,35 @@ export const BottomNavigation = () => {
         visible ? "translate-y-0" : "translate-y-full"
       }`}
     >
-      <Link to="/" className="flex flex-col items-center">
-        <Home className={`w-6 h-6 ${isActive("/")}`} />
-        <span className={`text-xs mt-1 ${isActive("/")}`}>Home</span>
+      {/* Home Tab */}
+      <Link to="/home" className="flex flex-col items-center">
+        <Home className={`w-6 h-6 ${isActive("/home")}`} />
+        <span className={`text-xs mt-1 ${isActive("/home")}`}>Home</span>
       </Link>
-      <Link to="/activity-feed" className="flex flex-col items-center">
-        <Users className={`w-6 h-6 ${isActive("/activity-feed")}`} />
-        <span className={`text-xs mt-1 ${isActive("/activity-feed")}`}>Friends</span>
-      </Link>
+
+      {/* Friends Tab */}
       <Link to="/connections" className="flex flex-col items-center">
-        <Search className={`w-6 h-6 ${isActive("/connections")}`} />
-        <span className={`text-xs mt-1 ${isActive("/connections")}`}>Connect</span>
+        <Users className={`w-6 h-6 ${isActive("/connections")}`} />
+        <span className={`text-xs mt-1 ${isActive("/connections")}`}>Friends</span>
       </Link>
-      <Link to="/add-review" className="flex flex-col items-center">
-        <Plus className={`w-6 h-6 ${isActive("/add-review")}`} />
-        <span className={`text-xs mt-1 ${isActive("/add-review")}`}>Review</span>
+
+      {/* Central FAB - Floating Action Button */}
+      <div className="relative">
+        <Link 
+          to="/add-review" 
+          className="flex items-center justify-center w-14 h-14 bg-purple-600 hover:bg-purple-700 rounded-full shadow-lg transition-colors duration-200 -mt-2"
+        >
+          <Plus className="w-7 h-7 text-white" />
+        </Link>
+      </div>
+
+      {/* Search Tab */}
+      <Link to="/search" className="flex flex-col items-center">
+        <Search className={`w-6 h-6 ${isActive("/search")}`} />
+        <span className={`text-xs mt-1 ${isActive("/search")}`}>Search</span>
       </Link>
+
+      {/* Profile Tab */}
       <Link to="/profile" className="flex flex-col items-center">
         <User className={`w-6 h-6 ${isActive("/profile")}`} />
         <span className={`text-xs mt-1 ${isActive("/profile")}`}>Profile</span>
