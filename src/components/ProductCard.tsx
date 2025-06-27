@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { StarIcon } from "@/components/StarIcon";
 import { ProductImage } from "@/components/ui/ProductImage";
@@ -36,11 +37,11 @@ export const ProductCard = ({
     const hasHalfStar = rating % 1 !== 0;
     
     for (let i = 0; i < fullStars; i++) {
-      stars.push(<StarIcon key={i} filled={true} className="w-3 h-3 text-yellow-400" />);
+      stars.push(<StarIcon key={i} filled={true} className="w-3 h-3 text-yellow-500" />);
     }
     
     if (hasHalfStar) {
-      stars.push(<StarIcon key="half" filled={false} className="w-3 h-3 text-yellow-400" />);
+      stars.push(<StarIcon key="half" filled={false} className="w-3 h-3 text-yellow-500" />);
     }
     
     const remainingStars = 5 - Math.ceil(rating);
