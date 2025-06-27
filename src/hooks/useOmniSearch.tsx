@@ -45,7 +45,13 @@ export const useOmniSearch = () => {
         return;
       }
 
-      setSearchResults(data || []);
+      // Type assertion to ensure proper typing
+      const typedResults: OmniSearchResult[] = (data || []).map((item: any) => ({
+        ...item,
+        result_type: item.result_type as 'parent' | 'sitter' | 'product'
+      }));
+
+      setSearchResults(typedResults);
     } catch (error) {
       console.error('Search error:', error);
       toast({
