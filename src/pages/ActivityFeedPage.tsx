@@ -14,6 +14,29 @@ const ActivityFeedPage = () => {
     error 
   } = useNetworkActivityFeed(user?.id);
 
+  // Map database activity types to component activity types
+  const mapActivityType = (dbActivityType: string): 'product_review' | 'sitter_review' | 'follow_user' => {
+    console.log('🔍 ActivityFeedPage - Mapping activity type:', dbActivityType);
+    
+    switch (dbActivityType) {
+      case 'REVIEWED_PRODUCT':
+      case 'product_review':
+        console.log('✅ ActivityFeedPage - Mapped to: product_review');
+        return 'product_review';
+      case 'REVIEWED_SITTER':
+      case 'sitter_review':
+        console.log('✅ ActivityFeedPage - Mapped to: sitter_review');
+        return 'sitter_review';
+      case 'FOLLOWED_USER':
+      case 'user_follow':
+        console.log('✅ ActivityFeedPage - Mapped to: follow_user');
+        return 'follow_user';
+      default:
+        console.warn('⚠️ ActivityFeedPage - Unknown activity type:', dbActivityType, '- defaulting to sitter_review');
+        return 'sitter_review'; // fallback
+    }
+  };
+
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
       <Header 
@@ -58,24 +81,37 @@ const ActivityFeedPage = () => {
         ) : (
           // Activity feed list
           <div className="space-y-4">
-            {friendsActivity.map((activity) => (
-              <div key={activity.activity_id} className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                <GenericActivityFeedItem
-                  activityId={activity.activity_id}
-                  activityType={activity.activity_type as 'product_review' | 'sitter_review'}
-                  actorId={activity.actor_id}
-                  actorFullName={activity.actor_full_name}
-                  actorAvatarUrl={activity.actor_avatar_url}
-                  activityTimestamp={activity.activity_timestamp}
-                  itemId={activity.item_id}
-                  itemName={activity.item_name}
-                  itemImageUrl={activity.item_image_url}
-                  itemCategory={activity.item_category}
-                  reviewRating={activity.review_rating}
-                  reviewTitle={activity.review_title}
-                />
-              </div>
-            ))}
+            {friendsActivity.map((activity) => {
+              const activityType = mapActivityType(activity.activity_type);
+              
+              console.log(`🎯 ActivityFeedPage - Rendering activity ${activity.activity_id}:`, {
+                original_type: activity.activity_type,
+                mapped_type: activityType,
+                will_show_rating: activityType !== 'follow_user' && activity.review_rating,
+                will_show_title: activityType !== 'follow_user' && activity.review_title
+              });
+              
+              return (
+                <div key={activity.activity_id} className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                  <GenericActivityFeedItem
+                    activityId={activity.activity_id}
+                    activityType={activityType}
+                    actorId={activity.actor_id}
+                    actorFullName={activity.actor_full_name}
+                    actorAvatarUrl={activity.actor_avatar_url}
+                    activityTimestamp={activity.activity_timestamp}
+                    itemId={activity.item_id}
+                    itemName={activity.item_name}
+                    itemImageUrl={activity.item_image_url}
+                    itemCategory={activity.item_category}
+                    reviewRating={activityType === 'follow_user' ? null : activity.review_rating}
+                    reviewTitle={activityType === 'follow_user' ? null : activity.review_title}
+                    displayMode="full"
+                    isFriendsActivity={false}
+                  />
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
