@@ -13,7 +13,7 @@ interface OmniSearchResult {
   relevance_score: number;
   category: string;
   rating: number | null;
-  metadata: any;
+  metadata: any; // Changed from jsonb to json, but both serialize to any in TypeScript
 }
 
 export const useOmniSearch = (searchTerm: string) => {

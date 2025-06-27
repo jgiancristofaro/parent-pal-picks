@@ -12,10 +12,10 @@ interface OmniSearchResult {
   relevance_score: number;
   category: string;
   rating: number | null;
-  metadata: any;
+  metadata: any; // Updated to match the corrected database function
 }
 
-export const useOmniSearch = () => {
+export const useOmniSearchManual = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<OmniSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
