@@ -1160,6 +1160,20 @@ export type Database = {
           matched_identifier_count: number
         }[]
       }
+      omni_search: {
+        Args: { p_search_term: string }
+        Returns: {
+          id: string
+          name: string
+          image_url: string
+          description: string
+          result_type: string
+          relevance_score: number
+          category: string
+          rating: number
+          metadata: Json
+        }[]
+      }
       remove_favorite: {
         Args: { p_item_id: string; p_item_type: string }
         Returns: Json

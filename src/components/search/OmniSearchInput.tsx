@@ -7,13 +7,15 @@ interface OmniSearchInputProps {
   onSearchTermChange: (term: string) => void;
   onKeyPress: (e: React.KeyboardEvent) => void;
   isLoading: boolean;
+  placeholder?: string;
 }
 
 export const OmniSearchInput = ({
   searchTerm,
   onSearchTermChange,
   onKeyPress,
-  isLoading
+  isLoading,
+  placeholder = "Search parents, sitters, and products..."
 }: OmniSearchInputProps) => {
   return (
     <div className="relative mb-6">
@@ -24,7 +26,7 @@ export const OmniSearchInput = ({
         )}
         <Input
           type="text"
-          placeholder="Search by name, username, email, or phone..."
+          placeholder={placeholder}
           value={searchTerm}
           onChange={(e) => onSearchTermChange(e.target.value)}
           onKeyPress={onKeyPress}
