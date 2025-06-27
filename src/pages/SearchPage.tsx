@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Search, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
-import { EntitySearchPage } from "./EntitySearchPage";
+import EntitySearchPage from "./EntitySearchPage";
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
