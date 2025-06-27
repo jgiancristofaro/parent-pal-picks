@@ -17,6 +17,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import UpdatePasswordPage from "./pages/UpdatePasswordPage";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
+import SearchPage from "./pages/SearchPage";
 import SearchSelection from "./pages/SearchSelection";
 import FindParents from "./pages/FindParents";
 import ConnectionsPage from "./pages/ConnectionsPage";
@@ -70,7 +71,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/update-password" element={<UpdatePasswordPage />} />
             <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-            <Route path="/search" element={<ProtectedRoute><SearchSelection /></ProtectedRoute>} />
+            <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
             <Route path="/find-sitter" element={<ProtectedRoute><EntitySearchPage type="sitter" mode="discovery" /></ProtectedRoute>} />
             <Route path="/find-parents" element={<ProtectedRoute><FindParents /></ProtectedRoute>} />
             <Route path="/connections" element={<ProtectedRoute><ConnectionsPage /></ProtectedRoute>} />
