@@ -18,7 +18,8 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,gif,webp}']
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,gif,webp}'],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024 // 3 MB limit
       },
       manifest: {
         name: 'ParentPal',
