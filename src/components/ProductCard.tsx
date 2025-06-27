@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { StarIcon } from "@/components/StarIcon";
 import { ProductImage } from "@/components/ui/ProductImage";
@@ -77,7 +76,7 @@ export const ProductCard = ({
             />
           </div>
           <div className="flex-grow p-3 flex flex-col">
-            <h3 className="font-semibold text-gray-800 leading-tight break-words whitespace-normal">{name}</h3>
+            <h3 className="font-semibold text-gray-800 text-sm leading-tight break-words whitespace-normal">{name}</h3>
             {category && <p className="text-sm text-gray-500 break-words whitespace-normal">{category}</p>}
             
             {displayRating && (

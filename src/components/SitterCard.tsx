@@ -1,5 +1,3 @@
-
-
 import { Link } from "react-router-dom";
 import { StarIcon } from "./StarIcon";
 import { Badge } from "@/components/ui/badge";
@@ -104,7 +102,7 @@ export const SitterCard = ({
             />
           </div>
           <div className="flex-grow p-3 flex flex-col">
-            <h3 className="font-semibold text-gray-800 mb-1 leading-tight break-words whitespace-normal">{name}</h3>
+            <h3 className="font-semibold text-gray-800 text-sm mb-1 leading-tight break-words whitespace-normal">{name}</h3>
             
             {/* Updated star display to match ProductCard */}
             {displayRating > 0 && (
@@ -157,4 +155,3 @@ export const SitterCard = ({
     </div>
   );
 };
-
