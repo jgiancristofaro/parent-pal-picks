@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -46,6 +45,10 @@ const OnboardingPage = () => {
     api?.scrollNext();
   };
 
+  const handleSkip = () => {
+    api?.scrollTo(2); // Navigate to the last slide (index 2)
+  };
+
   const slides = [
     {
       headline: "ParentPal: Trusted picks for your little one, powered by friends you know.",
@@ -73,7 +76,7 @@ const OnboardingPage = () => {
       {!isReturningUser && (
         <Button 
           variant="ghost"
-          onClick={handleSignUp}
+          onClick={handleSkip}
           className="absolute top-4 right-4 z-10 text-purple-600 hover:text-purple-700 hover:bg-purple-100"
         >
           Skip
