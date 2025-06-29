@@ -1,5 +1,4 @@
-
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { User, Baby, Package, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,9 +27,10 @@ interface GroupedResults {
 interface OmniSearchResultsProps {
   results: OmniSearchResult[];
   isLoading: boolean;
+  searchTerm?: string;
 }
 
-export const OmniSearchResults = ({ results, isLoading }: OmniSearchResultsProps) => {
+export const OmniSearchResults = ({ results, isLoading, searchTerm }: OmniSearchResultsProps) => {
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -64,7 +64,6 @@ export const OmniSearchResults = ({ results, isLoading }: OmniSearchResultsProps
     );
   }
 
-  // Group results by type
   const groupedResults: GroupedResults = results.reduce((acc, result) => {
     if (!acc[result.result_type]) {
       acc[result.result_type] = [];
@@ -74,6 +73,9 @@ export const OmniSearchResults = ({ results, isLoading }: OmniSearchResultsProps
   }, { parent: [], sitter: [], product: [] } as GroupedResults);
 
   const getCategoryInfo = (type: keyof GroupedResults) => {
+    const baseUrl = type === 'sitter' ? '/find-sitter' : type === 'product' ? '/shop' : '/find-parents';
+    const urlWithSearch = searchTerm ? `${baseUrl}?search=${encodeURIComponent(searchTerm)}` : baseUrl;
+    
     switch (type) {
       case 'parent':
         return { 
@@ -81,7 +83,7 @@ export const OmniSearchResults = ({ results, isLoading }: OmniSearchResultsProps
           icon: User, 
           color: 'text-blue-600',
           bgColor: 'bg-blue-50',
-          linkPath: '/find-parents'
+          linkPath: urlWithSearch
         };
       case 'sitter':
         return { 
@@ -89,7 +91,7 @@ export const OmniSearchResults = ({ results, isLoading }: OmniSearchResultsProps
           icon: Baby, 
           color: 'text-purple-600',
           bgColor: 'bg-purple-50',
-          linkPath: '/find-sitter'
+          linkPath: urlWithSearch
         };
       case 'product':
         return { 
@@ -97,7 +99,7 @@ export const OmniSearchResults = ({ results, isLoading }: OmniSearchResultsProps
           icon: Package, 
           color: 'text-green-600',
           bgColor: 'bg-green-50',
-          linkPath: '/shop'
+          linkPath: urlWithSearch
         };
       default:
         return { 

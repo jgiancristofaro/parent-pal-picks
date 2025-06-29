@@ -66,7 +66,6 @@ const SearchPage = () => {
       <Header 
         title="Search Hub"
         showBack={false}
-        showSettings={false}
       />
       
       <div className="px-4 py-6">
@@ -116,7 +115,7 @@ const SearchPage = () => {
                     Back to Search
                   </Button>
                 </div>
-                <OmniSearchResults results={omniResults} isLoading={isOmniSearching} />
+                <OmniSearchResults results={omniResults} isLoading={isOmniSearching} searchTerm={omniSearchTerm} />
               </div>
             )}
           </TabsContent>

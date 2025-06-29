@@ -1,4 +1,5 @@
-
+import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { PageHeader } from "./PageHeader";
 import { SitterSearchContent } from "./SitterSearchContent";
@@ -26,7 +27,11 @@ export const SearchPageContent = ({
 }: SearchPageContentProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const currentUserId = user?.id || "";
+
+  // Get search term from URL params
+  const urlSearchTerm = searchParams.get('search') || '';
 
   // Sitter search logic
   const {
@@ -66,6 +71,17 @@ export const SearchPageContent = ({
     filteredProducts,
     handleCategoryClick,
   } = useProductSearch();
+
+  // Set search term from URL params when component mounts
+  useEffect(() => {
+    if (urlSearchTerm) {
+      if (type === 'sitter') {
+        setSitterSearchTerm(urlSearchTerm);
+      } else if (type === 'product') {
+        setProductSearchTerm(urlSearchTerm);
+      }
+    }
+  }, [urlSearchTerm, type, setSitterSearchTerm, setProductSearchTerm]);
 
   const getBackgroundColor = () => {
     return type === 'sitter' ? 'bg-purple-50' : 'bg-gray-50';
