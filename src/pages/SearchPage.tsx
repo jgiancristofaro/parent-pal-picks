@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
@@ -11,28 +10,19 @@ import { useOmniSearch } from "@/hooks/useOmniSearch";
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [omniSearchTerm, setOmniSearchTerm] = useState("");
-  const [showResults, setShowResults] = useState(false);
 
-  // Omni search hook
-  const { results: omniResults, isLoading: isOmniSearching } = useOmniSearch(omniSearchTerm);
-
-  const handleOmniSearch = () => {
-    setOmniSearchTerm(searchQuery);
-    setShowResults(true);
-  };
+  // Omni search hook - now directly using searchQuery for real-time search
+  const { results: omniResults, isLoading: isOmniSearching } = useOmniSearch(searchQuery);
 
   const handleOmniKeyPress = (e: React.KeyboardEvent) => {
+    // Keep the Enter key handling for accessibility, but it's not required for search anymore
     if (e.key === 'Enter') {
-      handleOmniSearch();
+      // Search is already happening in real-time, no additional action needed
     }
   };
 
-  const resetSearch = () => {
-    setSearchQuery("");
-    setOmniSearchTerm("");
-    setShowResults(false);
-  };
+  // Show results when there are results or when actively loading with a search term
+  const showResults = omniResults.length > 0 || (isOmniSearching && searchQuery.trim());
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
@@ -51,34 +41,21 @@ const SearchPage = () => {
             isLoading={isOmniSearching}
             placeholder="Search parents, sitters, and products..."
           />
-          {!showResults && (
-            <Button 
-              onClick={handleOmniSearch} 
-              disabled={!searchQuery.trim()} 
-              className="w-full mt-4"
-            >
-              <Search className="w-4 h-4 mr-2" />
-              Search All
-            </Button>
-          )}
         </div>
 
-        {/* Search Results */}
+        {/* Search Results - shown in real-time when available */}
         {showResults && (
           <div className="mb-8">
-            <Button onClick={resetSearch} variant="outline" className="mb-4">
-              Back to Search
-            </Button>
             <OmniSearchResults 
               results={omniResults} 
               isLoading={isOmniSearching} 
-              searchTerm={omniSearchTerm} 
+              searchTerm={searchQuery} 
             />
           </div>
         )}
 
-        {/* Quick Actions */}
-        {!showResults && (
+        {/* Quick Actions - shown when no search term is entered */}
+        {!searchQuery.trim() && (
           <div className="space-y-3">
             <h4 className="text-sm font-medium text-gray-700 mb-3">Quick Actions</h4>
             <Link to="/find-sitter" className="block">
