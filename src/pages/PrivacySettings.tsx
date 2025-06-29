@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
@@ -16,6 +15,7 @@ const PrivacySettings = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phoneNumberSearchable, setPhoneNumberSearchable] = useState(false);
   const [profilePrivacySetting, setProfilePrivacySetting] = useState<'public' | 'private'>('private');
+  const [phoneValidationError, setPhoneValidationError] = useState<string>('');
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -45,6 +45,41 @@ const PrivacySettings = () => {
       setProfilePrivacySetting(profile.profile_privacy_setting || 'private');
     }
   }, [profile]);
+
+  const validatePhoneNumber = (phone: string) => {
+    // Remove all non-digit characters
+    const cleanPhone = phone.replace(/\D/g, '');
+    
+    if (cleanPhone.length === 0) {
+      setPhoneValidationError('');
+      return true;
+    }
+    
+    if (cleanPhone.length < 10) {
+      setPhoneValidationError('Phone number must be at least 10 digits');
+      return false;
+    }
+    
+    if (cleanPhone.length > 11) {
+      setPhoneValidationError('Phone number must be 10 or 11 digits');
+      return false;
+    }
+    
+    // If 11 digits, first digit should be 1 (US country code)
+    if (cleanPhone.length === 11 && !cleanPhone.startsWith('1')) {
+      setPhoneValidationError('11-digit numbers must start with 1');
+      return false;
+    }
+    
+    setPhoneValidationError('');
+    return true;
+  };
+
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPhoneNumber(value);
+    validatePhoneNumber(value);
+  };
 
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: any) => {
@@ -88,6 +123,16 @@ const PrivacySettings = () => {
       return;
     }
 
+    // Check if phone number validation passes
+    if (!validatePhoneNumber(phoneNumber)) {
+      toast({
+        title: 'Invalid phone number',
+        description: 'Please enter a valid phone number format.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     updateProfileMutation.mutate({
       phone_number: phoneNumber,
       phone_number_searchable: phoneNumberSearchable,
@@ -121,16 +166,24 @@ const PrivacySettings = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="phone">Phone Number *</Label>
               <Input
                 id="phone"
                 type="tel"
                 placeholder="Enter your phone number"
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                onChange={handlePhoneNumberChange}
                 required
+                className={phoneValidationError ? 'border-red-500' : ''}
               />
+              
+              {phoneValidationError && (
+                <div className="text-sm text-red-600 flex items-center gap-2">
+                  <span>⚠️</span>
+                  <span>{phoneValidationError}</span>
+                </div>
+              )}
             </div>
             
             <div className="flex items-center space-x-2">
