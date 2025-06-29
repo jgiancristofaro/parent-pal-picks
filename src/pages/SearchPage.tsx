@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Button } from "@/components/ui/button";
-import { Search, Plus } from "lucide-react";
+import { Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { OmniSearchInput } from "@/components/search/OmniSearchInput";
 import { OmniSearchResults } from "@/components/search/OmniSearchResults";
@@ -97,12 +97,6 @@ const SearchPage = () => {
               <Button variant="outline" className="w-full justify-start">
                 <Search className="w-4 h-4 mr-2" />
                 Find Parents Near Me
-              </Button>
-            </Link>
-            <Link to="/add-review" state={{ createNew: true, selectedType: 'product' }}>
-              <Button variant="outline" className="w-full justify-start">
-                <Plus className="w-4 h-4 mr-2" />
-                Add a Product Review
               </Button>
             </Link>
           </div>
