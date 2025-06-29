@@ -75,11 +75,10 @@ export const Header = ({
           </Link>
         )}
         
-        {showSettings && (
-          <Link to="/settings">
-            <Settings className="w-6 h-6 text-gray-700" />
-          </Link>
-        )}
+        {/* Settings icon - Always show by default */}
+        <Link to="/settings">
+          <Settings className="w-6 h-6 text-gray-700" />
+        </Link>
       </div>
     </header>
   );
