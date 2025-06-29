@@ -1,4 +1,6 @@
 
+import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { OmniSearchInput } from "@/components/search/OmniSearchInput";
@@ -7,6 +9,9 @@ import { SearchResultsSection } from "@/components/search/SearchResultsSection";
 import { useParentSearch } from "@/hooks/useParentSearch";
 
 const FindParents = () => {
+  const [searchParams] = useSearchParams();
+  const urlSearchTerm = searchParams.get('search') || '';
+
   const {
     searchTerm,
     setSearchTerm,
@@ -17,13 +22,20 @@ const FindParents = () => {
     isSearchActive
   } = useParentSearch();
 
+  // Set search term from URL params when component mounts
+  useEffect(() => {
+    if (urlSearchTerm && urlSearchTerm !== searchTerm) {
+      setSearchTerm(urlSearchTerm);
+    }
+  }, [urlSearchTerm, searchTerm, setSearchTerm]);
+
   const handleFollowStatusChange = () => {
     refreshResults();
   };
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
-      <Header title="Find Parents" showBack={true} showSettings={false} />
+      <Header title="Find Parents" showBack={true} />
       
       <div className="px-4 py-6">
         <OmniSearchInput
