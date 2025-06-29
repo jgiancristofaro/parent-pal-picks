@@ -84,7 +84,7 @@ export const SearchPageContent = ({
   }, [urlSearchTerm, type, setSitterSearchTerm, setProductSearchTerm]);
 
   const getBackgroundColor = () => {
-    return type === 'sitter' ? 'bg-purple-50' : 'bg-gray-50';
+    return 'bg-gray-50';
   };
 
   const handleSelectForReview = (item: any) => {
