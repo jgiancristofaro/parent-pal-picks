@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -36,11 +35,47 @@ const SignUpForm = ({
 }: SignUpFormProps) => {
   const [emailValidationStatus, setEmailValidationStatus] = useState<ValidationStatus>('idle');
   const [emailValidationMessage, setEmailValidationMessage] = useState<string>('');
+  const [phoneValidationError, setPhoneValidationError] = useState<string>('');
 
   const handleEmailValidationChange = (status: ValidationStatus, message?: string) => {
     setEmailValidationStatus(status);
     setEmailValidationMessage(message || '');
     onEmailValidationChange?.(status, message);
+  };
+
+  const validatePhoneNumber = (phone: string) => {
+    // Remove all non-digit characters
+    const cleanPhone = phone.replace(/\D/g, '');
+    
+    if (cleanPhone.length === 0) {
+      setPhoneValidationError('');
+      return true;
+    }
+    
+    if (cleanPhone.length < 10) {
+      setPhoneValidationError('Phone number must be at least 10 digits');
+      return false;
+    }
+    
+    if (cleanPhone.length > 11) {
+      setPhoneValidationError('Phone number must be 10 or 11 digits');
+      return false;
+    }
+    
+    // If 11 digits, first digit should be 1 (US country code)
+    if (cleanPhone.length === 11 && !cleanPhone.startsWith('1')) {
+      setPhoneValidationError('11-digit numbers must start with 1');
+      return false;
+    }
+    
+    setPhoneValidationError('');
+    return true;
+  };
+
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPhoneNumber(value);
+    validatePhoneNumber(value);
   };
 
   const isEmailAvailable = emailValidationStatus === 'available';
@@ -99,14 +134,23 @@ const SignUpForm = ({
         className="py-3 text-lg"
       />
 
-      <Input
-        type="tel"
-        placeholder="Phone Number"
-        value={phoneNumber}
-        onChange={(e) => setPhoneNumber(e.target.value)}
-        disabled={isLoading}
-        className="py-3 text-lg"
-      />
+      <div className="space-y-2">
+        <Input
+          type="tel"
+          placeholder="Phone Number"
+          value={phoneNumber}
+          onChange={handlePhoneNumberChange}
+          disabled={isLoading}
+          className={`py-3 text-lg ${phoneValidationError ? 'border-red-500' : ''}`}
+        />
+        
+        {phoneValidationError && (
+          <div className="text-sm text-red-600 flex items-center gap-2">
+            <span>⚠️</span>
+            <span>{phoneValidationError}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
