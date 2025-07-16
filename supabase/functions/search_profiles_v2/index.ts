@@ -59,7 +59,7 @@ async function checkRateLimit(
         identifier: identifier.substring(0, 8) + '...',
         request_type: requestType
       });
-      return true; // Allow on error to prevent blocking users
+      return false; // Fail securely - deny request if rate limiting fails
     }
 
     return data === true;
@@ -69,7 +69,7 @@ async function checkRateLimit(
       identifier: identifier.substring(0, 8) + '...',
       request_type: requestType
     });
-    return true; // Allow on error
+    return false; // Fail securely on error
   }
 }
 

@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/profile';
+import { useSessionTimeout } from '@/hooks/useSessionTimeout';
 
 interface AuthContextType {
   session: Session | null;
@@ -31,6 +32,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Initialize session timeout functionality
+  useSessionTimeout({
+    sessionTimeoutMs: 30 * 60 * 1000, // 30 minutes
+    warningTimeMs: 5 * 60 * 1000,     // 5 minutes warning
+    enabled: true,
+  });
 
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -80,7 +88,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state change:', event, session?.user?.id);
+        // Auth state change detected
         setSession(session);
         setUser(session?.user ?? null);
         

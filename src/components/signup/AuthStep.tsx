@@ -72,12 +72,12 @@ const AuthStep = ({
       referralCode
     };
 
-    console.log('Attempting signup with data:', { ...signUpData, password: '[REDACTED]' });
+    // Removed console logging for security - no need to log signup attempts
     
     const result = await signUp(signUpData);
     
     if (result.success) {
-      console.log('Signup successful, proceeding to next step');
+      // Signup successful, proceeding to next step
       onNext();
     } else {
       console.error('Signup failed:', result.error);

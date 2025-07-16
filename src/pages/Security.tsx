@@ -14,7 +14,7 @@ const Security = () => {
   const handlePasswordChange = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle password change logic here
-    console.log("Password change requested");
+    // Password change functionality would be implemented here
   };
 
   const securityOptions = [

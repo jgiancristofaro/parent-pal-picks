@@ -21,7 +21,7 @@ const UpdatePasswordPage = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (event === 'PASSWORD_RECOVERY') {
-          console.log('Password recovery event received');
+          // Password recovery event received
           setIsValidToken(true);
           setIsVerifying(false);
         }
