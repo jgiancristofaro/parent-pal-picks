@@ -8,6 +8,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { AdminToolbar } from "@/components/admin/AdminToolbar";
 import { AlertsProvider } from "@/contexts/AlertsContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -57,11 +58,12 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AlertsProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+    <AuthProvider>
+      <AlertsProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
@@ -151,6 +153,7 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </AlertsProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
