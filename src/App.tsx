@@ -9,6 +9,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { AdminToolbar } from "@/components/admin/AdminToolbar";
 import { AlertsProvider } from "@/contexts/AlertsContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { SessionTimeoutManager } from "@/components/auth/SessionTimeoutManager";
 
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -59,6 +60,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
+      <SessionTimeoutManager />
       <AlertsProvider>
         <TooltipProvider>
           <Toaster />

@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/profile';
-import { useSessionTimeout } from '@/hooks/useSessionTimeout';
+
 
 interface AuthContextType {
   session: Session | null;
@@ -33,12 +33,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize session timeout functionality
-  useSessionTimeout({
-    sessionTimeoutMs: 30 * 60 * 1000, // 30 minutes
-    warningTimeMs: 5 * 60 * 1000,     // 5 minutes warning
-    enabled: true,
-  });
 
   const fetchUserProfile = async (userId: string) => {
     try {
